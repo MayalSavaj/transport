@@ -17,13 +17,15 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Divider
+  Divider,
+  IconButton,
 } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import React, { useState } from "react";
 import { ToWords } from 'to-words';
+import DownloadIcon from "@mui/icons-material/Download";
 
 // Initial form values
 const initialValues = {
@@ -59,7 +61,6 @@ const toWords = new ToWords({
   },
 });
 
-
 const OrdersForm = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [formData, setFormData] = useState(null);
@@ -69,20 +70,27 @@ const OrdersForm = () => {
   const [invoiceData, setInvoiceData] = useState({});
   const [showForm, setShowForm] = useState(false);
   const [t3lrForm, setT3lrForm] = useState({
-    city: "",
-    lrNo: "",
+    
     consignee: "",
     consigner: "",
   });
+  const [lrInnerModalOpen, setLrInnerModalOpen] = useState(false);
+    const [selectedCity, setSelectedCity] = useState(null);
+ 
 
-
-  const handleT3lrChange = (e) => {
-    const { name, value } = e.target;
-    setT3lrForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  const handleDownload = (item) => {
+    // Replace this with real download logic if needed
+    console.log(`Downloading ${item.city} - ${item.lrNumber}`);
   };
+  const handleCityClick = (item) => {
+    setSelectedCity(item.city);
+    setT3lrForm({ consignee: "", consigner: "" }); // Reset form when opened
+  };
+
+  const handleCloseCityModal = () => {
+    setSelectedCity(null);
+  };
+
   const handleChangeinvoice = (e) => {
     const { name, value } = e.target;
 
@@ -109,13 +117,25 @@ const OrdersForm = () => {
 
   const handleFormSubmit = (values, { resetForm }) => {
     setFormData(values);
-    setActiveTab(1); // Go to A2 tab where summary shows
+    setActiveTab(1);
   };
 
   const handleDelete = () => {
     setFormData(null);
     setActiveTab(0);
   };
+  const handleFormChange = (field) => (event) => {
+    setT3lrForm((prev) => ({ ...prev, [field]: event.target.value }));
+  };
+   const handleSave = () => {
+    console.log("Saved Data:", { city: selectedCity, ...formData });
+    setSelectedCity(null);
+  };
+  const lrDataList = [
+    { city: "Surat", lrNumber: "LR101" },
+    { city: "Rajkot", lrNumber: "LR205" },
+    { city: "Ahmedabad", lrNumber: "LR309" },
+  ];
   return (
     <Card sx={{ p: 3 }}>
       {/* Tabs UI */}
@@ -720,42 +740,128 @@ const OrdersForm = () => {
         </DialogActions>
       </Dialog>
 
-    <Dialog
-  open={t3lrModalOpen}
-  onClose={() => setT3lrModalOpen(false)}
-  maxWidth="xs"
-  fullWidth
->
-  <DialogTitle sx={{ textAlign: "center", fontWeight: 600 }}>
-    T3LR
-  </DialogTitle>
+      <Dialog open={t3lrModalOpen} onClose={() => setT3lrModalOpen(false)} maxWidth="xs" fullWidth>
+        <DialogTitle sx={{ textAlign: "center", fontWeight: 600 }}>
+          T3LR
+        </DialogTitle>
+        <DialogContent sx={{ py: 3 }}>
+          <Typography variant="body2" mt={1} align="center">
+            Do you want to continue with the T3LR process?
+          </Typography>
+          <Stack direction="row" justifyContent="center" spacing={2} mt={3}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => {
+                console.log("Yes clicked");
+                setT3lrModalOpen(false);
+                setLrInnerModalOpen(true);
+              }}
+            >
+              Yes
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => setT3lrModalOpen(false)}
+            >
+              No
+            </Button>
+          </Stack>
+        </DialogContent>
+      </Dialog>
 
-  <DialogContent sx={{ py: 3 }}>
-    <Typography variant="body2" mt={1} align="center">
-      Do you want to continue with the T3LR process?
-    </Typography>
+      {/* Modal */}
+     <Dialog
+        open={lrInnerModalOpen}
+        onClose={() => setLrInnerModalOpen(false)}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle sx={{ textAlign: "center", fontWeight: 600 }}>
+          LR
+        </DialogTitle>
 
-    <Stack direction="row" justifyContent="center" spacing={2} mt={3}>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={() => {
-          // You can replace this with your next action
-          console.log("Yes clicked");
-        }}
+        <DialogContent sx={{ py: 2 }}>
+          <Stack spacing={2}>
+            {lrDataList.map((item, index) => (
+              <Box
+                key={index}
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  border: "1px solid #ccc",
+                  borderRadius: 2,
+                  px: 2,
+                  py: 1,
+                  cursor: "pointer",
+                }}
+                onClick={() => handleCityClick(item)} // Click on box
+              >
+                <Typography variant="body2">
+                  {item.city} - {item.lrNumber}
+                </Typography>
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation(); // prevent city modal opening
+                    handleDownload(item);
+                  }}
+                  color="primary"
+                >
+                  <DownloadIcon fontSize="small" />
+                </IconButton>
+              </Box>
+            ))}
+          </Stack>
+
+          <Stack direction="row" justifyContent="center" mt={3}>
+            <Button variant="contained" onClick={() => setLrInnerModalOpen(false)}>
+              Close
+            </Button>
+          </Stack>
+        </DialogContent>
+      </Dialog>
+
+     <Dialog
+        open={Boolean(selectedCity)}
+        onClose={handleCloseCityModal}
+        maxWidth="xs"
+        fullWidth
       >
-        Yes
-      </Button>
-      <Button
-        variant="outlined"
-        color="secondary"
-        onClick={() => setT3lrModalOpen(false)}
-      >
-        No
-      </Button>
-    </Stack>
-  </DialogContent>
-</Dialog>
+        <DialogTitle sx={{ textAlign: "center", fontWeight: 600 }}>
+          Bilty Form - {selectedCity}
+        </DialogTitle>
+
+        <DialogContent sx={{ py: 3 }}>
+          <Stack spacing={2}>
+            <TextField
+              label="Consignee"
+              fullWidth
+              value={t3lrForm.consignee}
+              onChange={handleFormChange("consignee")}
+            />
+            <TextField
+              label="Consigner"
+              fullWidth
+              value={t3lrForm.consigner}
+              onChange={handleFormChange("consigner")}
+            />
+          </Stack>
+
+          <Stack direction="row" justifyContent="center" spacing={2} mt={3}>
+            <Button variant="contained" onClick={handleSave}>
+              Save
+            </Button>
+            <Button variant="outlined" onClick={handleCloseCityModal}>
+              Close
+            </Button>
+          </Stack>
+        </DialogContent>
+      </Dialog>
+
+
 
 
 
