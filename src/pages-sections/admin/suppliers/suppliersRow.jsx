@@ -9,38 +9,40 @@ import { StyledIconButton, StyledTableCell, StyledTableRow } from "../StyledComp
 
 // ========================================================================
 
-const BrandRow = ({
+const SuppliersRow = ({
   brand,
   selected
 }) => {
   const {
     name,
-    featured,
-    logo,
-    id,
-    slug
+   id,
+    pan_number,
+    gst_number,
+    route_name,
+    address,
+    city,
+    state,
+    pin_code,
+    contact_person,
+    contact_number,
   } = brand;
   const router = useRouter();
-  const [featuredCategory, setFeaturedCategory] = useState(featured);
-  const isItemSelected = selected.indexOf(name) !== -1;
-  const handleNavigate = () => router.push(`/admin/categories/${slug}`);
-  return <StyledTableRow tabIndex={-1} role="checkbox" selected={isItemSelected}>
-      <StyledTableCell align="center">#{id.split("-")[0]}</StyledTableCell>
+
+  const handleNavigate = () => router.push(`/admin/suppliers/${slug}`);
+  return <StyledTableRow>
+      <StyledTableCell align="center">#{id}</StyledTableCell>
 
       <StyledTableCell align="center">{name}</StyledTableCell>
 
-      <StyledTableCell align="center">
-        <Avatar src={logo} sx={{
-        width: 55,
-        height: "auto",
-        margin: "auto",
-        borderRadius: 0
-      }} />
-      </StyledTableCell>
-
-      <StyledTableCell align="center">
-        <BazaarSwitch color="info" checked={featuredCategory} onChange={() => setFeaturedCategory(state => !state)} />
-      </StyledTableCell>
+    <StyledTableCell align="center">{pan_number}</StyledTableCell>
+    <StyledTableCell align="center">{gst_number}</StyledTableCell>
+    <StyledTableCell align="center">{route_name}</StyledTableCell>
+    <StyledTableCell align="center">{address}</StyledTableCell>
+    <StyledTableCell align="center">{city}</StyledTableCell>
+    <StyledTableCell align="center">{state}</StyledTableCell>
+    <StyledTableCell align="center">{pin_code}</StyledTableCell>
+    <StyledTableCell align="center">{contact_person}</StyledTableCell>
+    <StyledTableCell align="center">{contact_number}</StyledTableCell>
 
       <StyledTableCell align="center">
         <StyledIconButton onClick={handleNavigate}>
@@ -53,4 +55,4 @@ const BrandRow = ({
       </StyledTableCell>
     </StyledTableRow>;
 };
-export default BrandRow;
+export default SuppliersRow;

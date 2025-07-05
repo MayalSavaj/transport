@@ -1,4 +1,4 @@
-import { Delete, Edit, RemoveRedEye } from "@mui/icons-material";
+import { Delete, Edit } from "@mui/icons-material";
 import { StyledTableRow, CategoryWrapper, StyledIconButton, StyledTableCell } from "../StyledComponents";
 import { useRouter } from "next/router";
 

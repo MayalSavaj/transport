@@ -142,7 +142,7 @@ export default function partypaymentList() {
     <Box py={4}>
       <H3 mb={2}>Party Payment</H3>
 
-         <Card>
+      <Card>
         <Scrollbar>
           <TableContainer sx={{ minWidth: 900 }}>
             <Table>
@@ -180,7 +180,7 @@ export default function partypaymentList() {
     </Box>
   );
 }
- function RowWithExpand({ item, isOpen, toggleExpand }) {
+function RowWithExpand({ item, isOpen, toggleExpand }) {
   const [checkedItems, setCheckedItems] = useState(item.moreInfo?.map(() => false) || []);
   const [openModal, setOpenModal] = useState(false);
   const [formRows, setFormRows] = useState([]);
@@ -198,7 +198,7 @@ export default function partypaymentList() {
       name: item.name,
       amount: entry.amount,
       date: entry.date,
-      pay: entry.amount, // Pre-fill pay
+      pay: entry.amount, 
       remark: '',
       settleDate: '',
       receipt: null
@@ -207,6 +207,10 @@ export default function partypaymentList() {
     setSelectedRadio('');
     setOpenModal(true);
   };
+
+  const [remark, setRemark] = useState("");
+  const [settleDate, setSettleDate] = useState("");
+  const [receipt, setReceipt] = useState(null);
 
   const handleExtraInputChange = (index, field, value) => {
     const updated = [...formRows];
@@ -293,114 +297,101 @@ export default function partypaymentList() {
       </TableRow>
 
       {/* Modal */}
-     <Dialog open={openModal} onClose={() => setOpenModal(false)} maxWidth="md" fullWidth>
-  <DialogTitle>Settle Payments</DialogTitle>
+      <Dialog open={openModal} onClose={() => setOpenModal(false)} maxWidth="md" fullWidth>
+        <DialogTitle>Settle Payments</DialogTitle>
 
-  <DialogContent dividers sx={{ maxHeight: '70vh', overflowY: 'auto' }}>
-    <RadioGroup value={selectedRadio} onChange={(e) => setSelectedRadio(e.target.value)}>
-      {formRows.map((row, idx) => (
-        <Box key={idx} mb={3}>
-          <FormControlLabel
-            value={idx.toString()}
-            control={<Radio sx={{ mt: 1.5, ml: 1 }} />}
-            sx={{
-              m: 0,
-              width: '100%',
-              alignItems: 'flex-start',
-              borderRadius: 2,
-              border: selectedRadio === idx.toString() ? '2px solid #1976d2' : '1px solid #e0e0e0',
-              transition: 'all 0.2s ease',
-              backgroundColor: selectedRadio === idx.toString() ? '#e3f2fd' : '#f9f9f9',
-            }}
-            label={
-              <Box sx={{ width: '100%', p: 2 }}>
-                <Grid container spacing={2}>
-                  <Grid item xs={12} sm={4}>
-                    <Typography variant="caption" color="text.secondary">Name</Typography>
-                    <Typography fontWeight={600}>{row.name}</Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={4}>
-                    <Typography variant="caption" color="text.secondary">Amount</Typography>
-                    <Typography fontWeight={600} color="primary">₹{row.amount}</Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={4}>
-                    <Typography variant="caption" color="text.secondary">Date</Typography>
-                    <Typography fontWeight={600}>{row.date}</Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      label="Pay"
-                      fullWidth
-                      type="number"
-                      value={row.pay || ""}
-                      inputProps={{ min: 0 }}
-                      onChange={(e) => handleExtraInputChange(idx, "pay", e.target.value)}
-                    />
-                  </Grid>
-                </Grid>
-              </Box>
-            }
-          />
-
-          {/* Expanded Section */}
-          {selectedRadio === idx.toString() && (
-            <Box mt={2} pl={6} pr={1}>
+        <DialogContent dividers sx={{ maxHeight: '70vh', overflowY: 'auto' }}>
+          {formRows.map((row, idx) => (
+            <Box
+              key={idx}
+              mb={3}
+              sx={{
+                borderRadius: 2,
+                border: '1px solid #e0e0e0',
+                backgroundColor: '#f9f9f9',
+                p: 2
+              }}
+            >
               <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    label="Remark"
-                    fullWidth
-                    value={row.remark || ""}
-                    onChange={(e) => handleExtraInputChange(idx, "remark", e.target.value)}
-                  />
+                <Grid item xs={12} sm={4}>
+                  <Typography variant="caption" color="text.secondary">Name</Typography>
+                  <Typography fontWeight={600}>{row.name}</Typography>
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <Typography variant="caption" color="text.secondary">Amount</Typography>
+                  <Typography fontWeight={600} color="primary">₹{row.amount}</Typography>
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <Typography variant="caption" color="text.secondary">Date</Typography>
+                  <Typography fontWeight={600}>{row.date}</Typography>
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
-                    label="Settle Date"
-                    type="date"
+                    label="Pay"
                     fullWidth
-                    InputLabelProps={{ shrink: true }}
-                    value={row.settleDate || ""}
-                    onChange={(e) => handleExtraInputChange(idx, "settleDate", e.target.value)}
+                    type="number"
+                    value={row.pay || ""}
+                    inputProps={{ min: 0 }}
+                    onChange={(e) => handleExtraInputChange(idx, "pay", e.target.value)}
                   />
-                </Grid>
-                <Grid item xs={12}>
-                  <Button variant="outlined" fullWidth component="label">
-                    Upload Receipt
-                    <input
-                      type="file"
-                      hidden
-                      onChange={(e) =>
-                        handleExtraInputChange(idx, "receipt", e.target.files[0])
-                      }
-                    />
-                  </Button>
-                  {row.receipt && (
-                    <Typography variant="body2" mt={1} color="text.secondary">
-                      📎 {row.receipt.name}
-                    </Typography>
-                  )}
                 </Grid>
               </Grid>
             </Box>
-          )}
-        </Box>
-      ))}
-    </RadioGroup>
-  </DialogContent>
+          ))}
 
-  <DialogActions>
-    <Button onClick={() => setOpenModal(false)}>Cancel</Button>
-    <Button
-      onClick={handleSettleSubmit}
-      variant="contained"
-      color="primary"
-      disabled={selectedRadio === ""}
-    >
-      Submit
-    </Button>
-  </DialogActions>
-</Dialog>
+          <Box mt={2} p={2} sx={{ borderRadius: 2, backgroundColor: '#f1f1f1' }}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Remark"
+                  fullWidth
+                  value={remark || ""}
+                  onChange={(e) => setRemark(e.target.value)}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Settle Date"
+                  type="date"
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  value={settleDate || ""}
+                  onChange={(e) => setSettleDate(e.target.value)}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Button variant="outlined" fullWidth component="label">
+                  Upload Receipt
+                  <input
+                    type="file"
+                    hidden
+                    onChange={(e) => setReceipt(e.target.files[0])}
+                  />
+                </Button>
+                {receipt && (
+                  <Typography variant="body2" mt={1} color="text.secondary">
+                    📎 {receipt.name}
+                  </Typography>
+                )}
+              </Grid>
+            </Grid>
+          </Box>
+        </DialogContent>
+
+
+
+
+        <DialogActions>
+          <Button onClick={() => setOpenModal(false)}>Cancel</Button>
+          <Button
+            onClick={handleSettleSubmit}
+            variant="contained"
+            color="primary"
+          >
+            Submit
+          </Button>
+        </DialogActions>
+      </Dialog>
 
     </>
   );

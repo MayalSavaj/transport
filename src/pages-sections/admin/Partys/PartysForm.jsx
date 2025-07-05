@@ -1,9 +1,26 @@
 import { useState } from "react";
 import { Button, Card, Grid, TextField } from "@mui/material";
 import { Formik } from "formik";
+import DropZone from "components/DropZone";
+import { UploadImageBox, StyledClear } from "../StyledComponents";
+import BazaarImage from "components/BazaarImage";
+import { FlexBox } from "components/flex-box";
+
 
 const PartysForm = (props) => {
   const { initialValues, validationSchema, handleFormSubmit } = props;
+  const [files, setFiles] = useState([]);
+
+  const handleChangeDropZone = files => {
+    files.forEach(file => Object.assign(file, {
+      preview: URL.createObjectURL(file)
+    }));
+    setFiles(files);
+  };
+
+  const handleFileDelete = file => () => {
+    setFiles(files => files.filter(item => item.name !== file.name));
+  };
 
   return (
     <Card sx={{ p: 6 }}>
@@ -181,6 +198,36 @@ const PartysForm = (props) => {
                   helperText={touched.create_period && errors.create_period}
                 />
               </Grid>
+
+              <Grid item xs={12}>
+                {!files.length ? (
+                  <DropZone
+                    title="Upload Signature with Stamp"
+                    maxFiles={1}
+                    accept={{ "image/*": [] }}
+                    onChange={(selectedFiles) => {
+                      const file = selectedFiles[0];
+                      if (file) {
+                        const updatedFile = Object.assign(file, {
+                          preview: URL.createObjectURL(file),
+                        });
+                        setFiles([updatedFile]);
+                      }
+                    }}
+                  />
+                ) : (
+                  <FlexBox flexDirection="row" mt={2} flexWrap="wrap" gap={1}>
+                    {files.map((file, index) => (
+                      <UploadImageBox key={index}>
+                        <BazaarImage src={file.preview} width="100%" />
+                        <StyledClear onClick={handleFileDelete(file)} />
+                      </UploadImageBox>
+                    ))}
+                  </FlexBox>
+                )}
+              </Grid>
+
+
 
               {/* Submit Button */}
               <Grid item xs={12}>

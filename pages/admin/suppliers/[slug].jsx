@@ -1,50 +1,63 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { Box } from "@mui/material";
 import * as yup from "yup";
 import { H3 } from "components/Typography";
-import { BrandForm } from "pages-sections/admin";
+import {SuppliersForm} from "pages-sections/admin";
 import VendorDashboardLayout from "components/layouts/vendor-dashboard";
-// import api from "utils/__api__/products";
+import api from "utils/__api__/dashboard"; 
 
-// =============================================================================
-EditBrand.getLayout = function getLayout(page) {
+EditSupplier.getLayout = function getLayout(page) {
   return <VendorDashboardLayout>{page}</VendorDashboardLayout>;
 };
-// =============================================================================
 
-const INITIAL_VALUES = {
-  name: "",
-  featured: false
-};
-
-// form field validation schema
 const validationSchema = yup.object().shape({
-  name: yup.string().required("required")
+  name: yup.string().required("Name is required"),
+  pan_number: yup
+    .string()
+    .matches(/[A-Z]{5}[0-9]{4}[A-Z]{1}$/, "Invalid PAN format")
+    .required("PAN number is required"),
+  gst_number: yup.string().required("GST number is required"),
+  route_name: yup.string().required("Route name is required"),
+  address: yup.string().required("Address is required"),
+  city: yup.string().required("City is required"),
+  state: yup.string().required("State is required"),
+  pin_code: yup.string().required("Pincode is required"),
+  contact_person: yup.string().required("Contact person is required"),
+  contact_number: yup.string().required("Contact number is required"),
 });
-export default function EditBrand() {
-  const {
-    query
-  } = useRouter();
-  const [brand, setBrand] = useState({
-    ...INITIAL_VALUES
-  });
 
-  // useEffect(() => {
-  //   api.getProduct(query.slug as string).then((data) => {
-  //     setProduct((state) => ({
-  //       ...state,
-  //       name: data.title,
-  //       price: data.price,
-  //       category: data.categories,
-  //     }));
-  //   });
-  // }, [query.slug]);
+export default function EditSupplier() {
+  const { query } = useRouter();
+  const { slug } = query;
 
-  const handleFormSubmit = () => {};
-  return <Box py={4}>
-      <H3 mb={2}>Edit Brand</H3>
+  const [supplier, setSupplier] = useState(null);
 
-      <BrandForm initialValues={brand} validationSchema={validationSchema} handleFormSubmit={handleFormSubmit} />
-    </Box>;
+  useEffect(() => {
+    if (slug) {
+      api.getSupplierBySlug(slug).then((data) => {
+        if (data) setSupplier(data);
+        else router.push("/admin/suppliers");
+      });
+    }
+  }, [slug]);
+
+  const handleFormSubmit = (values) => {
+    console.log("Updated supplier:", values);
+    alert("Supplier updated successfully!");
+  };
+
+  return (
+    <Box py={4}>
+      <H3 mb={2}>Edit Supplier</H3>
+
+   
+        <SuppliersForm
+          initialValues={supplier}
+          validationSchema={validationSchema}
+          handleFormSubmit={handleFormSubmit}
+        />
+    
+    </Box>
+  );
 }

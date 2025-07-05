@@ -3,14 +3,11 @@ import { useDropzone } from "react-dropzone";
 import { Box, Button, Divider } from "@mui/material";
 import { H5, Small } from "./Typography";
 
-// ========================================================
 
-// ========================================================
 
 const DropZone = ({
   onChange,
   title = "Drag & drop product image here",
-  imageSize = "Upload 280*280 image"
 }) => {
   const onDrop = useCallback(acceptedFiles => onChange(acceptedFiles), [onChange]);
   const {
@@ -55,7 +52,7 @@ const DropZone = ({
         Select files
       </Button>
 
-      <Small color="grey.600">{imageSize}</Small>
+      {/* <Small color="grey.600">{imageSize}</Small> */}
     </Box>;
 };
 export default DropZone;
