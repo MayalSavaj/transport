@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 import * as yup from "yup";
 import { H3 } from "components/Typography";
-import SuppliersForm from "pages-sections/admin/SuppliersForm"; 
+import {SuppliersForm} from "pages-sections/admin"; 
 import VendorDashboardLayout from "components/layouts/vendor-dashboard";
 
 CreateBrand.getLayout = function getLayout(page) {
