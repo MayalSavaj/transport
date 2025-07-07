@@ -22,24 +22,7 @@ const LCForm = (props) => {
           <form onSubmit={handleSubmit}>
             <Grid container spacing={3}>
               {/* Text Field */}
-              <Grid item sm={6} xs={12}>
-                <TextField
-                  fullWidth
-                  name="textField"
-                  label="Terms and Conditions"
-                  color="info"
-                  size="medium"
-                  placeholder="Enter text"
-                  multiline
-                  minRows={4} // or use rows={4} if you want fixed height
-                  value={values.textField}
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  error={!!touched.textField && !!errors.textField}
-                  helperText={touched.textField && errors.textField}
-                />
-
-              </Grid>
+             
 
               {/* Dropdown Field */}
               <Grid item sm={6} xs={12}>
@@ -58,6 +41,24 @@ const LCForm = (props) => {
                   <MenuItem value="option1">Invoice</MenuItem>
                   <MenuItem value="option2">L-R</MenuItem>
                 </TextField>
+              </Grid>
+               <Grid item sm={12} xs={12}>
+                <TextField
+                  fullWidth
+                  name="textField"
+                  label="Terms and Conditions"
+                  color="info"
+                  size="medium"
+                  placeholder="Enter text"
+                  multiline
+                  minRows={20} // or use rows={4} if you want fixed height
+                  value={values.textField}
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  error={!!touched.textField && !!errors.textField}
+                  helperText={touched.textField && errors.textField}
+                />
+
               </Grid>
 
               {/* Submit Button */}

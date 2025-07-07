@@ -75,11 +75,13 @@ const SuppliersForm = ({ handleFormSubmit }) => {
           <form onSubmit={handleSubmit}>
             <Grid container spacing={3}>
               {/* Name */}
-              <Grid item md={6} xs={12}>
+              <Grid item sm={6} xs={12}>
                 <TextField
                   fullWidth
                   name="name"
                   label="Name"
+                  size="medium"
+                  placeholder="Supplier Name"
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.name}
@@ -94,6 +96,8 @@ const SuppliersForm = ({ handleFormSubmit }) => {
                   fullWidth
                   name="pan_number"
                   label="PAN Number"
+                  size="medium"
+                  placeholder="PAN Number"
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.pan_number}
@@ -108,6 +112,8 @@ const SuppliersForm = ({ handleFormSubmit }) => {
                   fullWidth
                   name="gst_number"
                   label="GST Number"
+                  size="medium"
+                  placeholder="GST Number"
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.gst_number}
@@ -122,6 +128,8 @@ const SuppliersForm = ({ handleFormSubmit }) => {
                   fullWidth
                   name="route_name"
                   label="Route Name"
+                  size="medium"
+                  placeholder="Route Name"
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.route_name}
@@ -136,6 +144,8 @@ const SuppliersForm = ({ handleFormSubmit }) => {
                   fullWidth
                   name="address"
                   label="Address"
+                  size="medium"
+                  placeholder="Address"
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.address}
@@ -150,6 +160,8 @@ const SuppliersForm = ({ handleFormSubmit }) => {
                   fullWidth
                   name="city"
                   label="City"
+                  size="medium"
+                  placeholder="City"
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.city}
@@ -164,6 +176,8 @@ const SuppliersForm = ({ handleFormSubmit }) => {
                   fullWidth
                   name="state"
                   label="State"
+                  size="medium"
+                  placeholder="State"
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.state}
@@ -178,6 +192,8 @@ const SuppliersForm = ({ handleFormSubmit }) => {
                   fullWidth
                   name="pin_code"
                   label="Pin Code"
+                  size="medium"
+                  placeholder="Pin Code"
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.pin_code}
@@ -192,6 +208,8 @@ const SuppliersForm = ({ handleFormSubmit }) => {
                   fullWidth
                   name="contact_person"
                   label="Contact Person"
+                  size="medium"
+                  placeholder="Contact Person"
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.contact_person}
@@ -206,6 +224,8 @@ const SuppliersForm = ({ handleFormSubmit }) => {
                   fullWidth
                   name="contact_number"
                   label="Contact Number"
+                  size="medium"
+                  placeholder="Contact Number"
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.contact_number}

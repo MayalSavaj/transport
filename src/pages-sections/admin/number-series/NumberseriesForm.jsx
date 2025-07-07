@@ -65,6 +65,7 @@ const NumberseriesForm = (props) => {
                       label="Number Format"
                       placeholder="e.g. INV-####"
                       color="info"
+                      size="medium"
                       value={values.numberFormat}
                       onChange={handleChange}
                       onBlur={handleBlur}
@@ -81,6 +82,7 @@ const NumberseriesForm = (props) => {
                       placeholder="e.g. 1001"
                       type="number"
                       color="info"
+                      size="medium"
                       value={values.startingNumber}
                       onChange={handleChange}
                       onBlur={handleBlur}
@@ -101,6 +103,7 @@ const NumberseriesForm = (props) => {
                     placeholder="e.g. 5001"
                     type="number"
                     color="info"
+                    size="medium"
                     value={values.startingNumber}
                     onChange={handleChange}
                     onBlur={handleBlur}
@@ -116,8 +119,8 @@ const NumberseriesForm = (props) => {
                   {values.seriesType === "invoice"
                     ? "Save Invoice Number"
                     : values.seriesType === "lr"
-                    ? "Save LR Number"
-                    : "Save"}
+                      ? "Save LR Number"
+                      : "Save"}
                 </Button>
               </Grid>
             </Grid>
