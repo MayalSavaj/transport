@@ -50,7 +50,7 @@ const OrdersForm = () => {
         validationSchema={validationSchema}
         onSubmit={(values) => {
           setFormData(values);
-          router.push("/admin/orderdetails/create"); 
+          router.push("/admin/orderdetails/create");
         }}
       >
         {({
@@ -98,7 +98,6 @@ const OrdersForm = () => {
 
                 <Grid item sm={6} xs={12}>
                   <TextField
-                    select
                     fullWidth
                     label="Truck Type"
                     name="truckType"
@@ -108,11 +107,9 @@ const OrdersForm = () => {
                     onBlur={handleBlur}
                     error={!!touched.truckType && !!errors.truckType}
                     helperText={touched.truckType && errors.truckType}
-                  >
-                    <MenuItem value="Open">Open</MenuItem>
-                    <MenuItem value="Container">Container</MenuItem>
-                  </TextField>
+                  />
                 </Grid>
+
 
                 <Grid item sm={6} xs={12}>
                   <TextField

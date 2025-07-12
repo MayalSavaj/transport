@@ -15,10 +15,11 @@ const SuppliersRow = ({
 }) => {
   const {
     name,
-   id,
+    id,
     pan_number,
     gst_number,
     route_name,
+    rood,
     address,
     city,
     state,
@@ -30,12 +31,14 @@ const SuppliersRow = ({
 
   const handleNavigate = () => router.push(`/admin/suppliers/${slug}`);
   return <StyledTableRow>
-      <StyledTableCell align="center">#{id}</StyledTableCell>
+    <StyledTableCell align="center">#{id}</StyledTableCell>
 
-      <StyledTableCell align="center">{name}</StyledTableCell>
+    <StyledTableCell align="center">{name}</StyledTableCell>
 
     <StyledTableCell align="center">{pan_number}</StyledTableCell>
     <StyledTableCell align="center">{gst_number}</StyledTableCell>
+    <StyledTableCell align="center">{rood}</StyledTableCell>
+
     <StyledTableCell align="center">{route_name}</StyledTableCell>
     <StyledTableCell align="center">{address}</StyledTableCell>
     <StyledTableCell align="center">{city}</StyledTableCell>
@@ -44,15 +47,15 @@ const SuppliersRow = ({
     <StyledTableCell align="center">{contact_person}</StyledTableCell>
     <StyledTableCell align="center">{contact_number}</StyledTableCell>
 
-      <StyledTableCell align="center">
-        <StyledIconButton onClick={handleNavigate}>
-          <RemoveRedEye />
-        </StyledIconButton>
+    <StyledTableCell align="center">
+      <StyledIconButton onClick={handleNavigate}>
+        <RemoveRedEye />
+      </StyledIconButton>
 
-        <StyledIconButton>
-          <Delete />
-        </StyledIconButton>
-      </StyledTableCell>
-    </StyledTableRow>;
+      <StyledIconButton>
+        <Delete />
+      </StyledIconButton>
+    </StyledTableCell>
+  </StyledTableRow>;
 };
 export default SuppliersRow;

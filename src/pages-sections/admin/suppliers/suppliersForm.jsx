@@ -29,6 +29,7 @@ const initialValues = {
   pan_number: "",
   gst_number: "",
   route_name: "",
+  root: "",
   address: "",
   city: "",
   state: "",
@@ -133,6 +134,20 @@ const SuppliersForm = ({ handleFormSubmit }) => {
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.route_name}
+                  error={!!touched.route_name && !!errors.route_name}
+                  helperText={touched.route_name && errors.route_name}
+                />
+              </Grid>
+              <Grid item md={6} xs={12}>
+                <TextField
+                  fullWidth
+                  name="rood"
+                  label="Rood"
+                  size="medium"
+                  placeholder="Rood"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.rood}
                   error={!!touched.route_name && !!errors.route_name}
                   helperText={touched.route_name && errors.route_name}
                 />

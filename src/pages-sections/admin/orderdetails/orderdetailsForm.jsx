@@ -386,56 +386,66 @@ const OrderdetailsForm = () => {
                 </DialogContent>
               </Dialog>
 
-              <Dialog
-                open={Boolean(selectedCity)}
-                onClose={handleCloseCityModal}
-                maxWidth="xs"
-                fullWidth
-              >
-                <DialogTitle sx={{ textAlign: "center", fontWeight: 600 }}>
-                  Bilty Form - {selectedCity}
-                </DialogTitle>
+            <Dialog
+  open={Boolean(selectedCity)}
+  onClose={handleCloseCityModal}
+  maxWidth="xs"
+  fullWidth
+ PaperProps={{
+  sx: {
+    position: "absolute",
+    right: 100,
+    top: "50%",
+    transform: "translateY(-50%)",
+    m: 0,
+  },
+}}
+>
+  <DialogTitle sx={{ textAlign: "center", fontWeight: 600 }}>
+    Bilty Form - {selectedCity}
+  </DialogTitle>
 
-                <DialogContent sx={{ py: 3 }}>
-                  <Stack spacing={2}>
-                    <TextField
-                      label="Consignee"
-                      fullWidth
-                      multiline
-                      rows={3}
-                      value={t3lrForm.consignee}
-                      onChange={handleFormChange("consignee")}
-                    />
+  <DialogContent sx={{ py: 3 }}>
+    <Stack spacing={2}>
+      <TextField
+        label="Consignee"
+        fullWidth
+        multiline
+        rows={3}
+        value={t3lrForm.consignee}
+        onChange={handleFormChange("consignee")}
+      />
 
-                    <TextField
-                      label="Consigner"
-                      fullWidth
-                      multiline
-                      rows={3}
-                      value={t3lrForm.consigner}
-                      onChange={handleFormChange("consigner")}
-                    />
-                    <TextField
-                      label="Material"
-                      fullWidth
-                      multiline
-                      rows={3}
-                      value={t3lrForm.consigner}
-                      onChange={handleFormChange("material")}
-                    />
+      <TextField
+        label="Consigner"
+        fullWidth
+        multiline
+        rows={3}
+        value={t3lrForm.consigner}
+        onChange={handleFormChange("consigner")}
+      />
 
-                  </Stack>
+      <TextField
+        label="Material"
+        fullWidth
+        multiline
+        rows={3}
+        value={t3lrForm.material}
+        onChange={handleFormChange("material")}
+      />
+    </Stack>
 
-                  <Stack direction="row" justifyContent="center" spacing={2} mt={3}>
-                    <Button variant="contained" onClick={handleSave}>
-                      Save
-                    </Button>
-                    <Button variant="outlined" onClick={handleCloseCityModal}>
-                      Close
-                    </Button>
-                  </Stack>
-                </DialogContent>
-              </Dialog>
+    <Stack direction="row" justifyContent="center" spacing={2} mt={3}>
+      <Button variant="contained" onClick={handleSave}>
+        Save
+      </Button>
+      <Button variant="outlined" onClick={handleCloseCityModal}>
+        Close
+      </Button>
+    </Stack>
+  </DialogContent>
+</Dialog>
+
 
 
               {activeTab === 1 && (

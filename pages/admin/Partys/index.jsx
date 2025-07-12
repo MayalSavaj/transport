@@ -14,13 +14,8 @@ const tableHeading = [
   { id: "id", label: "ID", align: "left" },
   { id: "name", label: "Name", align: "left" },
   { id: "gst_number", label: "GST Number", align: "left" },
-  { id: "pan_number", label: "PAN Number", align: "left" },
   { id: "contact_person", label: "Contact Person", align: "left" },
   { id: "contact_number", label: "Contact Number", align: "left" },
-  { id: "address", label: "Address", align: "left" }, 
-  { id: "city", label: "City", align: "left" },
-  { id: "state", label: "State", align: "left" },
-  { id: "pincode", label: "Pincode", align: "left" },
   { id: "create_period", label: "Create Period", align: "left" },
   { id: "action", label: "Action", align: "center" }
 ];
@@ -39,7 +34,7 @@ const products = [
     city: "Ahmedabad",
     state: "Gujarat",
     pincode: "380001",
-    create_period: "2024-01"
+    create_period: "2024-01-20"
   },
   {
     id: "2",
@@ -52,7 +47,7 @@ const products = [
     city: "Bangalore",
     state: "Karnataka",
     pincode: "560001",
-    create_period: "2024-02"
+    create_period: "2024-02-23"
   },
   {
     id: "3",
@@ -65,7 +60,7 @@ const products = [
     city: "Surat",
     state: "Gujarat",
     pincode: "395007",
-    create_period: "2024-03"
+    create_period: "2024-03-01"
   }
 ];
 export default function PartyList() {

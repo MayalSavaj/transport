@@ -9,12 +9,8 @@ const PartysRow = ({
     id,
     name,
     gst_number,
-    pan_number,
     contact_person,
     contact_number,
-    city,
-    state,
-    pincode,
     create_period
   } = product;
   const router = useRouter();
@@ -22,13 +18,8 @@ const PartysRow = ({
     <StyledTableCell align="left">#{id.split("-")[0]}</StyledTableCell>
     <StyledTableCell align="left">{name}</StyledTableCell>
     <StyledTableCell align="left">{gst_number}</StyledTableCell>
-    <StyledTableCell align="left">{pan_number}</StyledTableCell>
-    <StyledTableCell align="left">{pan_number}</StyledTableCell>
     <StyledTableCell align="left">{contact_person}</StyledTableCell>
     <StyledTableCell align="left">{contact_number}</StyledTableCell>
-    <StyledTableCell align="left">{city}</StyledTableCell>
-    <StyledTableCell align="left">{state}</StyledTableCell>
-    <StyledTableCell align="left">{pincode}</StyledTableCell>
     <StyledTableCell align="left">{create_period}</StyledTableCell>
 
     <StyledTableCell align="center">

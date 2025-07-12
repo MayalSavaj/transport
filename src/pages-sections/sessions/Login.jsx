@@ -33,7 +33,7 @@ const initialValues = {
   userType: "",
   panNumber: "",
   gstNumber: "",
-  name: "",
+  firmname: "",
 };
 
 const Login = () => {
@@ -95,7 +95,7 @@ const Login = () => {
 
     name: yup.string().when("userType", {
       is: (val) => val === "company" || val === "transportor",
-      then: (schema) => schema.required("Name is required"),
+      then: (schema) => schema.required("Firm Name is required"),
     }),
   });
 
@@ -248,10 +248,10 @@ const Login = () => {
               size="small"
               variant="outlined"
               onBlur={handleBlur}
-              value={values.name}
+              value={values.firmname}
               onChange={handleChange}
-              label="Name"
-              placeholder="Enter your name"
+              label="Firm Name"
+              placeholder="Name as per GST"
               error={!!touched.name && !!errors.name}
               helperText={touched.name && errors.name}
             />
@@ -282,10 +282,10 @@ const Login = () => {
               size="small"
               variant="outlined"
               onBlur={handleBlur}
-              value={values.name}
+              value={values.firmname}
               onChange={handleChange}
-              label="Name"
-              placeholder="Enter your name"
+              label="Firm Name"
+              placeholder="Name as Per PAN"
               error={!!touched.name && !!errors.name}
               helperText={touched.name && errors.name}
             />
