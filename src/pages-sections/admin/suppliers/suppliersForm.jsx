@@ -3,7 +3,8 @@ import {
   Button,
   Card,
   Grid,
-  TextField
+  TextField,
+  Typography
 } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
@@ -16,6 +17,7 @@ const validationSchema = yup.object().shape({
     .required("PAN number is required"),
   gst_number: yup.string().required("GST number is required"),
   route_name: yup.string().required("Route name is required"),
+  root: yup.string().required("Root is required"),
   address: yup.string().required("Address is required"),
   city: yup.string().required("City is required"),
   state: yup.string().required("State is required"),
@@ -75,7 +77,14 @@ const SuppliersForm = ({ handleFormSubmit }) => {
         }) => (
           <form onSubmit={handleSubmit}>
             <Grid container spacing={3}>
-              {/* Name */}
+
+              {/* Basic Information */}
+              <Grid item xs={12}>
+                <Typography variant="subtitle1" fontWeight={800} mb={1}>
+                  Supplier Details
+                </Typography>
+              </Grid>
+
               <Grid item sm={6} xs={12}>
                 <TextField
                   fullWidth
@@ -91,14 +100,13 @@ const SuppliersForm = ({ handleFormSubmit }) => {
                 />
               </Grid>
 
-              {/* PAN Number */}
-              <Grid item md={6} xs={12}>
+              <Grid item sm={6} xs={12}>
                 <TextField
                   fullWidth
                   name="pan_number"
                   label="PAN Number"
-                  size="medium"
                   placeholder="PAN Number"
+                  size="medium"
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.pan_number}
@@ -107,14 +115,13 @@ const SuppliersForm = ({ handleFormSubmit }) => {
                 />
               </Grid>
 
-              {/* GST Number */}
-              <Grid item md={6} xs={12}>
+              <Grid item sm={6} xs={12}>
                 <TextField
                   fullWidth
                   name="gst_number"
                   label="GST Number"
-                  size="medium"
                   placeholder="GST Number"
+                  size="medium"
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.gst_number}
@@ -123,14 +130,20 @@ const SuppliersForm = ({ handleFormSubmit }) => {
                 />
               </Grid>
 
-              {/* Route Name */}
-              <Grid item md={6} xs={12}>
+              {/* Route Info */}
+              <Grid item xs={12}>
+                <Typography variant="subtitle1" fontWeight={800} mb={1}>
+                  Route Details
+                </Typography>
+              </Grid>
+
+              <Grid item sm={6} xs={12}>
                 <TextField
                   fullWidth
                   name="route_name"
                   label="Route Name"
-                  size="medium"
                   placeholder="Route Name"
+                  size="medium"
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.route_name}
@@ -138,29 +151,36 @@ const SuppliersForm = ({ handleFormSubmit }) => {
                   helperText={touched.route_name && errors.route_name}
                 />
               </Grid>
-              <Grid item md={6} xs={12}>
+
+              <Grid item sm={6} xs={12}>
                 <TextField
                   fullWidth
-                  name="rood"
-                  label="Rood"
+                  name="root"
+                  label="Root"
+                  placeholder="Root"
                   size="medium"
-                  placeholder="Rood"
                   onBlur={handleBlur}
                   onChange={handleChange}
-                  value={values.rood}
-                  error={!!touched.route_name && !!errors.route_name}
-                  helperText={touched.route_name && errors.route_name}
+                  value={values.root}
+                  error={!!touched.root && !!errors.root}
+                  helperText={touched.root && errors.root}
                 />
               </Grid>
 
-              {/* Address */}
-              <Grid item md={6} xs={12}>
+              {/* Address Info */}
+              <Grid item xs={12}>
+                <Typography variant="subtitle1" fontWeight={800} mb={1}>
+                  Address Information
+                </Typography>
+              </Grid>
+
+              <Grid item sm={6} xs={12}>
                 <TextField
                   fullWidth
                   name="address"
                   label="Address"
-                  size="medium"
                   placeholder="Address"
+                  size="medium"
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.address}
@@ -169,14 +189,13 @@ const SuppliersForm = ({ handleFormSubmit }) => {
                 />
               </Grid>
 
-              {/* City */}
-              <Grid item md={6} xs={12}>
+              <Grid item sm={6} xs={12}>
                 <TextField
                   fullWidth
                   name="city"
                   label="City"
-                  size="medium"
                   placeholder="City"
+                  size="medium"
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.city}
@@ -185,14 +204,13 @@ const SuppliersForm = ({ handleFormSubmit }) => {
                 />
               </Grid>
 
-              {/* State */}
-              <Grid item md={6} xs={12}>
+              <Grid item sm={6} xs={12}>
                 <TextField
                   fullWidth
                   name="state"
                   label="State"
-                  size="medium"
                   placeholder="State"
+                  size="medium"
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.state}
@@ -201,14 +219,13 @@ const SuppliersForm = ({ handleFormSubmit }) => {
                 />
               </Grid>
 
-              {/* Pin Code */}
-              <Grid item md={6} xs={12}>
+              <Grid item sm={6} xs={12}>
                 <TextField
                   fullWidth
                   name="pin_code"
                   label="Pin Code"
-                  size="medium"
                   placeholder="Pin Code"
+                  size="medium"
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.pin_code}
@@ -217,14 +234,20 @@ const SuppliersForm = ({ handleFormSubmit }) => {
                 />
               </Grid>
 
-              {/* Contact Person */}
-              <Grid item md={6} xs={12}>
+              {/* Contact Info */}
+              <Grid item xs={12}>
+                <Typography variant="subtitle1" fontWeight={800} mb={1}>
+                  Contact Details
+                </Typography>
+              </Grid>
+
+              <Grid item sm={6} xs={12}>
                 <TextField
                   fullWidth
                   name="contact_person"
                   label="Contact Person"
-                  size="medium"
                   placeholder="Contact Person"
+                  size="medium"
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.contact_person}
@@ -233,23 +256,20 @@ const SuppliersForm = ({ handleFormSubmit }) => {
                 />
               </Grid>
 
-              {/* Contact Number */}
-              <Grid item md={6} xs={12}>
+              <Grid item sm={6} xs={12}>
                 <TextField
                   fullWidth
                   name="contact_number"
                   label="Contact Number"
-                  size="medium"
                   placeholder="Contact Number"
+                  size="medium"
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.contact_number}
                   error={!!touched.contact_number && !!errors.contact_number}
                   helperText={touched.contact_number && errors.contact_number}
                 />
-              </Grid>  
-
-             
+              </Grid>
 
               {/* Submit */}
               <Grid item xs={12}>

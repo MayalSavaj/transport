@@ -329,6 +329,7 @@ function RowWithExpand({ item, isOpen, toggleExpand }) {
                   <TextField
                     label="Pay"
                     fullWidth
+                    size="medium"
                     type="number"
                     value={row.pay || ""}
                     inputProps={{ min: 0 }}
@@ -344,6 +345,7 @@ function RowWithExpand({ item, isOpen, toggleExpand }) {
               <Grid item xs={12} sm={6}>
                 <TextField
                   label="Remark"
+                  size="medium"
                   fullWidth
                   value={remark || ""}
                   onChange={(e) => setRemark(e.target.value)}
@@ -353,13 +355,14 @@ function RowWithExpand({ item, isOpen, toggleExpand }) {
                 <TextField
                   label="Settle Date"
                   type="date"
+                  size="medium"
                   fullWidth
                   InputLabelProps={{ shrink: true }}
                   value={settleDate || ""}
                   onChange={(e) => setSettleDate(e.target.value)}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={6}>
                 <Button variant="outlined" fullWidth component="label">
                   Upload Receipt
                   <input

@@ -1,6 +1,5 @@
-import { Button, Card, Grid, TextField } from "@mui/material";
+import { Button, Card, Grid, TextField, Typography } from "@mui/material";
 import { Formik } from "formik";
-
 
 const PartysForm = (props) => {
   const { initialValues, validationSchema, handleFormSubmit } = props;
@@ -22,7 +21,13 @@ const PartysForm = (props) => {
         }) => (
           <form onSubmit={handleSubmit}>
             <Grid container spacing={3}>
+
               {/* GST & PAN */}
+              <Grid item xs={12}>
+                <Typography variant="subtitle1" fontWeight={800} mb={1}>
+                  Party Details
+                </Typography>
+              </Grid>
               <Grid item sm={6} xs={12}>
                 <TextField
                   fullWidth
@@ -53,8 +58,6 @@ const PartysForm = (props) => {
                   helperText={touched.pan_number && errors.pan_number}
                 />
               </Grid>
-
-              {/* Name, Contact Person */}
               <Grid item sm={6} xs={12}>
                 <TextField
                   fullWidth
@@ -70,6 +73,14 @@ const PartysForm = (props) => {
                   helperText={touched.name && errors.name}
                 />
               </Grid>
+
+              {/* Party Info */}
+              <Grid item xs={12}>
+                <Typography variant="subtitle1" fontWeight={800} mb={1}>
+                  Contact & Address
+                </Typography>
+              </Grid>
+
               <Grid item sm={6} xs={12}>
                 <TextField
                   fullWidth
@@ -86,7 +97,8 @@ const PartysForm = (props) => {
                 />
               </Grid>
 
-              {/* Contact Number, Address */}
+              {/* Contact & Address */}
+
               <Grid item sm={6} xs={12}>
                 <TextField
                   fullWidth
@@ -118,7 +130,7 @@ const PartysForm = (props) => {
                 />
               </Grid>
 
-              {/* City, State */}
+
               <Grid item sm={6} xs={12}>
                 <TextField
                   fullWidth
@@ -150,21 +162,11 @@ const PartysForm = (props) => {
                 />
               </Grid>
 
-              {/* Pincode, Create Period */}
-              <Grid item sm={6} xs={12}>
-                <TextField
-                  fullWidth
-                  name="pincode"
-                  label="Pincode"
-                  color="info"
-                  size="medium"
-                  placeholder="Pincode"
-                  value={values.pincode}
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  error={!!touched.pincode && !!errors.pincode}
-                  helperText={touched.pincode && errors.pincode}
-                />
+              {/* Other Info */}
+              <Grid item xs={12}>
+                <Typography variant="subtitle1" fontWeight={800} mb={1}>
+                  Other Information
+                </Typography>
               </Grid>
               <Grid item sm={6} xs={12}>
                 <TextField
