@@ -23,6 +23,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/router";
 import DownloadIcon from "@mui/icons-material/Download";
 
+
 const initialValues = {
   partyName: "",
   truckType: "",
@@ -60,7 +61,6 @@ const OrderdetailsForm = () => {
   const [openAmountEditModal, setOpenAmountEditModal] = useState(false);
   const [opnelrModal, setOpenlrModal] = useState(false);
   const [t3lrModalOpen, setT3lrModalOpen] = useState(false);
-  const [lrInnerModalOpen, setLrInnerModalOpen] = useState(false);
   const [selectedCity, setSelectedCity] = useState(null);
 
   const [t3lrForm, setT3lrForm] = useState({
@@ -315,9 +315,8 @@ const OrderdetailsForm = () => {
                       variant="contained"
                       color="primary"
                       onClick={() => {
-                        console.log("Yes clicked");
                         setT3lrModalOpen(false);
-                        setLrInnerModalOpen(true);
+                        router.push("/admin/bilty/create");
                       }}
                     >
                       Yes
@@ -332,120 +331,6 @@ const OrderdetailsForm = () => {
                   </Stack>
                 </DialogContent>
               </Dialog>
-
-              {/* Modal */}
-              <Dialog
-                open={lrInnerModalOpen}
-                onClose={() => setLrInnerModalOpen(false)}
-                maxWidth="xs"
-                fullWidth
-              >
-                <DialogTitle sx={{ textAlign: "center", fontWeight: 600 }}>
-                  LR
-                </DialogTitle>
-
-                <DialogContent sx={{ py: 2 }}>
-                  <Stack spacing={2}>
-                    {lrDataList.map((item, index) => (
-                      <Box
-                        key={index}
-                        sx={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          border: "1px solid #ccc",
-                          borderRadius: 2,
-                          px: 2,
-                          py: 1,
-                          cursor: "pointer",
-                        }}
-                        onClick={() => handleCityClick(item)}
-                      >
-                        <Typography variant="body2">
-                          {item.city} - {item.lrNumber}
-                        </Typography>
-                        <IconButton
-                          size="small"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDownload(item);
-                          }}
-                          color="primary"
-                        >
-                          <DownloadIcon fontSize="small" />
-                        </IconButton>
-                      </Box>
-                    ))}
-                  </Stack>
-
-                  <Stack direction="row" justifyContent="center" mt={3}>
-                    <Button variant="contained" onClick={() => setLrInnerModalOpen(false)}>
-                      Close
-                    </Button>
-                  </Stack>
-                </DialogContent>
-              </Dialog>
-
-              <Dialog
-                open={Boolean(selectedCity)}
-                onClose={handleCloseCityModal}
-                maxWidth="xs"
-                fullWidth
-                PaperProps={{
-                  sx: {
-                    position: "absolute",
-                    right: 100,
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    m: 0,
-                  },
-                }}
-              >
-                <DialogTitle sx={{ textAlign: "center", fontWeight: 600 }}>
-                  Bilty Form - {selectedCity}
-                </DialogTitle>
-
-                <DialogContent sx={{ py: 3 }}>
-                  <Stack spacing={2}>
-                    <TextField
-                      label="Consignee"
-                      fullWidth
-                      multiline
-                      rows={3}
-                      value={t3lrForm.consignee}
-                      onChange={handleFormChange("consignee")}
-                    />
-
-                    <TextField
-                      label="Consigner"
-                      fullWidth
-                      multiline
-                      rows={3}
-                      value={t3lrForm.consigner}
-                      onChange={handleFormChange("consigner")}
-                    />
-
-                    <TextField
-                      label="Material"
-                      fullWidth
-                      multiline
-                      rows={3}
-                      value={t3lrForm.material}
-                      onChange={handleFormChange("material")}
-                    />
-                  </Stack>
-
-                  <Stack direction="row" justifyContent="center" spacing={2} mt={3}>
-                    <Button variant="contained" onClick={handleSave}>
-                      Save
-                    </Button>
-                    <Button variant="outlined" onClick={handleCloseCityModal}>
-                      Close
-                    </Button>
-                  </Stack>
-                </DialogContent>
-              </Dialog>
-
 
 
               {activeTab === 1 && (

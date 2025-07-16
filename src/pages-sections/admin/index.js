@@ -16,9 +16,10 @@ import PartypaymentForm from "./party-payment/PartypaymentForm";
 import SupplierpaymentRow from "./supplier-payment/SupplierpaymentRow";
 import SupplierpaymentForm from "./supplier-payment/supplierpaymentForm";
 import OrderdetailsForm from "./orderdetails/orderdetailsForm"
+import BiltyForm from "./bilty/biltyForm";
 import { StatusWrapper, StyledTableRow, CategoryWrapper, StyledTableCell, StyledIconButton } from "./StyledComponents";
 export {
-   OrderdetailsForm, OrdersRow, OrdersForm, PartypaymentRow, PartypaymentForm, SupplierpaymentRow, SupplierpaymentForm, LCForm, LCRow, NumberseriesRow, NumberseriesForm, SuppliersRow, SuppliersForm, ReviewRow, PartysRow, CustomerRow, PartysForm, RefundRequestRow,
+  BiltyForm, OrderdetailsForm, OrdersRow, OrdersForm, PartypaymentRow, PartypaymentForm, SupplierpaymentRow, SupplierpaymentForm, LCForm, LCRow, NumberseriesRow, NumberseriesForm, SuppliersRow, SuppliersForm, ReviewRow, PartysRow, CustomerRow, PartysForm, RefundRequestRow,
     // styled components
     StatusWrapper, StyledTableRow, StyledTableCell, CategoryWrapper, StyledIconButton
 };
