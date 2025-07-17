@@ -47,6 +47,7 @@ const BiltyManager = () => {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [partyType, setPartyType] = useState(null); // null | "consignee" | "consigner"
+  const [activeTab, setActiveTab] = useState(0);
 
   const handleOpenForm = () => {
     setModalOpen(true);
@@ -73,6 +74,44 @@ const BiltyManager = () => {
   const handleDownload = (bilty) => {
     alert(`Downloading ${bilty.city} - ${bilty.lrNumber}`);
   };
+
+  const [tabAccess, setTabAccess] = useState([true, false, false]);
+
+  const isTabValid = (tabIndex, values) => {
+  if (tabIndex === 0) {
+    // Consigner Tab
+    return (
+      values.consigner_name &&
+      values.consigner_gstNumber &&
+      values.consigner_address1 &&
+      values.consigner_address2 &&
+      values.consigner_state &&
+      values.consigner_pincode &&
+      values.consigner_mobile
+    );
+  }
+
+  if (tabIndex === 1) {
+    // Consignee Tab
+    return (
+      values.consignee_name &&
+      values.consignee_gstNumber &&
+      values.consignee_address1 &&
+      values.consignee_address2 &&
+      values.consignee_state &&
+      values.consignee_pincode &&
+      values.consignee_mobile
+    );
+  }
+
+  if (tabIndex === 2) {
+    // Material Tab
+    return values.materialName && values.materialWeight;
+  }
+
+  return false;
+};
+
 
   return (
     <>
@@ -116,93 +155,312 @@ const BiltyManager = () => {
       </Paper>
 
       {/* Modal with Selection & Form */}
- <Dialog open={modalOpen} onClose={handleCloseForm} maxWidth="sm" fullWidth>
-  <DialogTitle sx={{ textAlign: "center" }}> Bilty {partyType}</DialogTitle>
-  <DialogContent>
-    <Card sx={{ p: 3 }}>
-      {/* Party Type Toggle Buttons */}
-      <Grid container spacing={2} sx={{ mb: 3 }}>
-        {["consignee", "consigner"].map((type) => (
-          <Grid item xs={6} key={type}>
-            <Button
-              fullWidth
-              variant={partyType === type ? "contained" : "outlined"}
-              color={partyType === type ? "primary" : "inherit"}
-              onClick={() => setPartyType(type)}
-            >
-              {type.charAt(0).toUpperCase() + type.slice(1)}
-            </Button>
-          </Grid>
-        ))}
-      </Grid>
+      <Dialog open={modalOpen} onClose={handleCloseForm} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ textAlign: "center" }}>
+          Bilty
+        </DialogTitle>
+        <DialogContent>
+          <Card sx={{ p: 3 }}>
 
-      <Formik
-        initialValues={initialValues}
-        validationSchema={validationSchema}
-        onSubmit={handleFormSubmit}
-      >
-        {({
-          values,
-          errors,
-          touched,
-          handleChange,
-          handleBlur,
-          handleSubmit,
-        }) => (
-          <form onSubmit={handleSubmit}>
-            <Grid container spacing={2}>
-              {[
-                { label: "GST Number", name: "gstNumber" },
-                {
-                  label:
-                    partyType === "consignee"
-                      ? "Consignee Name"
-                      : "Consigner Name",
-                  name: "name",
-                },
-                { label: "Address Line 1", name: "address1" },
-                { label: "Address Line 2", name: "address2" },
-                { label: "State", name: "state" },
-                { label: "Pincode", name: "pincode" },
-                { label: "Mobile Number", name: "mobile" },
-                { label: "Material Name", name: "materialName" },
-                { label: "Material Weight", name: "materialWeight" },
-              ].map((field) => (
-                <Grid item xs={12} key={field.name}>
-                  <TextField
+
+            {/* Tab Navigation */}
+            <Grid container spacing={1} sx={{ mb: 3 }}>
+              {["Consigner", "Consignee", "Material"].map((tab, index) => (
+                <Grid item xs={4} key={tab}>
+                  <Button
                     fullWidth
-                    label={field.label}
-                    name={field.name}
-                    value={values[field.name]}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={touched[field.name] && Boolean(errors[field.name])}
-                    helperText={touched[field.name] && errors[field.name]}
-                  />
+                    variant={activeTab === index ? "contained" : "outlined"}
+                    disabled={!tabAccess[index]}
+                    onClick={() => setActiveTab(index)}
+                  >
+                    {tab}
+                  </Button>
                 </Grid>
               ))}
-
-              {/* Submit Button */}
-              <Grid item xs={12}>
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  color="success"
-                >
-                  Save {partyType === "consignee" ? "Consignee" : "Consigner"}
-                </Button>
-              </Grid>
             </Grid>
-          </form>
-        )}
-      </Formik>
-    </Card>
-  </DialogContent>
-</Dialog>
 
+            {/* Formik Form */}
+            <Formik
+              initialValues={{
+                consignee_mobile: "",
+                consignee_name: "",
+                consignee_gstNumber: "",
+                consignee_address1: "",
+                consignee_address2: "",
+                consignee_state: "",
+                consignee_pincode: "",
+                consigner_mobile: "",
+                consigner_name: "",
+                consigner_gstNumber: "",
+                consigner_address1: "",
+                consigner_address2: "",
+                consigner_state: "",
+                consigner_pincode: "",
+                materialName: "",
+                materialWeight: "",
+              }}
+              validationSchema={validationSchema}
+              onSubmit={handleFormSubmit}
+            >
+              {({
+                values,
+                errors,
+                touched,
+                handleChange,
+                handleBlur,
+                handleSubmit,
+              }) => (
+                <form onSubmit={handleSubmit}>
+                  <Grid container spacing={2}>
+                    {/* Common Fields */}
+                    {activeTab === 0 && (
+                      <>
+                        <Grid item xs={12}>
+                          <TextField
+                            fullWidth
+                            label={partyType === "consignee" ? "Consignee Name" : "Consigner Name"}
+                            name="consigner_name"
+                            value={values.consigner_name}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.name && Boolean(errors.name)}
+                            helperText={touched.name && errors.name}
+                          />
+                        </Grid>
 
+                        <Grid item xs={12}>
+                          <TextField
+                            fullWidth
+                            label="GST Number"
+                            name="consigner_gstNumber"
+                            value={values.consigner_gstNumber}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.gstNumber && Boolean(errors.gstNumber)}
+                            helperText={touched.gstNumber && errors.gstNumber}
+                          />
+                        </Grid>
+                        <Grid item xs={12}>
+                          <TextField
+                            fullWidth
+                            label="Address Line 1"
+                            name="consigner_address1"
+                            value={values.consigner_address1}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.address1 && Boolean(errors.address1)}
+                            helperText={touched.address1 && errors.address1}
+                          />
+                        </Grid>
+                        <Grid item xs={12}>
+                          <TextField
+                            fullWidth
+                            label="Address Line 2"
+                            name="consigner_address2"
+                            value={values.consigner_address2}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.address2 && Boolean(errors.address2)}
+                            helperText={touched.address2 && errors.address2}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <TextField
+                            fullWidth
+                            label="State"
+                            name="consigner_state"
+                            value={values.consigner_state}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.state && Boolean(errors.state)}
+                            helperText={touched.state && errors.state}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <TextField
+                            fullWidth
+                            label="Pincode"
+                            name="consigner_pincode"
+                            value={values.consigner_pincode}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.pincode && Boolean(errors.pincode)}
+                            helperText={touched.pincode && errors.pincode}
+                          />
+                        </Grid>
+                        <Grid item xs={12}>
+                          <TextField
+                            fullWidth
+                            label="Mobile Number"
+                            name="consigner_mobile"
+                            value={values.consigner_mobile}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.mobile && Boolean(errors.mobile)}
+                            helperText={touched.mobile && errors.mobile}
+                          />
+                        </Grid>
+                      </>
+                    )}
 
+                    {/* Consigner / Consignee Info */}
+                    {activeTab === 1 && (
+                      <>
+                        <Grid item xs={12}>
+                          <TextField
+                            fullWidth
+                            label={partyType === "Consigner" ? "Consigner Name" : "Consignee Name"}
+                            name="consignee_name"
+                            value={values.consignee_name}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.name && Boolean(errors.name)}
+                            helperText={touched.name && errors.name}
+                          />
+                        </Grid>
+                        <Grid item xs={12}>
+                          <TextField
+                            fullWidth
+                            label="GST Number"
+                            name="consignee_gstNumber"
+                            value={values.consignee_gstNumber}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.gstNumber && Boolean(errors.gstNumber)}
+                            helperText={touched.gstNumber && errors.gstNumber}
+                          />
+                        </Grid>
+                        <Grid item xs={12}>
+                          <TextField
+                            fullWidth
+                            label="Address Line 1"
+                            name="consignee_address1"
+                            value={values.consignee_address1}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.address1 && Boolean(errors.address1)}
+                            helperText={touched.address1 && errors.address1}
+                          />
+                        </Grid>
+                        <Grid item xs={12}>
+                          <TextField
+                            fullWidth
+                            label="Address Line 2"
+                            name="consignee_address2"
+                            value={values.consignee_address2}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.address2 && Boolean(errors.address2)}
+                            helperText={touched.address2 && errors.address2}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <TextField
+                            fullWidth
+                            label="State"
+                            name="consignee_state"
+                            value={values.consignee_state}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.state && Boolean(errors.state)}
+                            helperText={touched.state && errors.state}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <TextField
+                            fullWidth
+                            label="Pincode"
+                            name="consignee_pincode"
+                            value={values.consignee_pincode}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.pincode && Boolean(errors.pincode)}
+                            helperText={touched.pincode && errors.pincode}
+                          />
+                        </Grid>
+                        <Grid item xs={12}>
+                          <TextField
+                            fullWidth
+                            label="Mobile Number"
+                            name="consignee_mobile"
+                            value={values.consignee_mobile}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.mobile && Boolean(errors.mobile)}
+                            helperText={touched.mobile && errors.mobile}
+                          />
+                        </Grid>
+                      </>
+                    )}
+
+                    {/* Material Info */}
+                    {activeTab === 2 && (
+                      <>
+                        <Grid item xs={12}>
+                          <TextField
+                            fullWidth
+                            label="Material Name"
+                            name="materialName"
+                            value={values.materialName}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.materialName && Boolean(errors.materialName)}
+                            helperText={touched.materialName && errors.materialName}
+                          />
+                        </Grid>
+                        <Grid item xs={12}>
+                          <TextField
+                            fullWidth
+                            label="Material Weight"
+                            name="materialWeight"
+                            value={values.materialWeight}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.materialWeight && Boolean(errors.materialWeight)}
+                            helperText={touched.materialWeight && errors.materialWeight}
+                          />
+                        </Grid>
+                      </>
+                    )}
+
+                    {/* Action Button */}
+                    <Grid item xs={12}>
+                      {activeTab < 2 ? (
+                        <Button
+                          fullWidth
+                          variant="contained"
+                          onClick={() => {
+                            if (isTabValid(activeTab, values)) {
+                              const updatedAccess = [...tabAccess];
+                              updatedAccess[activeTab + 1] = true;
+                              setTabAccess(updatedAccess);
+                              setActiveTab((prev) => prev + 1);
+                            } else {
+                              alert("Please fill all required fields before proceeding.");
+                            }
+                          }}
+                        >
+                          Next
+                        </Button>
+                      ) : (
+                        <Button
+                          type="submit"
+                          fullWidth
+                          variant="contained"
+                          color="success"
+                        >
+                          Save
+                        </Button>
+                      )}
+                    </Grid>
+
+                  </Grid>
+                </form>
+              )}
+            </Formik>
+          </Card>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
