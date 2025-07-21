@@ -50,7 +50,7 @@ export default function LCList() {
         handleSearch={() => {}}
         buttonText="Add T & C"
         searchPlaceholder="Search T & C..."
-        handleBtnClick={() => Router.push("/admin/l&c/create")}
+        handleBtnClick={() => Router.push("/admin/t&c/create")}
       />
 
       <Card>

@@ -126,7 +126,12 @@ const OrderdetailsForm = () => {
     setTempAmount(value || "");
     setOpenAmountEditModal(true);
   };
+  const [openPodModal, setOpenPodModal] = useState(false);
+  const [podFile, setPodFile] = useState(null);
 
+  const handleFileChange = (e) => {
+    setPodFile(e.target.files[0]);
+  };
   return (
     <Card sx={{ p: 3 }}>
       <Tabs value={activeTab} onChange={handleTabChange} sx={{ mb: 2 }}>
@@ -295,13 +300,47 @@ const OrderdetailsForm = () => {
 
                       <Box display="flex" justifyContent="space-between" alignItems="center">
                         <Typography variant="body2">POD Challan</Typography>
-                        <Button variant="contained" size="small" color="primary" sx={{ borderRadius: 2 }}>Add POD</Button>
+                        <Button
+                          variant="contained"
+                          size="small"
+                          color="primary"
+                          sx={{ borderRadius: 2 }}
+                          onClick={() => setOpenPodModal(true)}
+                        >
+                          Add POD
+                        </Button>
                       </Box>
                     </Card>
                   </Grid>
                 </Grid>
               )}
-
+              <Dialog open={openPodModal} onClose={() => setOpenPodModal(false)}>
+                <DialogTitle>POD</DialogTitle>
+                <DialogContent>
+                  <TextField
+                    fullWidth
+                    type="file"
+                    label="Proof of Delivery"
+                    InputLabelProps={{ shrink: true }}
+                    onChange={handleFileChange}
+                  />
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={() => setOpenPodModal(false)} color="error">
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="contained"
+                    onClick={() => {
+                      // You can add upload logic here
+                      console.log("Selected POD file:", podFile);
+                      setOpenPodModal(false);
+                    }}
+                  >
+                    Upload
+                  </Button>
+                </DialogActions>
+              </Dialog>
               <Dialog open={t3lrModalOpen} onClose={() => setT3lrModalOpen(false)} maxWidth="xs" fullWidth>
                 <DialogTitle sx={{ textAlign: "center", fontWeight: 600 }}>
                   T3LR

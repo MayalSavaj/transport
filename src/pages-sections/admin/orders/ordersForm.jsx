@@ -9,7 +9,9 @@ import {
   RadioGroup,
   Typography,
   Box,
+  Autocomplete,
 } from "@mui/material";
+
 import { Formik } from "formik";
 import * as Yup from "yup";
 import React, { useState } from "react";
@@ -42,6 +44,42 @@ const validationSchema = Yup.object().shape({
 const OrdersForm = () => {
   const [formData, setFormData] = useState(null);
   const router = useRouter();
+
+  const partyOptions = [
+    { label: "Party A", value: "Party A" },
+    { label: "B", value: "Party B" },
+  ];
+
+  const supplierOptions = [
+    { label: "Supplier One", value: "Supplier One" },
+    { label: "Supplier Two", value: "Supplier Two" },
+    { label: "Supplier Three", value: "Supplier Three" },
+  ];
+const dropPointOptions = [
+  { label: "Ahmedabad", value: "Ahmedabad" },
+  { label: "Mumbai", value: "Mumbai" },
+  { label: "Delhi", value: "Delhi" },
+  { label: "Bengaluru", value: "Bengaluru" },
+  { label: "Chennai", value: "Chennai" },
+  { label: "Hyderabad", value: "Hyderabad" },
+  { label: "Pune", value: "Pune" },
+  { label: "Jaipur", value: "Jaipur" },
+  { label: "Kolkata", value: "Kolkata" },
+  { label: "Surat", value: "Surat" },
+];
+
+const pickupOptions = [
+  { label: "Ahmedabad", value: "Ahmedabad" },
+  { label: "Mumbai", value: "Mumbai" },
+  { label: "Delhi", value: "Delhi" },
+  { label: "Bengaluru", value: "Bengaluru" },
+  { label: "Chennai", value: "Chennai" },
+  { label: "Hyderabad", value: "Hyderabad" },
+  { label: "Pune", value: "Pune" },
+  { label: "Jaipur", value: "Jaipur" },
+  { label: "Kolkata", value: "Kolkata" },
+  { label: "Surat", value: "Surat" },
+];
 
   return (
     <Card sx={{ p: 3 }}>
@@ -79,21 +117,26 @@ const OrdersForm = () => {
               </Typography>
               <Grid container spacing={3} mb={4}>
                 <Grid item sm={6} xs={12}>
-                  <TextField
-                    select
+                  <Autocomplete
                     fullWidth
-                    label="Party Name"
-                    name="partyName"
                     size="medium"
-                    value={values.partyName}
-                    onChange={handleChange}
+                    options={partyOptions}
+                    getOptionLabel={(option) => option.label}
+                    value={partyOptions.find((opt) => opt.value === values.partyName) || null}
+                    onChange={(e, newValue) =>
+                      setFieldValue("partyName", newValue ? newValue.value : "")
+                    }
                     onBlur={handleBlur}
-                    error={!!touched.partyName && !!errors.partyName}
-                    helperText={touched.partyName && errors.partyName}
-                  >
-                    <MenuItem value="Party A">Party A</MenuItem>
-                    <MenuItem value="Party B">Party B</MenuItem>
-                  </TextField>
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Party Name"
+                        name="partyName"
+                        error={!!touched.partyName && !!errors.partyName}
+                        helperText={touched.partyName && errors.partyName}
+                      />
+                    )}
+                  />
                 </Grid>
 
                 <Grid item sm={6} xs={12}>
@@ -149,13 +192,22 @@ const OrdersForm = () => {
               <Grid container spacing={3} mb={4}>
                 {/* Left Side - Pickup Location */}
                 <Grid item sm={6} xs={12}>
-                  <TextField
+                  <Autocomplete
                     fullWidth
-                    label="Pickup Location"
-                    name="pickup"
                     size="medium"
-                    value={values.pickup}
-                    onChange={handleChange}
+                    options={pickupOptions}
+                    getOptionLabel={(option) => option.label}
+                    value={pickupOptions.find((opt) => opt.value === values.pickup) || null}
+                    onChange={(e, newValue) =>
+                      setFieldValue("pickup", newValue ? newValue.value : "")
+                    }
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Pickup Location"
+                        name="pickup"
+                      />
+                    )}
                   />
                 </Grid>
 
@@ -164,13 +216,26 @@ const OrdersForm = () => {
                   <Grid container spacing={2}>
                     {values.dropPoints.map((drop, index) => (
                       <Grid item xs={12} key={index}>
-                        <TextField
+                        <Autocomplete
                           fullWidth
                           size="medium"
-                          label={`Drop Point ${index + 1}`}
-                          name={`dropPoints[${index}]`}
-                          value={drop}
-                          onChange={handleChange}
+                          options={dropPointOptions}
+                          getOptionLabel={(option) => option.label}
+                          value={
+                            dropPointOptions.find((opt) => opt.value === drop) || null
+                          }
+                          onChange={(event, newValue) => {
+                            const updatedPoints = [...values.dropPoints];
+                            updatedPoints[index] = newValue ? newValue.value : "";
+                            setFieldValue("dropPoints", updatedPoints);
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              label={`Drop Point ${index + 1}`}
+                              name={`dropPoints[${index}]`}
+                            />
+                          )}
                         />
                       </Grid>
                     ))}
@@ -179,10 +244,10 @@ const OrdersForm = () => {
                       <Grid item xs={12}>
                         <Button
                           variant="outlined"
+                          size="small"
                           onClick={() =>
                             setFieldValue("dropPoints", [...values.dropPoints, ""])
                           }
-                          size="small"
                         >
                           + Add Drop Point
                         </Button>
@@ -216,17 +281,31 @@ const OrdersForm = () => {
                 Charges & Supplier
               </Typography>
               <Grid container spacing={3} mb={4}>
+
                 <Grid item sm={6} xs={12}>
-                  <TextField
+                  <Autocomplete
                     fullWidth
-                    label="Settle Supplier"
-                    name="settleSupplier"
                     size="medium"
-                    value={values.settleSupplier}
-                    onChange={handleChange}
+                    options={supplierOptions}
+                    getOptionLabel={(option) => option.label}
+                    value={
+                      supplierOptions.find(
+                        (opt) => opt.value === values.settleSupplier
+                      ) || null
+                    }
+                    onChange={(event, newValue) =>
+                      setFieldValue("settleSupplier", newValue ? newValue.value : "")
+                    }
                     onBlur={handleBlur}
-                    error={!!touched.settleSupplier && !!errors.settleSupplier}
-                    helperText={touched.settleSupplier && errors.settleSupplier}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Select Supplier"
+                        name="settleSupplier"
+                        error={!!touched.settleSupplier && !!errors.settleSupplier}
+                        helperText={touched.settleSupplier && errors.settleSupplier}
+                      />
+                    )}
                   />
                 </Grid>
 

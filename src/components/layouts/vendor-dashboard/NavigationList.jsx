@@ -96,7 +96,7 @@ export const navigations = [
   {
     name: "Number Series",
     icon: duotone.Apps,
-    path: "/admin/number-series"
+    path: "/admin/number-series/create"
 
     // children: [
     //   {
@@ -112,16 +112,16 @@ export const navigations = [
   {
     name: "T&C",
     icon: duotone.Apps,
-    path: "/admin/l&c"
+    path: "/admin/t&c"
 
     // children: [
     //   {
     //     name: "L&C List",
-    //     path: "/admin/l&c"
+    //     path: "/admin/t&c"
     //   },
     //   {
     //     name: "Create L&C",
-    //     path: "/admin/l&c/create"
+    //     path: "/admin/t&c/create"
     //   }
     // ]
   },

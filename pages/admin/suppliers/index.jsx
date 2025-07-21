@@ -22,7 +22,7 @@ const tableHeading = [
   { id: "name", label: "Name", align: "center" },
   { id: "pan_number", label: "PAN", align: "center" },
   { id: "gst_number", label: "GST", align: "center" },
-  { id: "route_name", label: "Route", align: "center" },
+  // { id: "route_name", label: "Route", align: "center" },
   { id: "rood", label: "Rood", align: "center" },
   { id: "address", label: "Address", align: "center" },
   { id: "city", label: "City", align: "center" },

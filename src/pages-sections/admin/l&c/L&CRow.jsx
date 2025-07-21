@@ -9,7 +9,7 @@ const LCRow = ({
     id, terms, type
   } = item;
   const router = useRouter();
-  const handleNavigate = () => router.push(`/admin/l&c/${slug}`);
+  const handleNavigate = () => router.push(`/admin/t&c/${slug}`);
   return <StyledTableRow>
     <StyledTableCell align="left">#{id.split("-")[0]}</StyledTableCell>
 
