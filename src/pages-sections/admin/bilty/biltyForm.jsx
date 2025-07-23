@@ -78,39 +78,42 @@ const BiltyManager = () => {
   const [tabAccess, setTabAccess] = useState([true, false, false]);
 
   const isTabValid = (tabIndex, values) => {
-  if (tabIndex === 0) {
-    // Consigner Tab
-    return (
-      values.consigner_name &&
-      values.consigner_gstNumber &&
-      values.consigner_address1 &&
-      values.consigner_address2 &&
-      values.consigner_state &&
-      values.consigner_pincode &&
-      values.consigner_mobile
-    );
-  }
+    if (tabIndex === 0) {
+      // Consigner Tab
+      return (
+        values.consigner_name &&
+        values.consigner_gstNumber &&
+        values.consigner_address1 &&
+        values.consigner_state &&
+        values.consigner_pincode &&
+        values.consigner_mobile
+      );
+    }
 
-  if (tabIndex === 1) {
-    // Consignee Tab
-    return (
-      values.consignee_name &&
-      values.consignee_gstNumber &&
-      values.consignee_address1 &&
-      values.consignee_address2 &&
-      values.consignee_state &&
-      values.consignee_pincode &&
-      values.consignee_mobile
-    );
-  }
+    if (tabIndex === 1) {
+      // Consignee Tab
+      return (
+        values.consignee_name &&
+        values.consignee_gstNumber &&
+        values.consignee_address1 &&
+        values.consignee_state &&
+        values.consignee_pincode &&
+        values.consignee_mobile
+      );
+    }
 
-  if (tabIndex === 2) {
-    // Material Tab
-    return values.materialName && values.materialWeight;
-  }
+    if (tabIndex === 2) {
+  return (
+    values.materialDetail &&
+    values.totalWeight &&
+    values.ewayBillNo &&
+    values.invoiceNo &&
+    values.materialAmount
+  );
+}
 
-  return false;
-};
+    return false;
+  };
 
 
   return (
@@ -196,8 +199,11 @@ const BiltyManager = () => {
                 consigner_address2: "",
                 consigner_state: "",
                 consigner_pincode: "",
-                materialName: "",
-                materialWeight: "",
+                materialDetail: "",
+                totalWeight: "",
+                ewayBillNo: "",
+                invoiceNo: "",
+                materialAmount: "",
               }}
               validationSchema={validationSchema}
               onSubmit={handleFormSubmit}
@@ -373,29 +379,72 @@ const BiltyManager = () => {
                     {activeTab === 2 && (
                       <>
                         <Grid item xs={12}>
-                          <TextField
-                            fullWidth
-                            label="Material Name"
-                            name="materialName"
-                            value={values.materialName}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            error={touched.materialName && Boolean(errors.materialName)}
-                            helperText={touched.materialName && errors.materialName}
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <TextField
-                            fullWidth
-                            label="Material Weight"
-                            name="materialWeight"
-                            value={values.materialWeight}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            error={touched.materialWeight && Boolean(errors.materialWeight)}
-                            helperText={touched.materialWeight && errors.materialWeight}
-                          />
-                        </Grid>
+  <TextField
+    fullWidth
+    multiline
+    minRows={3}
+    label="Material Detail"
+    name="materialDetail"
+    value={values.materialDetail}
+    onChange={handleChange}
+    onBlur={handleBlur}
+    error={touched.materialDetail && Boolean(errors.materialDetail)}
+    helperText={touched.materialDetail && errors.materialDetail}
+  />
+</Grid>
+
+<Grid item xs={12} sm={6}>
+  <TextField
+    fullWidth
+    label="Total Weight"
+    name="totalWeight"
+    value={values.totalWeight}
+    onChange={handleChange}
+    onBlur={handleBlur}
+    error={touched.totalWeight && Boolean(errors.totalWeight)}
+    helperText={touched.totalWeight && errors.totalWeight}
+  />
+</Grid>
+
+<Grid item xs={12} sm={6}>
+  <TextField
+    fullWidth
+    label="E-Way Bill No"
+    name="ewayBillNo"
+    value={values.ewayBillNo}
+    onChange={handleChange}
+    onBlur={handleBlur}
+    error={touched.ewayBillNo && Boolean(errors.ewayBillNo)}
+    helperText={touched.ewayBillNo && errors.ewayBillNo}
+  />
+</Grid>
+
+<Grid item xs={12} sm={6}>
+  <TextField
+    fullWidth
+    label="Invoice Number"
+    name="invoiceNo"
+    value={values.invoiceNo}
+    onChange={handleChange}
+    onBlur={handleBlur}
+    error={touched.invoiceNo && Boolean(errors.invoiceNo)}
+    helperText={touched.invoiceNo && errors.invoiceNo}
+  />
+</Grid>
+
+<Grid item xs={12} sm={6}>
+  <TextField
+    fullWidth
+    label="Material Amount"
+    name="materialAmount"
+    value={values.materialAmount}
+    onChange={handleChange}
+    onBlur={handleBlur}
+    error={touched.materialAmount && Boolean(errors.materialAmount)}
+    helperText={touched.materialAmount && errors.materialAmount}
+  />
+</Grid>
+
                       </>
                     )}
 

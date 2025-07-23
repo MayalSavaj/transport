@@ -16,7 +16,7 @@ const tableHeading = [
   { id: "gst_number", label: "GST Number", align: "left" },
   { id: "contact_person", label: "Contact Person", align: "left" },
   { id: "contact_number", label: "Contact Number", align: "left" },
-  { id: "create_period", label: "Create Period", align: "left" },
+  { id: "city", label: "city", align: "left" },
   { id: "action", label: "Action", align: "center" }
 ];
 PartyList.getLayout = function getLayout(page) {

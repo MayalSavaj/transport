@@ -58,6 +58,21 @@ const PartysForm = (props) => {
                   helperText={touched.pan_number && errors.pan_number}
                 />
               </Grid>
+               <Grid item sm={6} xs={12}>
+                <TextField
+                  fullWidth
+                  name="vendoe_code"
+                  label="Vendor Code"
+                  color="info"
+                  size="medium"
+                  placeholder="Vendor Code"
+                  value={values.vendoe_code}
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  error={!!touched.vendoe_code && !!errors.vendoe_code}
+                  helperText={touched.vendoe_code && errors.vendoe_code}
+                />
+              </Grid>
               <Grid item sm={6} xs={12}>
                 <TextField
                   fullWidth
@@ -172,7 +187,7 @@ const PartysForm = (props) => {
                 <TextField
                   fullWidth
                   name="create_period"
-                  label="Create Period"
+                  label="Create Period (Days)"
                   color="info"
                   size="medium"
                   placeholder="Create Period"

@@ -13,6 +13,7 @@ export default function CreateParty() {
     name: "",
     gst_number: "",
     pan_number: "",
+    vendoe_code: "",
     contact_person: "",
     contact_number: "",
     address: "",
@@ -38,7 +39,8 @@ export default function CreateParty() {
       .string()
       .required("Pincode is required")
       .matches(/^\d{6}$/, "Enter a valid 6-digit pincode"),
-    create_period: yup.string().required("Create Period is required")
+    create_period: yup.string().required("Create Period is required"),
+    vendoe_code: yup.string().required("Vendor Code is required")
   });
 
   const handleFormSubmit = (values) => {

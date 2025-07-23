@@ -11,7 +11,7 @@ const PartysRow = ({
     gst_number,
     contact_person,
     contact_number,
-    create_period
+    city
   } = product;
   const router = useRouter();
   return <StyledTableRow>
@@ -20,7 +20,7 @@ const PartysRow = ({
     <StyledTableCell align="left">{gst_number}</StyledTableCell>
     <StyledTableCell align="left">{contact_person}</StyledTableCell>
     <StyledTableCell align="left">{contact_number}</StyledTableCell>
-    <StyledTableCell align="left">{create_period}</StyledTableCell>
+    <StyledTableCell align="left">{city}</StyledTableCell>
 
     <StyledTableCell align="center">
       <StyledIconButton onClick={() => router.push(`/admin/Partys/${slug}`)}>
