@@ -35,15 +35,15 @@ const SuppliersRow = ({
 
     <StyledTableCell align="center">{name}</StyledTableCell>
 
-    <StyledTableCell align="center">{pan_number}</StyledTableCell>
-    <StyledTableCell align="center">{gst_number}</StyledTableCell>
-    <StyledTableCell align="center">{rood}</StyledTableCell>
+    {/* <StyledTableCell align="center">{pan_number}</StyledTableCell> */}
+    {/* <StyledTableCell align="center">{gst_number}</StyledTableCell> */}
+    {/* <StyledTableCell align="center">{rood}</StyledTableCell> */}
 
     {/* <StyledTableCell align="center">{route_name}</StyledTableCell> */}
-    <StyledTableCell align="center">{address}</StyledTableCell>
-    <StyledTableCell align="center">{city}</StyledTableCell>
-    <StyledTableCell align="center">{state}</StyledTableCell>
-    <StyledTableCell align="center">{pin_code}</StyledTableCell>
+    {/* <StyledTableCell align="center">{address}</StyledTableCell> */}
+    {/* <StyledTableCell align="center">{city}</StyledTableCell> */}
+    {/* <StyledTableCell align="center">{state}</StyledTableCell> */}
+    {/* <StyledTableCell align="center">{pin_code}</StyledTableCell> */}
     <StyledTableCell align="center">{contact_person}</StyledTableCell>
     <StyledTableCell align="center">{contact_number}</StyledTableCell>
 

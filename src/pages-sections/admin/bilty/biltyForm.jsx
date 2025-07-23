@@ -243,25 +243,13 @@ const BiltyManager = () => {
                         <Grid item xs={12}>
                           <TextField
                             fullWidth
-                            label="Address Line 1"
+                            label="Address"
                             name="consigner_address1"
                             value={values.consigner_address1}
                             onChange={handleChange}
                             onBlur={handleBlur}
                             error={touched.address1 && Boolean(errors.address1)}
                             helperText={touched.address1 && errors.address1}
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <TextField
-                            fullWidth
-                            label="Address Line 2"
-                            name="consigner_address2"
-                            value={values.consigner_address2}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            error={touched.address2 && Boolean(errors.address2)}
-                            helperText={touched.address2 && errors.address2}
                           />
                         </Grid>
                         <Grid item xs={6}>
@@ -333,25 +321,13 @@ const BiltyManager = () => {
                         <Grid item xs={12}>
                           <TextField
                             fullWidth
-                            label="Address Line 1"
+                            label="Address"
                             name="consignee_address1"
                             value={values.consignee_address1}
                             onChange={handleChange}
                             onBlur={handleBlur}
                             error={touched.address1 && Boolean(errors.address1)}
                             helperText={touched.address1 && errors.address1}
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <TextField
-                            fullWidth
-                            label="Address Line 2"
-                            name="consignee_address2"
-                            value={values.consignee_address2}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            error={touched.address2 && Boolean(errors.address2)}
-                            helperText={touched.address2 && errors.address2}
                           />
                         </Grid>
                         <Grid item xs={6}>

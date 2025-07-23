@@ -347,7 +347,7 @@ const OrderdetailsForm = () => {
                 </DialogTitle>
                 <DialogContent sx={{ py: 3 }}>
                   <Typography variant="body2" mt={1} align="center">
-                    Do you want to continue with the T3LR process?
+                    Do you want Create LR Number
                   </Typography>
                   <Stack direction="row" justifyContent="center" spacing={2} mt={3}>
                     <Button

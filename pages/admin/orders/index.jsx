@@ -10,8 +10,8 @@ import Scrollbar from "components/Scrollbar";
 import { OrdersRow } from "pages-sections/admin";
 const tableHeading = [
   { id: "id", label: "ID", align: "left" },
-  { id: "lrNo", label: "LR No", align: "left" },
   { id: "date", label: "Date", align: "left" },
+  { id: "lrNo", label: "LR No", align: "left" },
   { id: "party", label: "Party Name", align: "left" },
   { id: "city", label: "City", align: "left" },
   { id: "freight", label: "Freight", align: "left" },

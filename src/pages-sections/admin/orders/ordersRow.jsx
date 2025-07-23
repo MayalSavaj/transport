@@ -12,8 +12,9 @@ const ordersRow = ({
   const handleNavigate = () => router.push(`/admin/orders/${slug}`);
   return <StyledTableRow>
     <StyledTableCell align="left">#{id.split("-")[0]}</StyledTableCell>
-    <StyledTableCell align="left">{lrNo}</StyledTableCell>
     <StyledTableCell align="left">{date}</StyledTableCell>
+
+    <StyledTableCell align="left">{lrNo}</StyledTableCell>
 
     <StyledTableCell align="left">
       <CategoryWrapper>{party}</CategoryWrapper>
