@@ -1,5 +1,15 @@
 import Router from "next/router";
-import { Box, Card, Stack, Table, TableContainer, TableBody, TableCell, TableRow, Chip } from "@mui/material";
+import {
+  Box,
+  Card,
+  Stack,
+  Table,
+  TableContainer,
+  TableBody,
+  TableCell,
+  TableRow,
+  Chip
+} from "@mui/material";
 import SearchArea from "components/dashboard/SearchArea";
 import TableHeader from "components/data-table/TableHeader";
 import TablePagination from "components/data-table/TablePagination";
@@ -7,7 +17,7 @@ import VendorDashboardLayout from "components/layouts/vendor-dashboard";
 import { H3 } from "components/Typography";
 import useMuiTable from "hooks/useMuiTable";
 import Scrollbar from "components/Scrollbar";
-import { OrdersRow } from "pages-sections/admin";
+
 const tableHeading = [
   { id: "id", label: "ID", align: "left" },
   { id: "date", label: "Date", align: "left" },
@@ -25,52 +35,58 @@ OrdersList.getLayout = function getLayout(page) {
 
 export default function OrdersList() {
   const categories = [
-    {
-      id: "1",
-      party: "ABC Logistics",
-      city: "Ahmedabad - Mumbai",
-      date: "2025-06-01",
-      lrNo: "LR-12345",
-      freight: 5000,
-      status: "Pending"
-    },
-    {
-      id: "2",
-      party: "XYZ Transport",
-      city: "Surat - Delhi",
-      date: "2025-06-05",
-      lrNo: "LR-23456",
-      freight: 8500,
-      status: "Complete"
-    },
-    {
-      id: "3",
-      party: "Global Freight",
-      city: "Rajkot - Pune",
-      date: "2025-06-10",
-      lrNo: "LR-34567",
-      freight: 7800,
-      status: "Pending"
-    },
-    {
-      id: "4",
-      party: "Express Movers",
-      city: "Baroda - Chennai",
-      date: "2025-06-15",
-      lrNo: "LR-45678",
-      freight: 12000,
-      status: "In Transit"
-    },
-    {
-      id: "5",
-      party: "Swift Logistics",
-      city: "Anand - Jaipur",
-      date: "2025-06-20",
-      lrNo: "LR-56789",
-      freight: 6700,
-      status: "Complete"
-    }
-  ];
+  {
+    id: "1",
+    party: "ABC Logistics",
+    city: "Ahmedabad - Mumbai",
+    date: "2025-06-01",
+    lrNo: "LR-12345",
+    freight: 5000,
+    status: "Pending",
+    slow: 4
+  },
+  {
+    id: "2",
+    party: "XYZ Transport",
+    city: "Surat - Delhi",
+    date: "2025-06-05",
+    lrNo: "LR-23456",
+    freight: 8500,
+    status: "Complete",
+    slow: 2
+  },
+  {
+    id: "3",
+    party: "Global Freight",
+    city: "Rajkot - Pune",
+    date: "2025-06-10",
+    lrNo: "LR-34567",
+    freight: 7800,
+    status: "Pending",
+    slow: 3
+  },
+  {
+    id: "4",
+    party: "Express Movers",
+    city: "Baroda - Chennai",
+    date: "2025-06-15",
+    lrNo: "LR-45678",
+    freight: 12000,
+    status: "In Transit",
+    slow: 1
+  },
+  {
+    id: "5",
+    party: "Swift Logistics",
+    city: "Anand - Jaipur",
+    date: "2025-06-20",
+    lrNo: "LR-56789",
+    freight: 6700,
+    status: "Complete",
+    slow: 5
+  }
+];
+
 
   const {
     order,
@@ -111,7 +127,39 @@ export default function OrdersList() {
 
               <TableBody>
                 {filteredList.map((item) => (
-                  <OrdersRow key={item.id} item={item} />
+                  <TableRow key={item.id} hover>
+                    <TableCell>{item.id}</TableCell>
+                    <TableCell>{item.date}</TableCell>
+                    <TableCell>
+                      {item.lrNo}
+                      <Chip
+                        label={item.slow}
+                        color="secondary"
+                        size="small"
+                        sx={{ ml: 1 }}
+                      />
+                    </TableCell>
+                    <TableCell>{item.party}</TableCell>
+                    <TableCell>{item.city}</TableCell>
+                    <TableCell>{item.freight}</TableCell>
+                    <TableCell>
+                      <Chip
+                        label={item.status}
+                        color={
+                          item.status === "Complete"
+                            ? "success"
+                            : item.status === "Pending"
+                            ? "warning"
+                            : "info"
+                        }
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell align="center">
+                      {/* Replace this with your Action buttons */}
+                      Action
+                    </TableCell>
+                  </TableRow>
                 ))}
               </TableBody>
             </Table>
