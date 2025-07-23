@@ -255,39 +255,10 @@ const OrderdetailsForm = () => {
 
                   {/* === RIGHT SIDE (Profit) === */}
                   <Grid item xs={12} md={4}>
-                    {/* Trip Profit Card */}
-                    <Card sx={{ p: 3, borderRadius: 3, boxShadow: 3 }}>
-                      <Typography variant="h6" fontWeight={700} mb={3}>Profit</Typography>
-
-                      {/* Revenue */}
-                      <Box mb={2}>
-                        <Typography variant="body2" color="text.secondary" mb={0.5}>(+) Revenue</Typography>
-                        <Box display="flex" justifyContent="space-between">
-                          <Typography>Nirav</Typography>
-                          <Typography fontWeight={600} color="primary.main">₹ 500</Typography>
-                        </Box>
-                      </Box>
-
-                      {/* Expense */}
-                      <Box mb={2}>
-                        <Typography variant="body2" color="text.secondary" mb={0.5}>(-) Expense</Typography>
-                        <Box display="flex" justifyContent="space-between">
-                          <Typography>Truck Hire Cost</Typography>
-                          <Typography fontWeight={600} color="error.main">₹ 200</Typography>
-                        </Box>
-                      </Box>
-
-                      {/* Total Profit */}
-                      <Box mt={3} pt={2} borderTop="1px dashed #ccc">
-                        <Box display="flex" justifyContent="space-between">
-                          <Typography variant="body2" color="text.secondary">Profit</Typography>
-                          <Typography fontWeight={700} color="success.main" fontSize={24}>₹ 300</Typography>
-                        </Box>
-                      </Box>
-                    </Card>
+                 
 
                     {/* Action Buttons Card */}
-                    <Card sx={{ mt: 3, p: 3, borderRadius: 3, boxShadow: 2 }}>
+                    <Card sx={{ mt: 3, p: 3, borderRadius: 3, boxShadow: 3 }}>
                       <Typography variant="subtitle2" fontWeight={600} mb={2}>Nirav</Typography>
 
                       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
@@ -372,71 +343,110 @@ const OrderdetailsForm = () => {
               </Dialog>
 
 
-              {activeTab === 1 && (
-                <>
-                  {/* Party Amount */}
-                  <Typography variant="h6" fontWeight={800} mb={2}>Party Amount</Typography>
-                  <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-                    <Typography variant="subtitle1">Party Amount</Typography>
-                    <Box display="flex" alignItems="center" gap={1}>
-                      <Typography color="primary" fontWeight={600}>₹ {values.Party || 0}</Typography>
-                      <Button size="small" onClick={() => handleOpenAmountEdit("Party", values.Party)}>✏️</Button>
-                    </Box>
-                  </Box>
-                  <Box pl={2} mb={2}>
-                    <Typography variant="body2">(-) Advance</Typography>
-                    <Button size="small" color="primary" onClick={() => {
-                      setAdvanceType("party"); setOpenAdvanceModal(true);
-                    }}>Add Advance</Button>
-                    <Typography variant="body2" mt={2}>(+) Charges</Typography>
-                    <Button size="small" color="primary" onClick={() => {
-                      setChargeType("party"); setOpenChargeModal(true);
-                    }}>Add Charge</Button>
-                  </Box>
-                  <Box display="flex" justifyContent="space-between" mt={2} mb={4}>
-                    <Typography fontWeight={700}>Pending Party Balance</Typography>
-                    <Typography color="primary" fontWeight={700}>
-                      ₹ {
-                        (
-                          parseFloat(values.Party || 0) -
-                          (advanceType === "party" ? parseFloat(advanceData.amount || 0) : 0) +
-                          (chargeType === "party" ? parseFloat(chargeData.amount || 0) : 0)
-                        ).toFixed(2)
-                      }
-                    </Typography>
-                  </Box>
+             {activeTab === 1 && (
+  <Grid container spacing={3}>
+    {/* Left Side - Party/Supplier Amount */}
+    <Grid item xs={12} md={8}>
+      {/* Party Amount */}
+      <Typography variant="h6" fontWeight={800} mb={2}>Party Amount</Typography>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+        <Typography variant="subtitle1">Party Amount</Typography>
+        <Box display="flex" alignItems="center" gap={1}>
+          <Typography color="primary" fontWeight={600}>₹ {values.Party || 0}</Typography>
+          <Button size="small" onClick={() => handleOpenAmountEdit("Party", values.Party)}>✏️</Button>
+        </Box>
+      </Box>
+      <Box pl={2} mb={2}>
+        <Typography variant="body2">(-) Advance</Typography>
+        <Button size="small" color="primary" onClick={() => {
+          setAdvanceType("party"); setOpenAdvanceModal(true);
+        }}>Add Advance</Button>
+        <Typography variant="body2" mt={2}>(+) Charges</Typography>
+        <Button size="small" color="primary" onClick={() => {
+          setChargeType("party"); setOpenChargeModal(true);
+        }}>Add Charge</Button>
+      </Box>
+      <Box display="flex" justifyContent="space-between" mt={2} mb={4}>
+        <Typography fontWeight={700}>Pending Party Balance</Typography>
+        <Typography color="primary" fontWeight={700}>
+          ₹ {
+            (
+              parseFloat(values.Party || 0) -
+              (advanceType === "party" ? parseFloat(advanceData.amount || 0) : 0) +
+              (chargeType === "party" ? parseFloat(chargeData.amount || 0) : 0)
+            ).toFixed(2)
+          }
+        </Typography>
+      </Box>
 
-                  {/* Supplier Amount */}
-                  <Typography variant="h6" fontWeight={800} mt={3} mb={2}>Supplier Amount</Typography>
-                  <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-                    <Typography variant="subtitle1">Supplier Amount</Typography>
-                    <Box display="flex" alignItems="center" gap={1}>
-                      <Typography color="primary" fontWeight={600}>₹ {values.Supplier || 0}</Typography>
-                      <Button size="small" onClick={() => handleOpenAmountEdit("Supplier", values.Supplier)}>✏️</Button>
-                    </Box>
-                  </Box>
-                  <Box pl={2} mb={2}>
-                    <Typography variant="body2">(-) Advance</Typography>
-                    <Button size="small" color="primary" onClick={() => {
-                      setAdvanceType("supplier"); setOpenAdvanceModal(true);
-                    }}>Add Supplier Advance</Button>
-                    <Typography variant="body2" mt={2}>(+) Charges</Typography>
-                    <Button size="small" color="primary" onClick={() => {
-                      setChargeType("supplier"); setOpenChargeModal(true);
-                    }}>Add Supplier Charge</Button>
-                  </Box>
-                  <Box display="flex" justifyContent="space-between" mt={2} mb={4}>
-                    <Typography fontWeight={700}>Pending Supplier Balance</Typography>
-                    <Typography color="primary" fontWeight={700}>
-                      ₹ {
-                        (parseFloat(values.Supplier || 0) -
-                          (advanceType === "supplier" ? parseFloat(advanceData.amount || 0) : 0) +
-                          (chargeType === "supplier" ? parseFloat(chargeData.amount || 0) : 0)
-                        ).toFixed(2)}
-                    </Typography>
-                  </Box>
-                </>
-              )}
+      {/* Supplier Amount */}
+      <Typography variant="h6" fontWeight={800} mt={3} mb={2}>Supplier Amount</Typography>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+        <Typography variant="subtitle1">Supplier Amount</Typography>
+        <Box display="flex" alignItems="center" gap={1}>
+          <Typography color="primary" fontWeight={600}>₹ {values.Supplier || 0}</Typography>
+          <Button size="small" onClick={() => handleOpenAmountEdit("Supplier", values.Supplier)}>✏️</Button>
+        </Box>
+      </Box>
+      <Box pl={2} mb={2}>
+        <Typography variant="body2">(-) Advance</Typography>
+        <Button size="small" color="primary" onClick={() => {
+          setAdvanceType("supplier"); setOpenAdvanceModal(true);
+        }}>Add Supplier Advance</Button>
+        <Typography variant="body2" mt={2}>(+) Charges</Typography>
+        <Button size="small" color="primary" onClick={() => {
+          setChargeType("supplier"); setOpenChargeModal(true);
+        }}>Add Supplier Charge</Button>
+      </Box>
+      <Box display="flex" justifyContent="space-between" mt={2} mb={4}>
+        <Typography fontWeight={700}>Pending Supplier Balance</Typography>
+        <Typography color="primary" fontWeight={700}>
+          ₹ {
+            (
+              parseFloat(values.Supplier || 0) -
+              (advanceType === "supplier" ? parseFloat(advanceData.amount || 0) : 0) +
+              (chargeType === "supplier" ? parseFloat(chargeData.amount || 0) : 0)
+            ).toFixed(2)
+          }
+        </Typography>
+      </Box>
+    </Grid>
+
+    {/* Right Side - Profit Card */}
+    <Grid item xs={12} md={4}>
+      <Card sx={{ p: 3, borderRadius: 3, boxShadow: 3 }}>
+        <Typography variant="h6" fontWeight={700} mb={3}>Profit</Typography>
+
+        {/* Revenue */}
+        <Box mb={2}>
+          <Typography variant="body2" color="text.secondary" mb={0.5}>(+) Revenue</Typography>
+          <Box display="flex" justifyContent="space-between">
+            <Typography>Nirav</Typography>
+            <Typography fontWeight={600} color="primary.main">₹ 500</Typography>
+          </Box>
+        </Box>
+
+        {/* Expense */}
+        <Box mb={2}>
+          <Typography variant="body2" color="text.secondary" mb={0.5}>(-) Expense</Typography>
+          <Box display="flex" justifyContent="space-between">
+            <Typography>Truck Hire Cost</Typography>
+            <Typography fontWeight={600} color="error.main">₹ 200</Typography>
+          </Box>
+        </Box>
+
+        {/* Total Profit */}
+        <Box mt={3} pt={2} borderTop="1px dashed #ccc">
+          <Box display="flex" justifyContent="space-between">
+            <Typography variant="body2" color="text.secondary">Profit</Typography>
+            <Typography fontWeight={700} color="success.main" fontSize={24}>₹ 300</Typography>
+          </Box>
+        </Box>
+      </Card>
+    </Grid>
+  </Grid>
+)}
+
 
               <Box textAlign="right" mt={4}>
                 <Button variant="contained" type="submit">
