@@ -8,21 +8,19 @@ const PartypaymentRow = ({
   const {
      id, name,amount
    } = item;
-   const router = useRouter();
+    const router = useRouter();
+  const handleNavigate = () => router.push(`/admin/party-Settle`);
    return <StyledTableRow>
      <StyledTableCell align="left">#{id.split("-")[0]}</StyledTableCell>
  
-     <StyledTableCell align="left">
-       <CategoryWrapper>{name}</CategoryWrapper>
+     <StyledTableCell align="left" onClick={handleNavigate}>
+       <CategoryWrapper >{name}</CategoryWrapper>
      </StyledTableCell>
  
      <StyledTableCell align="left">{amount}</StyledTableCell>
  
      <StyledTableCell align="center">
-       <StyledIconButton onClick={handleNavigate}>
-         <Edit />
-       </StyledIconButton>
- 
+     
        <StyledIconButton>
          <Delete />
        </StyledIconButton>

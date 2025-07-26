@@ -9,10 +9,12 @@ const SupplierpaymentRow = ({
     id, name,amount
   } = item;
   const router = useRouter();
+  const handleNavigate = () => router.push(`/admin/party-Settle`);
+
   return <StyledTableRow>
     <StyledTableCell align="left">#{id.split("-")[0]}</StyledTableCell>
 
-    <StyledTableCell align="left">
+    <StyledTableCell align="left" onClick={handleNavigate}>
       <CategoryWrapper>{name}</CategoryWrapper>
     </StyledTableCell>
 
