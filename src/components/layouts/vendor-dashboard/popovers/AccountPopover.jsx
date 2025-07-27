@@ -19,7 +19,7 @@ const AccountPopover = () => {
 
   // Navigate to profile page
   const handleProfileClick = () => {
-    router.push("/profile");
+    router.push("/admin/profile");
     handleClose();
   };
 

@@ -130,6 +130,7 @@ const pickupOptions = [
                     renderInput={(params) => (
                       <TextField
                         {...params}
+                       size="medium"
                         label="Party Name"
                         name="partyName"
                         error={!!touched.partyName && !!errors.partyName}
@@ -204,6 +205,7 @@ const pickupOptions = [
                     renderInput={(params) => (
                       <TextField
                         {...params}
+                        size="medium"
                         label="Pickup Location"
                         name="pickup"
                       />
@@ -232,6 +234,7 @@ const pickupOptions = [
                           renderInput={(params) => (
                             <TextField
                               {...params}
+                              size="medium"
                               label={`Drop Point ${index + 1}`}
                               name={`dropPoints[${index}]`}
                             />
@@ -300,6 +303,7 @@ const pickupOptions = [
                     renderInput={(params) => (
                       <TextField
                         {...params}
+                        size="medium"
                         label="Select Supplier"
                         name="settleSupplier"
                         error={!!touched.settleSupplier && !!errors.settleSupplier}

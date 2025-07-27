@@ -1,11 +1,11 @@
 import duotone from "components/icons/duotone";
 
 export const navigations = [
-  {
-    name: "Profile",
-    icon: duotone.Customers,
-    path: "/admin/profile",
-  },
+  // {
+  //   name: "Profile",
+  //   icon: duotone.Customers,
+  //   path: "/admin/profile",
+  // },
   {
     type: "label",
     label: "TransCation"

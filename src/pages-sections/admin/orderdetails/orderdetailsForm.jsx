@@ -13,16 +13,26 @@ import {
   DialogActions,
   Tab as MuiTab,
   Tabs as MuiTabs,
-  Fade,
   Stack,
-  IconButton
+  CardHeader,
+  CardContent,
+  Divider,
 } from "@mui/material";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import React, { useState } from "react";
 import { useRouter } from "next/router";
-import DownloadIcon from "@mui/icons-material/Download";
-
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
+import PlayCircleFilledWhiteIcon from "@mui/icons-material/PlayCircleFilledWhite";
+import PersonIcon from "@mui/icons-material/Person";
+import BusinessIcon from "@mui/icons-material/Business";
+import DescriptionIcon from "@mui/icons-material/Description";
+import PaymentsIcon from "@mui/icons-material/Payments";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
 const initialValues = {
   partyName: "",
@@ -50,7 +60,6 @@ const validationSchema = Yup.object().shape({
   hiringCost: Yup.number().required("Required"),
 });
 
-// Main component
 const OrderdetailsForm = () => {
   const [activeTab, setActiveTab] = useState(0);
   const router = useRouter();
@@ -59,41 +68,9 @@ const OrderdetailsForm = () => {
   const [openAdvanceModal, setOpenAdvanceModal] = useState(false);
   const [openChargeModal, setOpenChargeModal] = useState(false);
   const [openAmountEditModal, setOpenAmountEditModal] = useState(false);
-  const [opnelrModal, setOpenlrModal] = useState(false);
   const [t3lrModalOpen, setT3lrModalOpen] = useState(false);
   const [selectedCity, setSelectedCity] = useState(null);
 
-  const [t3lrForm, setT3lrForm] = useState({
-
-    consignee: "",
-    consigner: "",
-    material: "",
-  });
-  const handleDownload = (item) => {
-    console.log(`Downloading ${item.city} - ${item.lrNumber}`);
-  };
-  const handleCityClick = (item) => {
-    setSelectedCity(item.city);
-    setT3lrForm({ consignee: "", consigner: "" });
-  };
-
-
-  const handleCloseCityModal = () => {
-    setSelectedCity(null);
-  };
-  const lrDataList = [
-    { city: "Surat", lrNumber: "LR101" },
-    { city: "Rajkot", lrNumber: "LR205" },
-    { city: "Ahmedabad", lrNumber: "LR309" },
-  ];
-  const handleFormChange = (field) => (event) => {
-    setT3lrForm((prev) => ({ ...prev, [field]: event.target.value }));
-  };
-  const handleSave = () => {
-    console.log("Saved Data:", { city: selectedCity, ...formData });
-    setSelectedCity(null);
-  };
-  // Data management
   const [advanceType, setAdvanceType] = useState("party");
   const [chargeType, setChargeType] = useState("party");
   const [editAmountType, setEditAmountType] = useState("party");
@@ -110,7 +87,6 @@ const OrderdetailsForm = () => {
     description: "",
   });
 
-  // Handlers
   const handleAdvanceChange = (field, value) => {
     setAdvanceData((prev) => ({ ...prev, [field]: value }));
   };
@@ -132,6 +108,14 @@ const OrderdetailsForm = () => {
   const handleFileChange = (e) => {
     setPodFile(e.target.files[0]);
   };
+
+  const steps = [
+    { label: "Started", icon: <PlayCircleFilledWhiteIcon /> },
+    { label: "In-transit", icon: <DirectionsCarIcon /> },
+    { label: "Completed", icon: <CheckCircleIcon /> },
+  ];
+
+  const activeStep = 2;
   return (
     <Card sx={{ p: 3 }}>
       <Tabs value={activeTab} onChange={handleTabChange} sx={{ mb: 2 }}>
@@ -166,107 +150,273 @@ const OrderdetailsForm = () => {
 
               {activeTab === 0 && (
                 <Grid container spacing={3}>
-                  {/* === LEFT SIDE (Trip Info) === */}
+                  {/* === LEFT SIDE === */}
                   <Grid item xs={12} md={8}>
                     <Card sx={{ p: 4, borderRadius: 3, boxShadow: 3 }}>
                       {/* Header */}
-                      <Box display="flex" alignItems="center" mb={2}>
-                        <Typography variant="h6" fontWeight={700}>GJ 05 BB 1111</Typography>
-                        <Box ml={2} px={1.5} py={0.5} bgcolor="warning.main" color="#fff" borderRadius={1} fontSize={12}>
+                      <Box display="flex" alignItems="center" justifyContent="space-between" mb={3}>
+                        <Box display="flex" alignItems="center" gap={1}>
+                          <DirectionsCarIcon color="primary" />
+                          <Typography variant="h6" fontWeight={700}>GJ 05 BB 1111</Typography>
+                        </Box>
+                        <Box px={2} py={0.5} bgcolor="warning.main" color="#fff" borderRadius={1} fontSize={12}>
                           MARKET
                         </Box>
                       </Box>
 
-                      {/* Party Info */}
-                      <Typography variant="subtitle1" fontWeight={600} mb={2}>Nirav</Typography>
+                      {/* Party & LR Info */}
+                      <Card variant="outlined" sx={{ borderRadius: 2, p: 3, boxShadow: 2 }}>
+                        <CardContent>
+                          <Divider sx={{ mb: 3 }} />
 
-                      <Grid container spacing={3}>
-                        <Grid item sm={6}>
-                          <Typography variant="body2" color="text.secondary">Party Name</Typography>
-                          <Typography fontWeight={600} color="primary.main">Nirav</Typography>
-                          <Typography variant="body2" color="text.secondary" mt={1}>Party Balance</Typography>
-                          <Typography fontWeight={600} color="success.main">₹ 500</Typography>
+                          <Grid container spacing={4}>
+                            {/* Left Column: Party, Supplier, Pay By */}
+                            <Grid item xs={12} sm={6}>
+                              <Stack spacing={3}>
+                                {/* Party Name */}
+                                <Box display="flex" alignItems="center" gap={1}>
+                                  <PersonIcon fontSize="small" color="primary" />
+                                  <Box>
+                                    <Typography variant="body2" color="text.secondary">Party Name</Typography>
+                                    <Typography fontWeight={600}>Nirav</Typography>
+                                  </Box>
+                                </Box>
+
+                                {/* Supplier Name */}
+                                <Box display="flex" alignItems="center" gap={1}>
+                                  <BusinessIcon fontSize="small" color="primary" />
+                                  <Box>
+                                    <Typography variant="body2" color="text.secondary">Supplier Name</Typography>
+                                    <Typography fontWeight={600}>Rajesh</Typography>
+                                  </Box>
+                                </Box>
+
+                                {/* Pay By */}
+                                <Box display="flex" alignItems="center" gap={1}>
+                                  <PaymentsIcon fontSize="small" color="primary" />
+                                  <Box>
+                                    <Typography variant="body2" color="text.secondary">Pay By</Typography>
+                                    <Typography fontWeight={600}>Billed</Typography>
+                                  </Box>
+                                </Box>
+                              </Stack>
+                            </Grid>
+
+                            {/* Right Column: LR Numbers */}
+                            <Grid item xs={12} sm={6}>
+                              <Typography
+                                variant="h6"
+                                fontWeight={600}
+                                gutterBottom
+                                sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                              >
+                                <DescriptionIcon color="primary" />
+                                LR Numbers
+                              </Typography>
+
+                              <Box component="ol" sx={{ pl: 3, m: 0 }}>
+                                {['LRN-101', 'LRN-102', 'LRN-103'].map((lr, index) => (
+                                  <li key={index} style={{ marginBottom: 6 }}>
+                                    <Typography variant="body2" fontWeight={500}>
+                                      {lr}
+                                    </Typography>
+                                  </li>
+                                ))}
+                              </Box>
+                            </Grid>
+                          </Grid>
+                        </CardContent>
+                      </Card>
+
+                      {/* Route Info Card */}
+                      <Card sx={{ mt: 3, p: 3, borderRadius: 2, bgcolor: "#f9f9f9" }}>
+                        <Typography variant="subtitle1" fontWeight={600} mb={3}>
+                          Route Information
+                        </Typography>
+
+                        <Grid item>
+                          <Box display="flex" alignItems="center" gap={1.5}>
+                            <Box>
+                              <Typography fontSize={14} fontWeight={600} color="primary.main" mb={0.5}>
+                                From City
+                              </Typography>
+                            </Box>
+                          </Box>
                         </Grid>
 
-                        <Grid item sm={6}>
-                          <Typography variant="body2" color="text.secondary">Supplier Name</Typography>
-                          <Typography fontWeight={600} color="primary.main">Rajesh</Typography>
-                          <Typography variant="body2" color="text.secondary" mt={1}>Supplier Balance</Typography>
-                          <Typography fontWeight={600} color="success.main">₹ 200</Typography>
-                        </Grid>
+                        <Grid container spacing={3} alignItems="center" justifyContent="center">
+                          {/* From City */}
+                          <Grid item>
+                            <Box display="flex" alignItems="center" gap={1.5}>
+                              <LocationOnIcon color="info" />
+                              <Box>
+                                <Typography variant="h6" fontWeight={700}>Mumbai</Typography>
+                                <Typography variant="caption" color="text.secondary">1 Jul 2025</Typography>
+                              </Box>
+                            </Box>
+                          </Grid>
 
-                        <Grid item sm={6}>
-                          <Typography variant="body2" color="text.secondary">LR Number</Typography>
-                          <Typography fontWeight={600}>LRN-001</Typography>
-                        </Grid>
+                          <Grid item><ArrowForwardIcon /></Grid>
 
-                        <Grid item sm={6}>
-                          <Typography variant="body2" color="text.secondary">Pay By</Typography>
-                          <Typography fontWeight={600}>Billed</Typography>
-                        </Grid>
+                          <Grid item>
+                            <Box display="flex" alignItems="center" gap={1.5}>
+                              <LocationOnIcon color="error" />
+                              <Box>
+                                <Typography variant="h6" fontWeight={700}>Ahmedabad</Typography>
+                                <Typography variant="caption" color="text.secondary">2 Jul 2025</Typography>
+                              </Box>
+                            </Box>
+                          </Grid>
 
-                        <Grid item sm={6}>
-                          <Typography variant="body2" color="text.secondary">Mumbai</Typography>
-                          <Typography variant="caption" color="text.secondary">1 Jul 2025</Typography>
-                        </Grid>
+                          <Grid item><ArrowForwardIcon /></Grid>
 
-                        <Grid item sm={6}>
-                          <Typography variant="body2" color="text.secondary">Delhi</Typography>
-                        </Grid>
-                      </Grid>
+                          <Grid item>
+                            <Box display="flex" alignItems="center" gap={1.5}>
+                              <Box>
+                                <Typography variant="h6" fontWeight={700}>Jaipur</Typography>
+                                <Typography variant="caption" color="text.secondary">3 Jul 2025</Typography>
+                              </Box>
+                            </Box>
+                          </Grid>
 
-                      {/* Status Progress */}
-                      <Box mt={5}>
-                        <Box display="flex" justifyContent="space-between" mb={1}>
-                          {["Started", "In-transit", "Completed"].map((step, index) => (
-                            <Typography key={step} fontSize={13} color={index === 0 ? "success.main" : "text.secondary"} fontWeight={index === 0 ? 600 : 400}>
-                              {step}
-                            </Typography>
-                          ))}
-                        </Box>
-                        <Box position="relative" height={6} bgcolor="#eee" borderRadius={3}>
-                          {[0, 50, 100].map((left, i) => (
+                          <Grid item><ArrowForwardIcon /></Grid>
+
+                          <Grid item>
+                            <Box display="flex" alignItems="center" gap={1.5}>
+                              <Box>
+                                <Typography variant="h6" fontWeight={700}>Delhi</Typography>
+                                <Typography variant="caption" color="text.secondary">4 Jul 2025</Typography>
+                              </Box>
+                            </Box>
+                          </Grid>
+                        </Grid>
+                      </Card>
+                      {/* Trip Status Progress */}
+                      <Box mt={5} px={2}>
+                        <Box display="flex" alignItems="center" justifyContent="space-between" position="relative">
+                          {steps.map((step, index) => {
+                            const isCompleted = index < activeStep;
+                            const isActive = index === activeStep;
+
+                            return (
+                              <Box key={index} textAlign="center" flex={1} zIndex={2}>
+                                <Box
+                                  sx={{
+                                    width: 40,
+                                    height: 40,
+                                    mx: "auto",
+                                    mb: 1,
+                                    borderRadius: "50%",
+                                    backgroundColor: isCompleted || isActive
+                                      ? "success.main"
+                                      : "grey.300",
+                                    color: "#fff",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    fontSize: 20,
+                                  }}
+                                >
+                                  {step.icon}
+                                </Box>
+                                <Typography
+                                  fontSize={13}
+                                  fontWeight={isActive ? 600 : 400}
+                                  color={isCompleted || isActive ? "success.main" : "text.secondary"}
+                                >
+                                  {step.label}
+                                </Typography>
+                              </Box>
+                            );
+                          })}
+
+                          {/* Connecting track line */}
+                          <Box
+                            position="absolute"
+                            top={20}
+                            left={0}
+                            right={0}
+                            height={4}
+                            bgcolor="grey.300"
+                            zIndex={1}
+                          >
                             <Box
-                              key={i}
-                              position="absolute"
-                              left={`${left}%`}
-                              top={-5}
-                              width={16}
-                              height={16}
-                              bgcolor={i === 0 ? "green" : "#bbb"}
-                              borderRadius="50%"
-                              transform="translateX(-50%)"
+                              width={`${(activeStep / (steps.length - 1)) * 100}%`}
+                              height="100%"
+                              bgcolor="success.main"
+                              transition="width 0.3s ease-in-out"
                             />
-                          ))}
+                          </Box>
                         </Box>
                       </Box>
-
                       {/* Action Buttons */}
                       <Box mt={4} display="flex" gap={2} flexWrap="wrap">
-                        <Button variant="outlined" color="success" sx={{ borderRadius: 2, px: 3 }}>
+                        <Button
+                          variant="outlined"
+                          color="success"
+                          sx={{ borderRadius: 2, px: 3 }}
+                          startIcon={<LocalShippingIcon />}
+                        >
                           Complete Trip
                         </Button>
-                        <Button variant="contained" color="primary" sx={{ borderRadius: 2, px: 4 }}>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          sx={{ borderRadius: 2, px: 4 }}
+                          startIcon={<ReceiptLongIcon />}
+                        >
                           View Bill
                         </Button>
                       </Box>
                     </Card>
                   </Grid>
 
-                  {/* === RIGHT SIDE (Profit) === */}
-                  <Grid item xs={12} md={4}>
-                 
 
-                    {/* Action Buttons Card */}
-                    <Card sx={{ mt: 3, p: 3, borderRadius: 3, boxShadow: 3 }}>
-                      <Typography variant="subtitle2" fontWeight={600} mb={2}>Nirav</Typography>
+                  {/* === RIGHT SIDE === */}
+                  <Grid item xs={12} md={4}>
+                    {/* Profit Card */}
+                    <Card sx={{ p: 3, borderRadius: 3, boxShadow: 3 }}>
+                      <Typography variant="h6" fontWeight={700} mb={3}>Profit Summary</Typography>
+
+                      <Box mb={2}>
+                        <Typography variant="body2" color="text.secondary" mb={0.5}>(+) Revenue</Typography>
+                        <Box display="flex" justifyContent="space-between">
+                          <Typography>Nirav</Typography>
+                          <Typography fontWeight={600} color="primary.main">₹ 500</Typography>
+                        </Box>
+                      </Box>
+
+                      <Box mb={2}>
+                        <Typography variant="body2" color="text.secondary" mb={0.5}>(-) Expense</Typography>
+                        <Box display="flex" justifyContent="space-between">
+                          <Typography>Truck Hire Cost</Typography>
+                          <Typography fontWeight={600} color="error.main">₹ 200</Typography>
+                        </Box>
+                      </Box>
+
+                      <Box mt={3} pt={2} borderTop="1px dashed #ccc">
+                        <Box display="flex" justifyContent="space-between">
+                          <Typography variant="body2" color="text.secondary">Total Profit</Typography>
+                          <Typography fontWeight={700} color="success.main" fontSize={24}>₹ 300</Typography>
+                        </Box>
+                      </Box>
+                    </Card>
+
+                    {/* LR & POD Card */}
+                    <Card sx={{ mt: 3, p: 3, borderRadius: 3, boxShadow: 2 }}>
+                      <Typography variant="subtitle2" fontWeight={600} mb={2}>Actions for Nirav</Typography>
 
                       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
                         <Typography variant="body2">Online Bilty/LR</Typography>
-
-                        <Button variant="contained" size="small" color="success" sx={{ borderRadius: 2 }}
+                        <Button
+                          variant="contained"
+                          size="small"
+                          color="success"
+                          sx={{ borderRadius: 2 }}
                           onClick={() => setT3lrModalOpen(true)}
-                        >Create LR</Button>
+                        >
+                          Create LR
+                        </Button>
                       </Box>
 
                       <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -284,7 +434,9 @@ const OrderdetailsForm = () => {
                     </Card>
                   </Grid>
                 </Grid>
+
               )}
+              
               <Dialog open={openPodModal} onClose={() => setOpenPodModal(false)}>
                 <DialogTitle>POD</DialogTitle>
                 <DialogContent>
@@ -343,116 +495,157 @@ const OrderdetailsForm = () => {
               </Dialog>
 
 
-             {activeTab === 1 && (
-  <Grid container spacing={3}>
-    {/* Left Side - Party/Supplier Amount */}
-    <Grid item xs={12} md={8}>
-      {/* Party Amount */}
-      <Typography variant="h6" fontWeight={800} mb={2}>Party Amount</Typography>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-        <Typography variant="subtitle1">Party Amount</Typography>
-        <Box display="flex" alignItems="center" gap={1}>
-          <Typography color="primary" fontWeight={600}>₹ {values.Party || 0}</Typography>
-          <Button size="small" onClick={() => handleOpenAmountEdit("Party", values.Party)}>✏️</Button>
-        </Box>
-      </Box>
-      <Box pl={2} mb={2}>
-        <Typography variant="body2">(-) Advance</Typography>
-        <Button size="small" color="primary" onClick={() => {
-          setAdvanceType("party"); setOpenAdvanceModal(true);
-        }}>Add Advance</Button>
-        <Typography variant="body2" mt={2}>(+) Charges</Typography>
-        <Button size="small" color="primary" onClick={() => {
-          setChargeType("party"); setOpenChargeModal(true);
-        }}>Add Charge</Button>
-      </Box>
-      <Box display="flex" justifyContent="space-between" mt={2} mb={4}>
-        <Typography fontWeight={700}>Pending Party Balance</Typography>
-        <Typography color="primary" fontWeight={700}>
-          ₹ {
-            (
-              parseFloat(values.Party || 0) -
-              (advanceType === "party" ? parseFloat(advanceData.amount || 0) : 0) +
-              (chargeType === "party" ? parseFloat(chargeData.amount || 0) : 0)
-            ).toFixed(2)
-          }
-        </Typography>
-      </Box>
+              {activeTab === 1 && (
+                <Grid container spacing={3}>
+                  {/* Left Side - Party/Supplier Amount */}
+                  <Grid item xs={12} md={8}>
 
-      {/* Supplier Amount */}
-      <Typography variant="h6" fontWeight={800} mt={3} mb={2}>Supplier Amount</Typography>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-        <Typography variant="subtitle1">Supplier Amount</Typography>
-        <Box display="flex" alignItems="center" gap={1}>
-          <Typography color="primary" fontWeight={600}>₹ {values.Supplier || 0}</Typography>
-          <Button size="small" onClick={() => handleOpenAmountEdit("Supplier", values.Supplier)}>✏️</Button>
-        </Box>
-      </Box>
-      <Box pl={2} mb={2}>
-        <Typography variant="body2">(-) Advance</Typography>
-        <Button size="small" color="primary" onClick={() => {
-          setAdvanceType("supplier"); setOpenAdvanceModal(true);
-        }}>Add Supplier Advance</Button>
-        <Typography variant="body2" mt={2}>(+) Charges</Typography>
-        <Button size="small" color="primary" onClick={() => {
-          setChargeType("supplier"); setOpenChargeModal(true);
-        }}>Add Supplier Charge</Button>
-      </Box>
-      <Box display="flex" justifyContent="space-between" mt={2} mb={4}>
-        <Typography fontWeight={700}>Pending Supplier Balance</Typography>
-        <Typography color="primary" fontWeight={700}>
-          ₹ {
-            (
-              parseFloat(values.Supplier || 0) -
-              (advanceType === "supplier" ? parseFloat(advanceData.amount || 0) : 0) +
-              (chargeType === "supplier" ? parseFloat(chargeData.amount || 0) : 0)
-            ).toFixed(2)
-          }
-        </Typography>
-      </Box>
-    </Grid>
+                    {/* Party Amount Card */}
+                    <Card variant="outlined" sx={{ mb: 4, borderRadius: 3, boxShadow: 3 }}>
+                      <CardHeader title="Party Amount" titleTypographyProps={{ variant: "h6", fontWeight: 800 }} />
+                      <CardContent>
+                        <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+                          <Typography variant="subtitle1">Party Amount</Typography>
+                          <Box display="flex" alignItems="center" gap={1}>
+                            <Typography color="primary" fontWeight={600}>₹ {values.Party || 0}</Typography>
+                            <Button size="small" onClick={() => handleOpenAmountEdit("Party", values.Party)}>✏️</Button>
+                          </Box>
+                        </Box>
 
-    {/* Right Side - Profit Card */}
-    <Grid item xs={12} md={4}>
-      <Card sx={{ p: 3, borderRadius: 3, boxShadow: 3 }}>
-        <Typography variant="h6" fontWeight={700} mb={3}>Profit</Typography>
+                        <Box pl={2} mb={2}>
+                          <Typography variant="body2">(-) Advance</Typography>
+                          <Box display="flex" justifyContent="space-between" mt={2}>
+                            <Typography fontWeight={700}>Advance Party Balance</Typography>
+                            <Typography color="primary" fontWeight={700}>
+                              ₹500
+                            </Typography>
+                          </Box>
+                          <Button size="small" color="primary" onClick={() => {
+                            setAdvanceType("party"); setOpenAdvanceModal(true);
+                          }}>Add Advance</Button>
 
-        {/* Revenue */}
-        <Box mb={2}>
-          <Typography variant="body2" color="text.secondary" mb={0.5}>(+) Revenue</Typography>
-          <Box display="flex" justifyContent="space-between">
-            <Typography>Nirav</Typography>
-            <Typography fontWeight={600} color="primary.main">₹ 500</Typography>
-          </Box>
-        </Box>
+                          <Typography variant="body2" mt={2}>(+) Charges</Typography>
+                          <Box display="flex" justifyContent="space-between" mt={2}>
+                            <Typography fontWeight={700}>Charges Party Balance</Typography>
+                            <Typography color="primary" fontWeight={700}>
+                              ₹500
+                            </Typography>
+                          </Box>
+                          <Button size="small" color="primary" onClick={() => {
+                            setChargeType("party"); setOpenChargeModal(true);
+                          }}>Add Charge</Button>
+                        </Box>
 
-        {/* Expense */}
-        <Box mb={2}>
-          <Typography variant="body2" color="text.secondary" mb={0.5}>(-) Expense</Typography>
-          <Box display="flex" justifyContent="space-between">
-            <Typography>Truck Hire Cost</Typography>
-            <Typography fontWeight={600} color="error.main">₹ 200</Typography>
-          </Box>
-        </Box>
+                        <Box display="flex" justifyContent="space-between" mt={2}>
+                          <Typography fontWeight={700}>Pending Party Balance</Typography>
+                          <Typography color="primary" fontWeight={700}>
+                            ₹ {
+                              (
+                                parseFloat(values.Party || 0) -
+                                (advanceType === "party" ? parseFloat(advanceData.amount || 0) : 0) +
+                                (chargeType === "party" ? parseFloat(chargeData.amount || 0) : 0)
+                              ).toFixed(2)
+                            }
+                          </Typography>
+                        </Box>
+                      </CardContent>
+                    </Card>
 
-        {/* Total Profit */}
-        <Box mt={3} pt={2} borderTop="1px dashed #ccc">
+                    {/* Supplier Amount Card */}
+                    {/* <Card variant="outlined"> */}
+                    <Card variant="outlined" sx={{ mb: 4, borderRadius: 3, boxShadow: 3 }}>
+
+                      <CardHeader title="Supplier Amount" titleTypographyProps={{ variant: "h6", fontWeight: 800 }} />
+                      <CardContent>
+                        <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+                          <Typography variant="subtitle1">Supplier Amount</Typography>
+                          <Box display="flex" alignItems="center" gap={1}>
+                            <Typography color="primary" fontWeight={600}>₹ {values.Supplier || 0}</Typography>
+                            <Button size="small" onClick={() => handleOpenAmountEdit("Supplier", values.Supplier)}>✏️</Button>
+                          </Box>
+                        </Box>
+
+                        <Box pl={2} mb={2}>
+                          <Typography variant="body2">(-) Advance</Typography>
+                          <Box display="flex" justifyContent="space-between" mt={2}>
+                            <Typography fontWeight={700}>Advance Supplier Balance</Typography>
+                            <Typography color="primary" fontWeight={700}>
+                              ₹500
+                            </Typography>
+                          </Box>
+                          <Button size="small" color="primary" onClick={() => {
+                            setAdvanceType("supplier"); setOpenAdvanceModal(true);
+                          }}>Add Supplier Advance</Button>
+
+                          <Typography variant="body2" mt={2}>(+) Charges</Typography>
+                          <Box display="flex" justifyContent="space-between" mt={2}>
+                            <Typography fontWeight={700}>Advance Supplier Balance</Typography>
+                            <Typography color="primary" fontWeight={700}>
+                              ₹500
+                            </Typography>
+                          </Box>
+                          <Button size="small" color="primary" onClick={() => {
+                            setChargeType("supplier"); setOpenChargeModal(true);
+                          }}>Add Supplier Charge</Button>
+                        </Box>
+
+                        <Box display="flex" justifyContent="space-between" mt={2}>
+                          <Typography fontWeight={700}>Pending Supplier Balance</Typography>
+                          <Typography color="primary" fontWeight={700}>
+                            ₹ {
+                              (
+                                parseFloat(values.Supplier || 0) -
+                                (advanceType === "supplier" ? parseFloat(advanceData.amount || 0) : 0) +
+                                (chargeType === "supplier" ? parseFloat(chargeData.amount || 0) : 0)
+                              ).toFixed(2)
+                            }
+                          </Typography>
+                        </Box>
+                      </CardContent>
+                    </Card>
+
+                  </Grid>
+
+
+                  {/* Right Side - Profit Card */}
+                  <Grid item xs={12} md={4}>
+                    <Card sx={{ p: 3, borderRadius: 3, boxShadow: 3 }}>
+                      <Typography variant="h6" fontWeight={700} mb={3}>Balance</Typography>
+
+                      {/* Revenue */}
+                      <Box mb={2}>
+                        <Box display="flex" justifyContent="space-between">
+                          <Typography>Party Balance</Typography>
+                          <Typography fontWeight={600} color="primary.main">Nirav</Typography>
+                          <Typography fontWeight={600} color="primary.main">₹ 500</Typography>
+                        </Box>
+                      </Box>
+
+                      {/* Expense */}
+                      <Box mb={2}>
+                        <Box display="flex" justifyContent="space-between">
+                          <Typography>Supplier Balance</Typography>
+                          <Typography fontWeight={600} color="primary.main">Rajesh</Typography>
+                          <Typography fontWeight={600} color="error.main">₹ 200</Typography>
+                        </Box>
+                      </Box>
+
+                      {/* Total Profit */}
+                      {/* <Box mt={3} pt={2} borderTop="1px dashed #ccc">
           <Box display="flex" justifyContent="space-between">
             <Typography variant="body2" color="text.secondary">Profit</Typography>
             <Typography fontWeight={700} color="success.main" fontSize={24}>₹ 300</Typography>
           </Box>
-        </Box>
-      </Card>
-    </Grid>
-  </Grid>
-)}
-
-
-              <Box textAlign="right" mt={4}>
+        </Box> */}
+                    </Card>
+                  </Grid>
+                </Grid>
+              )}
+              {/* <Box textAlign="right" mt={4}>
                 <Button variant="contained" type="submit">
                   {activeTab === 0 ? "Save & Continue" : "Submit"}
                 </Button>
-              </Box>
+              </Box> */}
             </Card>
 
             {/* Amount Edit Modal */}
