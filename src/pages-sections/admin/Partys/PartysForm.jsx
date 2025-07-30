@@ -176,6 +176,21 @@ const PartysForm = (props) => {
                   helperText={touched.state && errors.state}
                 />
               </Grid>
+              <Grid item sm={6} xs={12}>
+                <TextField
+                  fullWidth
+                  name="pincode"
+                  label="Pincode"
+                  color="info"
+                  size="medium"
+                  placeholder="Pincode"
+                  value={values.pincode}
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  error={!!touched.pincode && !!errors.pincode}
+                  helperText={touched.pincode && errors.pincode}
+                />
+              </Grid>
 
               {/* Other Info */}
               <Grid item xs={12}>

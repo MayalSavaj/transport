@@ -17,7 +17,6 @@ const validationSchema = yup.object().shape({
     .required("PAN number is required"),
   gst_number: yup.string().required("GST number is required"),
   route_name: yup.string().required("Route name is required"),
-  root: yup.string().required("Root is required"),
   address: yup.string().required("Address is required"),
   city: yup.string().required("City is required"),
   state: yup.string().required("State is required"),
@@ -31,7 +30,6 @@ const initialValues = {
   pan_number: "",
   gst_number: "",
   route_name: "",
-  root: "",
   address: "",
   city: "",
   state: "",
@@ -149,21 +147,6 @@ const SuppliersForm = ({ handleFormSubmit }) => {
                   value={values.route_name}
                   error={!!touched.route_name && !!errors.route_name}
                   helperText={touched.route_name && errors.route_name}
-                />
-              </Grid>
-
-              <Grid item sm={6} xs={12}>
-                <TextField
-                  fullWidth
-                  name="root"
-                  label="Root"
-                  placeholder="Root"
-                  size="medium"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.root}
-                  error={!!touched.root && !!errors.root}
-                  helperText={touched.root && errors.root}
                 />
               </Grid>
 

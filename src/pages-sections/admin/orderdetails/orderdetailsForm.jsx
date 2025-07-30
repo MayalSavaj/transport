@@ -177,7 +177,7 @@ const OrderdetailsForm = () => {
                                 <Box display="flex" alignItems="center" gap={1}>
                                   <PersonIcon fontSize="small" color="primary" />
                                   <Box>
-                                    <Typography variant="body2" color="text.secondary">Party Name</Typography>
+                                    <Typography variant="body2" color="text.secondary" fontWeight={800}>Party Name</Typography>
                                     <Typography fontWeight={600}>Nirav</Typography>
                                   </Box>
                                 </Box>
@@ -229,68 +229,66 @@ const OrderdetailsForm = () => {
                       </Card>
 
                       {/* Route Info Card */}
-                      <Card sx={{ mt: 3, p: 3, borderRadius: 2, bgcolor: "#f9f9f9" }}>
-                        <Typography variant="subtitle1" fontWeight={600} mb={3}>
-                          Route Information
-                        </Typography>
+ <Card sx={{ mt: 3, p: 3, borderRadius: 2, bgcolor: "#f9f9f9" }}>
+  <Typography variant="subtitle1" fontWeight={600} mb={3}>
+    Route Information
+  </Typography>
 
-                        <Grid item>
-                          <Box display="flex" alignItems="center" gap={1.5}>
-                            <Box>
-                              <Typography fontSize={14} fontWeight={600} color="primary.main" mb={0.5}>
-                                From City
-                              </Typography>
-                            </Box>
-                          </Box>
-                        </Grid>
+  <Grid container spacing={12} alignItems="center" justifyContent="center">
+    {/* From City */}
+    <Grid item>
+      <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
+        <Typography fontSize={14} fontWeight={600} color="primary.main">
+          From City
+        </Typography>
+        <Box display="flex" alignItems="center" gap={1.5}>
+          <LocationOnIcon color="info" />
+          <Box>
+            <Typography variant="h6" fontWeight={700}>Mumbai</Typography>
+          </Box>
+        </Box>
+      </Box>
+    </Grid>
 
-                        <Grid container spacing={3} alignItems="center" justifyContent="center">
-                          {/* From City */}
-                          <Grid item>
-                            <Box display="flex" alignItems="center" gap={1.5}>
-                              <LocationOnIcon color="info" />
-                              <Box>
-                                <Typography variant="h6" fontWeight={700}>Mumbai</Typography>
-                                <Typography variant="caption" color="text.secondary">1 Jul 2025</Typography>
-                              </Box>
-                            </Box>
-                          </Grid>
+    {/* Arrow with margin */}
+    <Grid item>
+      <ArrowForwardIcon sx={{ fontSize: 30, color: 'grey.600', mx: 5 }} />
+    </Grid>
 
-                          <Grid item><ArrowForwardIcon /></Grid>
+    {/* To City */}
+   <Grid item>
+  <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
+    {/* Title */}
+    <Typography fontSize={14} fontWeight={600} color="error.main">
+      To City
+    </Typography>
 
-                          <Grid item>
-                            <Box display="flex" alignItems="center" gap={1.5}>
-                              <LocationOnIcon color="error" />
-                              <Box>
-                                <Typography variant="h6" fontWeight={700}>Ahmedabad</Typography>
-                                <Typography variant="caption" color="text.secondary">2 Jul 2025</Typography>
-                              </Box>
-                            </Box>
-                          </Grid>
+    {/* Ahmedabad */}
+    <Box display="flex" alignItems="center" gap={1.5}>
+      <LocationOnIcon color="error" />
+      <Box textAlign="center">
+        <Typography variant="h6" fontWeight={700}>Ahmedabad</Typography>
+      </Box>
+    </Box>
 
-                          <Grid item><ArrowForwardIcon /></Grid>
 
-                          <Grid item>
-                            <Box display="flex" alignItems="center" gap={1.5}>
-                              <Box>
-                                <Typography variant="h6" fontWeight={700}>Jaipur</Typography>
-                                <Typography variant="caption" color="text.secondary">3 Jul 2025</Typography>
-                              </Box>
-                            </Box>
-                          </Grid>
+    {/* Surat */}
+    <Box display="flex" alignItems="center" gap={1.5}>
+      <LocationOnIcon color="error" />
+      <Box textAlign="center">
+        <Typography variant="h6" fontWeight={700}>Surat</Typography>
+      </Box>
+    </Box>
+  </Box>
+</Grid>
 
-                          <Grid item><ArrowForwardIcon /></Grid>
+  </Grid>
+</Card>
 
-                          <Grid item>
-                            <Box display="flex" alignItems="center" gap={1.5}>
-                              <Box>
-                                <Typography variant="h6" fontWeight={700}>Delhi</Typography>
-                                <Typography variant="caption" color="text.secondary">4 Jul 2025</Typography>
-                              </Box>
-                            </Box>
-                          </Grid>
-                        </Grid>
-                      </Card>
+
+
+
+
                       {/* Trip Status Progress */}
                       <Box mt={5} px={2}>
                         <Box display="flex" alignItems="center" justifyContent="space-between" position="relative">
