@@ -5,7 +5,7 @@ import Container from "@mui/material/Container";
 import { useTheme } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { Clear, KeyboardArrowDown, PersonOutline } from "@mui/icons-material";
+import { Clear, PersonOutline } from "@mui/icons-material";
 import clsx from "clsx";
 import Icon from "components/icons";
 import { layoutConstant } from "utils/constants";
@@ -13,11 +13,8 @@ import Login from "pages-sections/sessions/Login";
 import { useAppContext } from "contexts/AppContext";
 import Image from "components/BazaarImage";
 import MiniCart from "components/MiniCart";
-import Category from "components/icons/Category";
 import { Paragraph } from "components/Typography";
-import MobileMenu from "components/navbar/MobileMenu";
 import { FlexBetween, FlexBox } from "components/flex-box";
-import CategoryMenu from "components/categories/CategoryMenu";
 import ShoppingBagOutlined from "components/icons/ShoppingBagOutlined";
 
 // styled component
@@ -87,10 +84,7 @@ const Header = ({
     return <HeaderWrapper className={clsx(className)}>
         <StyledContainer>
           <FlexBetween width="100%">
-            {/* LEFT CONTENT - NAVIGATION ICON BUTTON */}
-            <Box flex={1}>
-              <MobileMenu />
-            </Box>
+          
 
             {/* MIDDLE CONTENT - LOGO */}
             <Link href="/">
@@ -154,15 +148,7 @@ const Header = ({
             </a>
           </Link>
 
-          {/* SHOW DROP DOWN CATEGORY BUTTON WHEN HEADER FIXED */}
-          {isFixed && <CategoryMenu>
-              <FlexBox color="grey.600" alignItems="center" ml={2}>
-                <Button color="inherit">
-                  <Category fontSize="small" color="inherit" />
-                  <KeyboardArrowDown fontSize="small" color="inherit" />
-                </Button>
-              </FlexBox>
-            </CategoryMenu>}
+         
         </FlexBox>
 
         {/* SEARCH FORM */}

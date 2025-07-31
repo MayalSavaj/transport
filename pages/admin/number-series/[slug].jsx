@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { Box } from "@mui/material";
 import * as yup from "yup";
 import { H3 } from "components/Typography";
-import { CategoryForm } from "pages-sections/admin";
+import { NumberseriesForm } from "pages-sections/admin";
 import VendorDashboardLayout from "components/layouts/vendor-dashboard";
 // import api from "utils/__api__/products";
 
@@ -42,10 +42,10 @@ export default function EditNumberSeries() {
   //   });
   // }, [query.slug]);
 
-  const handleFormSubmit = () => {};
+const handleFormSubmit = () => {};
   return <Box py={4}>
       <H3 mb={2}>Edit Number Series</H3>
 
-      <CategoryForm initialValues={category} validationSchema={validationSchema} handleFormSubmit={handleFormSubmit} />
+      <NumberseriesForm initialValues={category} validationSchema={validationSchema} handleFormSubmit={handleFormSubmit} />
     </Box>;
 }

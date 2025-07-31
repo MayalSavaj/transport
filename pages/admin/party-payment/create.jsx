@@ -9,7 +9,7 @@ Createpartypayment.getLayout = function getLayout(page) {
   return <VendorDashboardLayout>{page}</VendorDashboardLayout>;
 };
 
-export default function Createpartypayments() {
+export default function Createpartypayment() {
   const INITIAL_VALUES = {
     terms: "",
     type: ""
