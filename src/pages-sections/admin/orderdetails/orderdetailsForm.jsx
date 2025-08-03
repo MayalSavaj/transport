@@ -17,6 +17,8 @@ import {
   CardHeader,
   CardContent,
   Divider,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { Formik } from "formik";
 import * as Yup from "yup";
@@ -116,6 +118,10 @@ const OrderdetailsForm = () => {
   ];
 
   const activeStep = 2;
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+
   return (
     <Card sx={{ p: 3 }}>
       <Tabs value={activeTab} onChange={handleTabChange} sx={{ mb: 2 }}>
@@ -145,14 +151,14 @@ const OrderdetailsForm = () => {
           setFieldValue,
         }) => (
           <form onSubmit={handleSubmit}>
-            <Card sx={{ p: 4, borderRadius: 3, backgroundColor: "#fff" }}>
+            <Card sx={{ backgroundColor: "#fff" }}>
 
 
               {activeTab === 0 && (
                 <Grid container spacing={3}>
                   {/* === LEFT SIDE === */}
                   <Grid item xs={12} md={8}>
-                    <Card sx={{ p: 4, borderRadius: 3, boxShadow: 3 }}>
+                    <Card>
                       {/* Header */}
                       <Box display="flex" alignItems="center" justifyContent="space-between" mb={3}>
                         <Box display="flex" alignItems="center" gap={1}>
@@ -165,7 +171,7 @@ const OrderdetailsForm = () => {
                       </Box>
 
                       {/* Party & LR Info */}
-                      <Card variant="outlined" sx={{ borderRadius: 2, p: 3, boxShadow: 2 }}>
+                      <Card>
                         <CardContent>
                           <Divider sx={{ mb: 3 }} />
 
@@ -229,65 +235,57 @@ const OrderdetailsForm = () => {
                       </Card>
 
                       {/* Route Info Card */}
- <Card sx={{ mt: 3, p: 3, borderRadius: 2, bgcolor: "#f9f9f9" }}>
-  <Typography variant="subtitle1" fontWeight={600} mb={3}>
-    Route Information
-  </Typography>
+                      <Card
+                        sx={{
+                          mt: 3,
+                          p: { xs: 2, sm: 3 },
+                          borderRadius: 2,
+                          bgcolor: "#f9f9f9",
+                        }}
+                      >
+                        <Typography variant="subtitle1" fontWeight={600} mb={3}>
+                          Route Information
+                        </Typography>
 
-  <Grid container spacing={12} alignItems="center" justifyContent="center">
-    {/* From City */}
-    <Grid item>
-      <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
-        <Typography fontSize={14} fontWeight={600} color="primary.main">
-          From City
-        </Typography>
-        <Box display="flex" alignItems="center" gap={1.5}>
-          <LocationOnIcon color="info" />
-          <Box>
-            <Typography variant="h6" fontWeight={700}>Mumbai</Typography>
-          </Box>
-        </Box>
-      </Box>
-    </Grid>
+                        <Grid container spacing={2} alignItems="flex-start">
+                          {/* From City */}
+                          <Grid item xs={12} md={4}>
+                            <Typography fontSize={14} fontWeight={600} color="primary.main" mb={1}>
+                              From City
+                            </Typography>
+                            <Box display="flex" alignItems="center" gap={1}>
+                              <LocationOnIcon color="primary" />
+                              <Typography variant="h6" fontWeight={700}>Mumbai</Typography>
+                            </Box>
+                          </Grid>
 
-    {/* Arrow with margin */}
-    <Grid item>
-      <ArrowForwardIcon sx={{ fontSize: 30, color: 'grey.600', mx: 5 }} />
-    </Grid>
+                          {/* Arrow */}
+                          <Grid item xs={12} md={1} display="flex" justifyContent="center" alignItems="center">
+                            <ArrowForwardIcon
+                              color="action"
+                              sx={{
+                                transform: { xs: "rotate(90deg)", md: "rotate(0deg)" },
+                                mt: { xs: 1, md: 3 },
+                              }}
+                            />
+                          </Grid>
 
-    {/* To City */}
-   <Grid item>
-  <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
-    {/* Title */}
-    <Typography fontSize={14} fontWeight={600} color="error.main">
-      To City
-    </Typography>
-
-    {/* Ahmedabad */}
-    <Box display="flex" alignItems="center" gap={1.5}>
-      <LocationOnIcon color="error" />
-      <Box textAlign="center">
-        <Typography variant="h6" fontWeight={700}>Ahmedabad</Typography>
-      </Box>
-    </Box>
-
-
-    {/* Surat */}
-    <Box display="flex" alignItems="center" gap={1.5}>
-      <LocationOnIcon color="error" />
-      <Box textAlign="center">
-        <Typography variant="h6" fontWeight={700}>Surat</Typography>
-      </Box>
-    </Box>
-  </Box>
-</Grid>
-
-  </Grid>
-</Card>
-
-
-
-
+                          {/* To City */}
+                          <Grid item xs={12} md={7}>
+                            <Typography fontSize={14} fontWeight={600} color="error.main" mb={1}>
+                              To City
+                            </Typography>
+                            <Box display="flex" alignItems="center" gap={1} mb={1}>
+                              <LocationOnIcon color="error" />
+                              <Typography variant="h6" fontWeight={700}>Ahmedabad</Typography>
+                            </Box>
+                            <Box display="flex" alignItems="center" gap={1}>
+                              <LocationOnIcon color="error" />
+                              <Typography variant="h6" fontWeight={700}>Surat</Typography>
+                            </Box>
+                          </Grid>
+                        </Grid>
+                      </Card>
 
                       {/* Trip Status Progress */}
                       <Box mt={5} px={2}>
@@ -434,7 +432,7 @@ const OrderdetailsForm = () => {
                 </Grid>
 
               )}
-              
+
               <Dialog open={openPodModal} onClose={() => setOpenPodModal(false)}>
                 <DialogTitle>POD</DialogTitle>
                 <DialogContent>

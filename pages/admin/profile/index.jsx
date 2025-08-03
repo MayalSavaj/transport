@@ -133,14 +133,16 @@ export default function Profile({ user: initialUser }) {
   );
 
   return (
-    // <CustomerDashboardLayout>
+    <CustomerDashboardLayout>
     
       <>
       <UserDashboardHeader
         icon={Person}
         title="My Profile"
         button={HEADER_LINK}
-        navigation={<CustomerDashboardNavigation />} /><Box mb={4}>
+        navigation={<CustomerDashboardNavigation />} 
+        />
+        <Box mb={4}>
         <Card sx={{ p: 4 }}>
           <FlexBox alignItems="center" mb={4}>
             <Avatar src={user.avatar} sx={{ height: 80, width: 80 }} />
@@ -225,7 +227,7 @@ export default function Profile({ user: initialUser }) {
         </Card>
       </Box></>
 
-    //</CustomerDashboardLayout> 
+    </CustomerDashboardLayout> 
   );
 }
 
