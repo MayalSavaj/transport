@@ -97,6 +97,10 @@ const Login = () => {
       is: (val) => val === "company" || val === "transportor",
       then: (schema) => schema.required("Firm Name is required"),
     }),
+    firmname: yup.string().when("userType", {
+      is: (val) => val === "company" || val === "transportor",
+      then: (schema) => schema.required("Firm Name is required"),
+    }),
   });
 
   const {
@@ -186,7 +190,20 @@ const Login = () => {
           error={!!touched.mobile && !!errors.mobile}
           helperText={touched.mobile && errors.mobile}
           disabled={(tabIndex === 0 && showOtp) || (tabIndex === 1 && showSignUpOtp)}
+          sx={{
+            '& .MuiInputBase-input.Mui-disabled': {
+              color: 'black',
+              fontWeight: 'bold',
+              WebkitTextFillColor: 'black',
+            },
+            '& .MuiInputLabel-root.Mui-disabled': {
+              color: 'black',
+              fontWeight: 'bold',
+            },
+          }}
         />
+
+
 
         {/* User Type Selection */}
         {tabIndex === 1 && !showSignUpOtp && (
@@ -241,10 +258,11 @@ const Login = () => {
               error={!!touched.gstNumber && !!errors.gstNumber}
               helperText={touched.gstNumber && errors.gstNumber}
             />
+
             <BazaarTextField
               mb={2}
               fullWidth
-              name="name"
+              name="firmname"
               size="small"
               variant="outlined"
               onBlur={handleBlur}
@@ -252,8 +270,8 @@ const Login = () => {
               onChange={handleChange}
               label="Firm Name"
               placeholder="Name as per GST"
-              error={!!touched.name && !!errors.name}
-              helperText={touched.name && errors.name}
+              error={!!touched.firmname && !!errors.firmname}
+              helperText={touched.firmname && errors.firmname}
             />
           </>
         )}
@@ -278,7 +296,7 @@ const Login = () => {
             <BazaarTextField
               mb={2}
               fullWidth
-              name="name"
+              name="firmname"
               size="small"
               variant="outlined"
               onBlur={handleBlur}
@@ -286,8 +304,8 @@ const Login = () => {
               onChange={handleChange}
               label="Firm Name"
               placeholder="Name as Per PAN"
-              error={!!touched.name && !!errors.name}
-              helperText={touched.name && errors.name}
+              error={!!touched.firmname && !!errors.firmname}
+              helperText={touched.firmname && errors.firmname}
             />
           </>
         )}
@@ -359,8 +377,8 @@ const Login = () => {
               ? "Verify OTP"
               : "Send OTP"
             : showSignUpOtp
-            ? "Verify OTP"
-            : "Register"}
+              ? "Verify OTP"
+              : "Register"}
         </Button>
       </form>
     </Wrapper>
