@@ -23,8 +23,8 @@ const InnerWrapper = styled(Box)(({
     margin: "auto"
   },
   [theme.breakpoints.down(1550)]: {
-    paddingLeft: "2rem",
-    paddingRight: "2rem"
+    paddingLeft: "1rem",
+    paddingRight: "1rem"
   }
 }));
 
