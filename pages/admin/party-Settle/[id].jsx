@@ -1,4 +1,4 @@
-import Router from "next/router";
+import { useRouter } from "next/router";
 import {
   Box,
   Card,
@@ -21,16 +21,62 @@ import {
   TextField
 } from "@mui/material";
 import TableBody from "@mui/material/TableBody";
+import axios from "utils/axios"; // import the custom axios
+
 import VendorDashboardLayout from "components/layouts/vendor-dashboard";
 import { H3 } from "components/Typography";
 import useMuiTable from "hooks/useMuiTable";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-supplierpaymentsettle.getLayout = function getLayout(page) {
+partypaymentsettle.getLayout = function getLayout(page) {
   return <VendorDashboardLayout>{page}</VendorDashboardLayout>;
 };
 
-export default function supplierpaymentsettle() {
+export default function partypaymentsettle() {
+
+  const router = useRouter();
+  const { id } = router.query;
+
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  console.log("Party Settle ID:", id);
+
+  useEffect(() => {
+
+
+
+
+    const fetchTermsConditions = async () => {
+      try {
+        const res = await axios.get(`/party-orders/${id}`);
+        if (res.data) {
+          setData(res.data);
+
+          console.log("Party Payments Data:", res.data);
+        }
+
+      } catch (err) {
+        console.error("Failed to fetch terms & conditions", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTermsConditions();
+
+
+
+
+    // // make API call if no stored data
+    // fetch(`party-orders/${id}`)
+    //   .then((res) => res.json())
+    //   .then((res) => setData(res));
+
+  }, [id]);
+
+  console.log("Party Settle Data:", data);
+
   const sampleData = [
     {
       id: 1,
@@ -66,12 +112,13 @@ export default function supplierpaymentsettle() {
   const isSelected = (id) => selected.includes(id);
 
   const handleSettle = () => {
-    const selectedRows = sampleData.filter((item) => selected.includes(item.id));
+    const selectedRows = data.filter((item) => selected.includes(item.id));
     const formatted = selectedRows.map((entry) => ({
-      name: "ABC Traders", // Hardcoded, or dynamic if needed
-      amount: entry.amount,
-      date: entry.date,
-      pay: entry.amount
+      name: entry?.party?.name, // Hardcoded, or dynamic if needed
+      amount: entry?.final_amount,
+      date: entry?.created_at,
+      pay: entry?.final_amount,
+      id: entry?.id// Default to full amount
     }));
     setFormRows(formatted);
     setRemark("");
@@ -80,26 +127,51 @@ export default function supplierpaymentsettle() {
     setOpenModal(true);
   };
 
-  const handleExtraInputChange = (index, field, value) => {
+  const handleExtraInputChange = (index, field, value, id) => {
     const updated = [...formRows];
     updated[index] = { ...updated[index], [field]: value };
     setFormRows(updated);
   };
 
-  const handleSettleSubmit = () => {
+  const handleSettleSubmit = async () => {
     const payload = {
       payments: formRows,
       remark,
       settleDate,
-      receiptName: receipt?.name || null
+      receiptName: receipt?.name || null,
+      orderId: id
     };
-    console.log("Submitted:", payload);
-    setOpenModal(false);
-    setSelected([]);
+
+
+
+    try {
+      const res = await axios.post("/party-settle", payload);
+
+      setData(res.data);
+      setRemark("");
+      setSettleDate("");
+      setReceipt(null);
+      setOpenModal(false);
+
+    } catch (error) {
+
+    } finally {
+      setLoading(false);
+    }
+
+
+
+
+
+    // setOpenModal(false);
+    // setSelected([]);
   };
 
+
+
+
   const getStatusChip = (status) => {
-    if (status === "Complete") {
+    if (status === "completed") {
       return (
         <Chip
           label="Complete"
@@ -131,11 +203,11 @@ export default function supplierpaymentsettle() {
 
   return (
     <Box py={4}>
-      <H3 mb={2}>Supplier Payment</H3>
+      <H3 mb={2}>Party Payment</H3>
 
       <Card sx={{ p: 3 }}>
         <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-          <Typography variant="h6">ABC Traders</Typography>
+          <Typography variant="h6">{data?.[0]?.party?.name}</Typography>
           <Button
             variant="contained"
             color="primary"
@@ -165,19 +237,19 @@ export default function supplierpaymentsettle() {
             </TableHead>
 
             <TableBody>
-              {sampleData.map((row) => (
-                <TableRow key={row.id} hover>
+              {data?.map((row) => (
+                <TableRow key={row?.id} hover>
                   <TableCell padding="checkbox">
                     <Checkbox
-                      checked={isSelected(row.id)}
-                      onChange={() => handleSelect(row.id)}
+                      checked={isSelected(row?.id)}
+                      onChange={() => handleSelect(row?.id)}
                     />
                   </TableCell>
-                  <TableCell>{row.city}</TableCell>
-                  <TableCell>{row.date}</TableCell>
-                  <TableCell>{row.truckType}</TableCell>
-                  <TableCell>₹{row.amount.toLocaleString()}</TableCell>
-                  <TableCell>{getStatusChip(row.status)}</TableCell>
+                  <TableCell>{row?.order?.pickup_location}</TableCell>
+                  <TableCell>{row?.created_at}</TableCell>
+                  <TableCell>{row?.order?.truck_type}</TableCell>
+                  <TableCell>₹{row?.final_amount.toLocaleString()}</TableCell>
+                  <TableCell>{getStatusChip(row?.status)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -187,7 +259,7 @@ export default function supplierpaymentsettle() {
 
       {/* Modal */}
       <Dialog open={openModal} onClose={() => setOpenModal(false)} maxWidth="md" fullWidth>
-        <DialogTitle>Settle supplier Payments</DialogTitle>
+        <DialogTitle>Settle Party Payments</DialogTitle>
 
         <DialogContent dividers sx={{ maxHeight: "70vh", overflowY: "auto" }}>
           {formRows.map((row, idx) => (
@@ -222,7 +294,7 @@ export default function supplierpaymentsettle() {
                     type="number"
                     value={row.pay || ""}
                     inputProps={{ min: 0 }}
-                    onChange={(e) => handleExtraInputChange(idx, "pay", e.target.value)}
+                    onChange={(e) => handleExtraInputChange(idx, "pay", e.target.value, row?.id)}
                   />
                 </Grid>
               </Grid>

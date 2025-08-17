@@ -38,8 +38,8 @@ const LCForm = (props) => {
                   label="T & C Type"
                   placeholder="Select Option"
                 >
-                  <MenuItem value="option1">Invoice</MenuItem>
-                  <MenuItem value="option2">L-R</MenuItem>
+                  <MenuItem value="invoice">Invoice</MenuItem>
+                  <MenuItem value="lr">L-R</MenuItem>
                 </TextField>
               </Grid>
                <Grid item sm={12} xs={12}>

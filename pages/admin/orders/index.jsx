@@ -17,6 +17,8 @@ import VendorDashboardLayout from "components/layouts/vendor-dashboard";
 import { H3 } from "components/Typography";
 import useMuiTable from "hooks/useMuiTable";
 import Scrollbar from "components/Scrollbar";
+import { useEffect, useState } from "react";
+import axios from "utils/axios"; // import the custom axios
 
 const tableHeading = [
   { id: "id", label: "ID", align: "left" },
@@ -34,58 +36,28 @@ OrdersList.getLayout = function getLayout(page) {
 };
 
 export default function OrdersList() {
-  const categories = [
-    {
-      id: "1",
-      party: "ABC Logistics",
-      city: "Ahmedabad - Mumbai",
-      date: "2025-06-01",
-      lrNo: "LR-12345",
-      freight: 5000,
-      status: "Pending",
-      slow: 4
-    },
-    {
-      id: "2",
-      party: "XYZ Transport",
-      city: "Surat - Delhi",
-      date: "2025-06-05",
-      lrNo: "LR-23456",
-      freight: 8500,
-      status: "Complete",
-      slow: 2
-    },
-    {
-      id: "3",
-      party: "Global Freight",
-      city: "Rajkot - Pune",
-      date: "2025-06-10",
-      lrNo: "LR-34567",
-      freight: 7800,
-      status: "Pending",
-      slow: 3
-    },
-    {
-      id: "4",
-      party: "Express Movers",
-      city: "Baroda - Chennai",
-      date: "2025-06-15",
-      lrNo: "LR-45678",
-      freight: 12000,
-      status: "In Transit",
-      slow: 1
-    },
-    {
-      id: "5",
-      party: "Swift Logistics",
-      city: "Anand - Jaipur",
-      date: "2025-06-20",
-      lrNo: "LR-56789",
-      freight: 6700,
-      status: "Complete",
-      slow: 5
-    }
-  ];
+
+  const [loading, setLoading] = useState(true);
+  const [categoriess, setCategoriess] = useState([]);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const response = await axios.get("/orders"); // Laravel: api/orders
+        // console.log("Orders Response:", response.data.orders);
+        setCategoriess(response.data.orders); // Adjust based on API structure
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, []);
+
+  console.log("Fetched Orders:", categoriess);
+
 
 
   const {
@@ -97,7 +69,7 @@ export default function OrdersList() {
     handleChangePage,
     handleRequestSort
   } = useMuiTable({
-    listData: categories
+    listData: categoriess
   });
 
   return (
@@ -120,29 +92,35 @@ export default function OrdersList() {
                 hideSelectBtn
                 orderBy={orderBy}
                 heading={tableHeading}
-                rowCount={categories.length}
+                rowCount={setCategoriess.length}
                 numSelected={selected.length}
                 onRequestSort={handleRequestSort}
               />
 
               <TableBody>
                 {filteredList.map((item) => (
-                  <TableRow key={item.id} hover onClick={() => Router.push("/admin/orderdetails/create")}
+                  <TableRow key={item.id} hover onClick={() => Router.push(`/admin/orderdetails/create/${item.id}`)}
                     style={{ cursor: "pointer" }}>
                     <TableCell>{item.id}</TableCell>
-                    <TableCell>{item.date}</TableCell>
                     <TableCell>
-                      {item.lrNo}
-                      <Chip
-                        label={item.slow}
-                        color="secondary"
-                        size="small"
-                        sx={{ ml: 1 }}
-                      />
+                      {item?.created_at
+                        ? new Date(item.created_at).toLocaleDateString("en-GB").replace(/\//g, "-")
+                        : "--"}
+                    </TableCell>                    <TableCell>
+                      {item?.lr_count > 0 ?? item?.lr_count}
+                      {
+                        item?.lr_count > 0 ?
+                          <Chip
+                            label={item?.order_lr_number?.lr_number}
+                            color="secondary"
+                            size="small"
+                            sx={{ ml: 1 }}
+                          /> : "-"
+                      }
                     </TableCell>
-                    <TableCell>{item.party}</TableCell>
-                    <TableCell>{item.city}</TableCell>
-                    <TableCell>{item.freight}</TableCell>
+                    <TableCell>{item.party.name}</TableCell>
+                    <TableCell>{item.pickup_location}</TableCell>
+                    <TableCell>{item.freight_charge}</TableCell>
                     <TableCell>
                       <Chip
                         label={item.status}
@@ -169,7 +147,7 @@ export default function OrdersList() {
         <Stack alignItems="center" my={4}>
           <TablePagination
             onChange={handleChangePage}
-            count={Math.ceil(categories.length / rowsPerPage)}
+            count={Math.ceil(setCategoriess.length / rowsPerPage)}
           />
         </Stack>
       </Card>

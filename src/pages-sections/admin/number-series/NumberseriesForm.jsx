@@ -12,14 +12,21 @@ import {
 import { Formik } from "formik";
 
 const NumberseriesForm = (props) => {
-  const { initialValues, validationSchema, handleFormSubmit } = props;
+  const {
+    initialValues,
+    validationSchema,
+    handleFormSubmit,
+    onSeriesTypeChange // ✅ new prop
+  } = props;
+
 
   return (
     <Card sx={{ p: 6 }}>
       <Formik
+        enableReinitialize
         onSubmit={handleFormSubmit}
         initialValues={initialValues}
-        validationSchema={validationSchema}
+      // validationSchema={validationSchema}
       >
         {({
           values,
@@ -29,6 +36,7 @@ const NumberseriesForm = (props) => {
           handleBlur,
           handleSubmit
         }) => (
+
           <form onSubmit={handleSubmit}>
             <Grid container spacing={3}>
               {/* Radio Buttons */}
@@ -39,7 +47,12 @@ const NumberseriesForm = (props) => {
                     row
                     name="seriesType"
                     value={values.seriesType}
-                    onChange={handleChange}
+                    onChange={(e) => {
+                      handleChange(e); // update Formik value
+                      if (onSeriesTypeChange) {
+                        onSeriesTypeChange(e.target.value); // notify parent of change
+                      }
+                    }}
                   >
                     <FormControlLabel
                       value="invoice"

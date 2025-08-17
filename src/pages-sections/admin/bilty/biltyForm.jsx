@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Card,
@@ -19,37 +19,53 @@ import {
 import DownloadIcon from "@mui/icons-material/Download";
 import { Formik } from "formik";
 import * as yup from "yup";
+import axios from "utils/axios"; // import the custom axios
+import { useRouter } from "next/router";
+
 
 // Initial values and validation schema
-const initialValues = {
-  gstNumber: "",
-  name: "",
-  address1: "",
-  address2: "",
-  state: "",
-  pincode: "",
-  mobile: "",
-  materialName: "",
-  materialWeight: "",
-};
-
 
 const validationSchema = yup.object().shape({
-  biltyNumber: yup.string().required("LR Number is required"),
-  city: yup.string().required("City is required"),
+  // biltyNumber: yup.string().required("LR Number is required"),
+  // city: yup.string().required("City is required"),
 });
 
 const BiltyManager = () => {
-  const [biltyList, setBiltyList] = useState([
-    { city: "Surat", lrNumber: "LR-101" },
-    { city: "Ahmedabad", lrNumber: "LR-102" },
-  ]);
+  const router = useRouter();
+  const { id } = router.query;
 
+  const [biltyList, setBiltyList] = useState([]);
+  const [lrNumber, setLrNumber] = useState();
+
+  useEffect(() => {
+    const fetchOrderLr = async () => {
+      try {
+        const res = await axios.get(`/showBilty/${id}`);
+        if (res.data) {
+
+          console.log(res.data.data);
+          setBiltyList(res.data.data);
+
+          console.log("Party Payments Data:", res.data);
+        }
+
+      } catch (err) {
+        console.error("Failed to fetch terms & conditions", err);
+      } finally {
+      }
+    };
+
+    fetchOrderLr();
+  }, []);
+
+
+  console.log("Bityt list ", biltyList);
   const [modalOpen, setModalOpen] = useState(false);
   const [partyType, setPartyType] = useState(null); // null | "consignee" | "consigner"
   const [activeTab, setActiveTab] = useState(0);
 
-  const handleOpenForm = () => {
+  const handleOpenForm = (value) => {
+    setLrNumber(value)
     setModalOpen(true);
   };
 
@@ -58,22 +74,60 @@ const BiltyManager = () => {
     setPartyType(null); // Reset selection when closing
   };
 
-  const handleFormSubmit = (values, { resetForm }) => {
-    const newEntry = {
-      city: values.city,
-      lrNumber: values.biltyNumber,
-      name: values.name,
-      surname: values.surname,
-      type: partyType === "consignee" ? "Consignee" : "Consigner",
-    };
-    setBiltyList([...biltyList, newEntry]);
-    resetForm();
-    handleCloseForm();
+  const handleFormSubmit = async (values, { resetForm }) => {
+    console.log("handleFormSubmit called ✅ with values:", values);
+    try {
+      const payload = {
+        consigner_name: values.consigner_name,
+        consigner_gst_number: values.consigner_gstNumber,
+        consigner_address: values.consigner_address1,
+        consigner_state: values.consigner_state,
+        consigner_pincode: values.consigner_pincode,
+        consigner_phone: values.consigner_mobile,
+
+        consignee_name: values.consignee_name,
+        consignee_gst_number: values.consignee_gstNumber,
+        consignee_address: values.consignee_address1,
+        consignee_state: values.consignee_state,
+        consignee_pincode: values.consignee_pincode,
+        consignee_phone: values.consignee_mobile,
+
+        material_details: values.materialDetail,
+        total_weight: values.totalWeight,
+        e_bill_no: values.ewayBillNo,
+        invoice_number: values.invoiceNo,
+        amount: values.materialAmount,
+      };
+
+      const res = await axios.post(`/updateBilty/${lrNumber}`, payload);
+      console.log("Update Bilty Response:", res.data);
+
+      resetForm();
+      handleCloseForm();
+    } catch (err) {
+      console.error("Failed to update Bilty:", err);
+    }
   };
 
-  const handleDownload = (bilty) => {
-    alert(`Downloading ${bilty.city} - ${bilty.lrNumber}`);
+
+  const handleDownload = async (id) => {
+    try {
+      const response = await axios.get(`/download-Bitty/${id}`, {
+        responseType: "blob", // Important
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `consignment_note_${new Date().toISOString()}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+    } catch (error) {
+      console.error("Download failed:", error);
+    }
   };
+
+
 
   const [tabAccess, setTabAccess] = useState([true, false, false]);
 
@@ -103,14 +157,14 @@ const BiltyManager = () => {
     }
 
     if (tabIndex === 2) {
-  return (
-    values.materialDetail &&
-    values.totalWeight &&
-    values.ewayBillNo &&
-    values.invoiceNo &&
-    values.materialAmount
-  );
-}
+      return (
+        values.materialDetail &&
+        values.totalWeight &&
+        values.ewayBillNo &&
+        values.invoiceNo &&
+        values.materialAmount
+      );
+    }
 
     return false;
   };
@@ -133,20 +187,20 @@ const BiltyManager = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {biltyList.map((bilty, index) => (
+            {biltyList?.lrNumbers?.map((bilty, index) => (
               <TableRow key={index}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell
                   sx={{ cursor: "pointer", color: "blue" }}
-                  onClick={handleOpenForm}
+                  onClick={() => handleOpenForm(bilty?.id)}
                 >
-                  {bilty.city}
+                  {bilty.drop_location}
                 </TableCell>
-                <TableCell>{bilty.lrNumber}</TableCell>
+                <TableCell>{bilty.lr_number}</TableCell>
                 <TableCell>
                   <IconButton
                     color="primary"
-                    onClick={() => handleDownload(bilty)}
+                    onClick={() => handleDownload(bilty?.id)}
                   >
                     <DownloadIcon />
                   </IconButton>
@@ -185,24 +239,24 @@ const BiltyManager = () => {
             {/* Formik Form */}
             <Formik
               initialValues={{
-                consignee_mobile: "",
-                consignee_name: "",
-                consignee_gstNumber: "",
-                consignee_address1: "",
+                consignee_mobile: biltyList?.consignee?.contact_number ?? "",
+                consignee_name: biltyList?.consignee?.name ?? "",
+                consignee_gstNumber: biltyList?.consignee?.gst_number ?? "",
+                consignee_address1: biltyList?.consignee?.address ?? "",
                 consignee_address2: "",
-                consignee_state: "",
-                consignee_pincode: "",
-                consigner_mobile: "",
-                consigner_name: "",
-                consigner_gstNumber: "",
-                consigner_address1: "",
+                consignee_state: biltyList?.consignee?.state ?? "",
+                consignee_pincode: biltyList?.consignee?.pincode ?? "",
+                consigner_mobile: biltyList?.consigner?.contact_number,
+                consigner_name: biltyList?.consigner?.name,
+                consigner_gstNumber: biltyList?.consigner?.gst_number,
+                consigner_address1: biltyList?.consigner?.address,
                 consigner_address2: "",
-                consigner_state: "",
-                consigner_pincode: "",
+                consigner_state: biltyList?.consigner?.state,
+                consigner_pincode: biltyList?.consigner?.pincode,
                 materialDetail: "",
                 totalWeight: "",
                 ewayBillNo: "",
-                invoiceNo: "",
+                invoiceNo: biltyList?.order?.invoice_number ?? "",
                 materialAmount: "",
               }}
               validationSchema={validationSchema}
@@ -379,71 +433,71 @@ const BiltyManager = () => {
                     {activeTab === 2 && (
                       <>
                         <Grid item xs={12}>
-  <TextField
-    fullWidth
-    multiline
-    minRows={3}
-    label="Material Detail"
-    name="materialDetail"
-    value={values.materialDetail}
-    onChange={handleChange}
-    onBlur={handleBlur}
-    error={touched.materialDetail && Boolean(errors.materialDetail)}
-    helperText={touched.materialDetail && errors.materialDetail}
-  />
-</Grid>
+                          <TextField
+                            fullWidth
+                            multiline
+                            minRows={3}
+                            label="Material Detail"
+                            name="materialDetail"
+                            value={values.materialDetail}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.materialDetail && Boolean(errors.materialDetail)}
+                            helperText={touched.materialDetail && errors.materialDetail}
+                          />
+                        </Grid>
 
-<Grid item xs={12} sm={6}>
-  <TextField
-    fullWidth
-    label="Total Weight"
-    name="totalWeight"
-    value={values.totalWeight}
-    onChange={handleChange}
-    onBlur={handleBlur}
-    error={touched.totalWeight && Boolean(errors.totalWeight)}
-    helperText={touched.totalWeight && errors.totalWeight}
-  />
-</Grid>
+                        <Grid item xs={12} sm={6}>
+                          <TextField
+                            fullWidth
+                            label="Total Weight"
+                            name="totalWeight"
+                            value={values.totalWeight}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.totalWeight && Boolean(errors.totalWeight)}
+                            helperText={touched.totalWeight && errors.totalWeight}
+                          />
+                        </Grid>
 
-<Grid item xs={12} sm={6}>
-  <TextField
-    fullWidth
-    label="E-Way Bill No"
-    name="ewayBillNo"
-    value={values.ewayBillNo}
-    onChange={handleChange}
-    onBlur={handleBlur}
-    error={touched.ewayBillNo && Boolean(errors.ewayBillNo)}
-    helperText={touched.ewayBillNo && errors.ewayBillNo}
-  />
-</Grid>
+                        <Grid item xs={12} sm={6}>
+                          <TextField
+                            fullWidth
+                            label="E-Way Bill No"
+                            name="ewayBillNo"
+                            value={values.ewayBillNo}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.ewayBillNo && Boolean(errors.ewayBillNo)}
+                            helperText={touched.ewayBillNo && errors.ewayBillNo}
+                          />
+                        </Grid>
 
-<Grid item xs={12} sm={6}>
-  <TextField
-    fullWidth
-    label="Invoice Number"
-    name="invoiceNo"
-    value={values.invoiceNo}
-    onChange={handleChange}
-    onBlur={handleBlur}
-    error={touched.invoiceNo && Boolean(errors.invoiceNo)}
-    helperText={touched.invoiceNo && errors.invoiceNo}
-  />
-</Grid>
+                        <Grid item xs={12} sm={6}>
+                          <TextField
+                            fullWidth
+                            label="Invoice Number"
+                            name="invoiceNo"
+                            value={values.invoiceNo}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.invoiceNo && Boolean(errors.invoiceNo)}
+                            helperText={touched.invoiceNo && errors.invoiceNo}
+                          />
+                        </Grid>
 
-<Grid item xs={12} sm={6}>
-  <TextField
-    fullWidth
-    label="Material Amount"
-    name="materialAmount"
-    value={values.materialAmount}
-    onChange={handleChange}
-    onBlur={handleBlur}
-    error={touched.materialAmount && Boolean(errors.materialAmount)}
-    helperText={touched.materialAmount && errors.materialAmount}
-  />
-</Grid>
+                        <Grid item xs={12} sm={6}>
+                          <TextField
+                            fullWidth
+                            label="Material Amount"
+                            name="materialAmount"
+                            value={values.materialAmount}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.materialAmount && Boolean(errors.materialAmount)}
+                            helperText={touched.materialAmount && errors.materialAmount}
+                          />
+                        </Grid>
 
                       </>
                     )}

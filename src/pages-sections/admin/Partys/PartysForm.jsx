@@ -11,6 +11,7 @@ const PartysForm = (props) => {
         initialValues={initialValues}
         validationSchema={validationSchema}
       >
+        
         {({
           values,
           errors,
@@ -58,19 +59,19 @@ const PartysForm = (props) => {
                   helperText={touched.pan_number && errors.pan_number}
                 />
               </Grid>
-               <Grid item sm={6} xs={12}>
+              <Grid item sm={6} xs={12}>
                 <TextField
                   fullWidth
-                  name="vendoe_code"
+                  name="vendor_code"
                   label="Vendor Code"
                   color="info"
                   size="medium"
                   placeholder="Vendor Code"
-                  value={values.vendoe_code}
+                  value={values.vendor_code}
                   onBlur={handleBlur}
                   onChange={handleChange}
-                  error={!!touched.vendoe_code && !!errors.vendoe_code}
-                  helperText={touched.vendoe_code && errors.vendoe_code}
+                  error={!!touched.vendor_code && !!errors.vendor_code}
+                  helperText={touched.vendor_code && errors.vendor_code}
                 />
               </Grid>
               <Grid item sm={6} xs={12}>
@@ -201,16 +202,16 @@ const PartysForm = (props) => {
               <Grid item sm={6} xs={12}>
                 <TextField
                   fullWidth
-                  name="create_period"
+                  name="period_days"
                   label="Create Period (Days)"
                   color="info"
                   size="medium"
                   placeholder="Create Period"
-                  value={values.create_period}
+                  value={values.period_days}
                   onBlur={handleBlur}
                   onChange={handleChange}
-                  error={!!touched.create_period && !!errors.create_period}
-                  helperText={touched.create_period && errors.create_period}
+                  error={!!touched.period_days && !!errors.period_days}
+                  helperText={touched.period_days && errors.period_days}
                 />
               </Grid>
 

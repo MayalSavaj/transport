@@ -9,6 +9,10 @@ import { H3 } from "components/Typography";
 import useMuiTable from "hooks/useMuiTable";
 import Scrollbar from "components/Scrollbar";
 import { LCRow } from "pages-sections/admin";
+import axios from "utils/axios"; // import the custom axios
+
+import { useEffect, useState } from "react";
+
 
 const tableHeading = [
   { id: "id", label: "ID", align: "left" },
@@ -22,13 +26,26 @@ LCList.getLayout = function getLayout(page) {
 };
 
 export default function LCList() {
-  const categories = [
-    { id: "1", terms: "You must be 18+ to use this service.", type: "Invoice" },
-    { id: "2", terms: "Data is stored securely in compliance with GDPR.", type: "L-R" },
-    { id: "3", terms: "Refund requests must be made within 7 days.", type: "L-R" },
-    { id: "4", terms: "Your information will not be shared.", type: "Invoice" },
-    { id: "5", terms: "Account suspension for policy violations.", type: "Invoice" }
-  ];
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTermsConditions = async () => {
+      try {
+        const res = await axios.get("/terms-conditions");
+        if (res.data) {
+          setCategories(res.data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch terms & conditions", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTermsConditions();
+  }, []);
+
 
   const {
     order,
@@ -42,12 +59,13 @@ export default function LCList() {
     listData: categories
   });
 
+
   return (
     <Box py={4}>
       <H3 mb={2}>T & C</H3>
 
       <SearchArea
-        handleSearch={() => {}}
+        handleSearch={() => { }}
         buttonText="Add T & C"
         searchPlaceholder="Search T & C..."
         handleBtnClick={() => Router.push("/admin/t&c/create")}
@@ -68,9 +86,19 @@ export default function LCList() {
               />
 
               <TableBody>
-                {filteredList.map((category) => (
-                  <LCRow item={category} key={category.id} selected={selected} />
-                ))}
+                {loading ? (
+                  <tr>
+                    <td colSpan={4} align="center">Loading...</td>
+                  </tr>
+                ) : filteredList.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} align="center">No T & C found.</td>
+                  </tr>
+                ) : (
+                  filteredList.map((category) => (
+                    <LCRow item={category} key={category.id} selected={selected} />
+                  ))
+                )}
               </TableBody>
             </Table>
           </TableContainer>

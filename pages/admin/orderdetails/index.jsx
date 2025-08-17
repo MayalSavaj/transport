@@ -8,6 +8,9 @@ import { H3 } from "components/Typography";
 import useMuiTable from "hooks/useMuiTable";
 import Scrollbar from "components/Scrollbar";
 import { OrdersRow } from "pages-sections/admin";
+import { useEffect, useState } from "react";
+import axios from "utils/axios"; // import the custom axios
+
 const tableHeading = [
   { id: "id", label: "ID", align: "left" },
   { id: "party", label: "Party Name", align: "left" },
@@ -29,7 +32,7 @@ export default function OrdersList() {
     {
       id: "1",
       party: "ABC Logistics",
-      city: "Ahmedabad - Mumbai",
+      city: "dasdasd - Mumbai",
       truckType: "Open",
       date: "2025-06-01",
       lrNo: "LR-12345",
@@ -90,12 +93,14 @@ export default function OrdersList() {
     listData: categories
   });
 
+
+
   return (
     <Box py={4}>
       <H3 mb={2}>Orders</H3>
 
       <SearchArea
-        handleSearch={() => {}}
+        handleSearch={() => { }}
         buttonText="Add Order"
         searchPlaceholder="Search Orders"
         handleBtnClick={() => Router.push("/admin/orders/create")}
@@ -125,10 +130,10 @@ export default function OrdersList() {
         </Scrollbar>
 
         <Stack alignItems="center" my={4}>
-          <TablePagination
+          {/* <TablePagination
             onChange={handleChangePage}
             count={Math.ceil(categories.length / rowsPerPage)}
-          />
+          /> */}
         </Stack>
       </Card>
     </Box>
