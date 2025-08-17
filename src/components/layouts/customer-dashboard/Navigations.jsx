@@ -49,7 +49,7 @@ const Navigations = () => {
     pathname
   } = useRouter();
   return <>
-      {/* {linkList.map(item => <Fragment key={item.title}>
+      {linkList.map(item => <Fragment key={item.title}>
           <Typography p="26px 30px 1rem" color="grey.600" fontSize="12px">
             {item.title}
           </Typography>
@@ -62,43 +62,43 @@ const Navigations = () => {
 
               <span>{item.count}</span>
             </StyledNavLink>)}
-        </Fragment>)} */}
+        </Fragment>)}
     </>;
 };
-// const linkList = [{
-//   list: [{
-//     href: "/orders",
-//     title: "Orders",
-//     icon: ShoppingBagOutlined,
-//     count: 5
-//   }, {
-//     href: "/wish-list",
-//     title: "Wishlist",
-//     icon: FavoriteBorder,
-//     count: 19
-//   }, {
-//     href: "/support-tickets",
-//     title: "Support Tickets",
-//     icon: CustomerService,
-//     count: 1
-//   }]
-// }, {
-//   title: "ACCOUNT SETTINGS",
-//   list: [{
-//     href: "/profile",
-//     title: "Profile Info",
-//     icon: Person,
-//     count: 3
-//   }, {
-//     href: "/address",
-//     title: "Addresses",
-//     icon: Place,
-//     count: 16
-//   }, {
-//     href: "/payment-methods",
-//     title: "Payment Methods",
-//     icon: CreditCard,
-//     count: 4
-//   }]
-// }];
+const linkList = [{
+  list: [{
+    href: "/orders",
+    title: "Orders",
+    icon: ShoppingBagOutlined,
+    count: 5
+  }, {
+    href: "/wish-list",
+    title: "Wishlist",
+    icon: FavoriteBorder,
+    count: 19
+  }, {
+    href: "/support-tickets",
+    title: "Support Tickets",
+    icon: CustomerService,
+    count: 1
+  }]
+}, {
+  title: "ACCOUNT SETTINGS",
+  list: [{
+    href: "/profile",
+    title: "Profile Info",
+    icon: Person,
+    count: 3
+  }, {
+    href: "/address",
+    title: "Addresses",
+    icon: Place,
+    count: 16
+  }, {
+    href: "/payment-methods",
+    title: "Payment Methods",
+    icon: CreditCard,
+    count: 4
+  }]
+}];
 export default Navigations;

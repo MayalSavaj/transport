@@ -146,14 +146,7 @@ const OrdersForm = () => {
           setFieldValue,
         }) => (
           <form onSubmit={handleSubmit}>
-            <Card
-              elevation={2}
-              sx={{
-                p: 4,
-                borderRadius: 3,
-                backgroundColor: "#fff",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
-              }}
+            <Grid
             >
 
               {/* Order Information */}
@@ -393,7 +386,7 @@ const OrdersForm = () => {
                   Save & Continue
                 </Button>
               </Box>
-            </Card>
+            </Grid>
           </form>
         )}
       </Formik>
