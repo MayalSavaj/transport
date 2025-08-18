@@ -34,29 +34,30 @@ const BiltyManager = () => {
   const router = useRouter();
   const { id } = router.query;
 
+  console.log("router is na", router);
+  console.log("id is na", id);
+
+
   const [biltyList, setBiltyList] = useState([]);
   const [lrNumber, setLrNumber] = useState();
 
   useEffect(() => {
+    if (!router.isReady) return; // ✅ only run when query is ready
+
     const fetchOrderLr = async () => {
       try {
         const res = await axios.get(`/showBilty/${id}`);
         if (res.data) {
-
-          console.log(res.data.data);
           setBiltyList(res.data.data);
-
           console.log("Party Payments Data:", res.data);
         }
-
       } catch (err) {
-        console.error("Failed to fetch terms & conditions", err);
-      } finally {
+        console.error("Failed to fetch bilty", err);
       }
     };
 
     fetchOrderLr();
-  }, []);
+  }, [router.isReady, id]);
 
 
   console.log("Bityt list ", biltyList);
@@ -239,13 +240,15 @@ const BiltyManager = () => {
             {/* Formik Form */}
             <Formik
               initialValues={{
-                consignee_mobile: biltyList?.consignee?.contact_number ?? "",
-                consignee_name: biltyList?.consignee?.name ?? "",
-                consignee_gstNumber: biltyList?.consignee?.gst_number ?? "",
-                consignee_address1: biltyList?.consignee?.address ?? "",
+                consignee_mobile: "",
+                consignee_name: "",
+                consignee_gstNumber: "",
+                consignee_address1: "",
                 consignee_address2: "",
-                consignee_state: biltyList?.consignee?.state ?? "",
-                consignee_pincode: biltyList?.consignee?.pincode ?? "",
+                consignee_state: "",
+                consignee_pincode: "",
+
+
                 consigner_mobile: biltyList?.consigner?.contact_number,
                 consigner_name: biltyList?.consigner?.name,
                 consigner_gstNumber: biltyList?.consigner?.gst_number,
@@ -506,9 +509,11 @@ const BiltyManager = () => {
                     <Grid item xs={12}>
                       {activeTab < 2 ? (
                         <Button
+                          type="button"
                           fullWidth
                           variant="contained"
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.preventDefault();  // <-- stops form submission
                             if (isTabValid(activeTab, values)) {
                               const updatedAccess = [...tabAccess];
                               updatedAccess[activeTab + 1] = true;
@@ -521,6 +526,7 @@ const BiltyManager = () => {
                         >
                           Next
                         </Button>
+
                       ) : (
                         <Button
                           type="submit"
@@ -532,6 +538,7 @@ const BiltyManager = () => {
                         </Button>
                       )}
                     </Grid>
+
 
                   </Grid>
                 </form>

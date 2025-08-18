@@ -107,11 +107,11 @@ export default function OrdersList() {
                         ? new Date(item.created_at).toLocaleDateString("en-GB").replace(/\//g, "-")
                         : "--"}
                     </TableCell>                    <TableCell>
-                      {item?.lr_count > 0 ?? item?.lr_count}
+                      {item?.lr_count > 0 ? item?.order_lr_number?.lr_number : ''}
                       {
                         item?.lr_count > 0 ?
                           <Chip
-                            label={item?.order_lr_number?.lr_number}
+                            label={item?.lr_count}
                             color="secondary"
                             size="small"
                             sx={{ ml: 1 }}
@@ -125,9 +125,9 @@ export default function OrdersList() {
                       <Chip
                         label={item.status}
                         color={
-                          item.status === "Complete"
+                          item.status === "completed"
                             ? "success"
-                            : item.status === "Pending"
+                            : item.status === "started"
                               ? "warning"
                               : "info"
                         }

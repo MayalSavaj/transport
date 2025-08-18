@@ -120,7 +120,10 @@ const OrdersForm = () => {
             truck_number: values.truckNo,
             pay_by: values.payBy,
             pickup_location: values.pickup,
-            drop_location_1: values.dropPoints[0], // map first drop point
+            drop_location_1: values.dropPoints[0],
+            drop_location_2: values.dropPoints[1] ?? " ",
+            drop_location_3: values.dropPoints[2] ?? "",
+
             supplier_id: values.settleSupplier,
             freight_charge: Number(values.freight),
             hiring_cost: Number(values.hiringCost),
@@ -128,7 +131,7 @@ const OrdersForm = () => {
 
           try {
             const res = await axios.post("/order", payload);
-            console.log("Order created:", res.data);    
+            console.log("Order created:", res.data);
             router.push(`/admin/orderdetails/create/${res.data.data.id}`);
           } catch (error) {
             console.error("Order creation failed:", error);
@@ -391,7 +394,7 @@ const OrdersForm = () => {
         )}
       </Formik>
 
-    </Card>
+    </Card >
   );
 };
 
