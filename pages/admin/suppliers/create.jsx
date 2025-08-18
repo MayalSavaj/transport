@@ -44,7 +44,7 @@ export default function CreateBrand() {
 
   const { enqueueSnackbar } = useSnackbar();
 
-  const handleFormSubmit = async (values, { setSubmitting }) => {
+  const handleFormSubmit = async (values,) => {
 
     console.log("11111111111111111111111");
     try {
@@ -85,7 +85,6 @@ export default function CreateBrand() {
         enqueueSnackbar("Server not responding ❌", { variant: "error" });
       }
     } finally {
-      setSubmitting(false);
     }
   };
 

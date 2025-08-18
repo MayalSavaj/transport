@@ -358,7 +358,7 @@ const OrderdetailsForm = () => {
             axios.post(`/order/create-lr-number/${id}`).then((response) => {
 
                 setT3lrModalOpen(false);
-                router.push("/admin/bilty/create");
+                router.push(`/admin/bilty/${id}`);
 
             });
         } else {
@@ -832,7 +832,7 @@ const OrderdetailsForm = () => {
                                                         size="small"
                                                         color="success"
                                                         sx={{ borderRadius: 2 }}
-                                                        onClick={() => window.open(`http://127.0.0.1:8000/storage/${order.pod}`, "_blank")}
+                                                        onClick={() => window.open(`https://biltozbackend.growmoon.top/storage/${order.pod}`, "_blank")}
                                                     >
                                                         View POD
                                                     </Button>

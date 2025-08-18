@@ -128,7 +128,7 @@ function RowWithExpand({ item }) {
           sx={{ cursor: 'pointer', color: 'primary.main', textDecoration: 'underline' }}
           onClick={() => handleRedirect(item)}
         >
-          {item?.supplier.name}
+          {item?.supplier?.name}
         </TableCell>
         <TableCell>{item?.final_amount}</TableCell>
 

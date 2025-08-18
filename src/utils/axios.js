@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const instance = axios.create({
-  baseURL: "http://127.0.0.1:8000/api", // your Laravel API base URL
+  baseURL: "https://biltozbackend.growmoon.top/api", // your Laravel API base URL
   headers: {
     "Content-Type": "application/json",
   },
