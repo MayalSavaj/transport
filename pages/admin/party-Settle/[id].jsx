@@ -1,3 +1,5 @@
+"use client";
+
 import { useRouter } from "next/router";
 import {
   Box,
@@ -18,64 +20,53 @@ import {
   DialogContent,
   DialogActions,
   Grid,
-  TextField
+  TextField,
 } from "@mui/material";
 import TableBody from "@mui/material/TableBody";
-import axios from "utils/axios"; // import the custom axios
+import axios from "utils/axios"; // custom axios
 
 import VendorDashboardLayout from "components/layouts/vendor-dashboard";
 import { H3 } from "components/Typography";
 import useMuiTable from "hooks/useMuiTable";
 import { useEffect, useState } from "react";
 
-partypaymentsettle.getLayout = function getLayout(page) {
-  return <VendorDashboardLayout>{page}</VendorDashboardLayout>;
-};
-
-export default function partypaymentsettle() {
-
+export default function PartyPaymentSettle() {
   const router = useRouter();
   const { id } = router.query;
 
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  console.log("Party Settle ID:", id);
+  if (typeof window !== "undefined") {
+    console.log("Party Settle ID:", id);
+  }
 
   useEffect(() => {
-
-
-
+    if (!id) return; // wait until dynamic route param is ready
 
     const fetchTermsConditions = async () => {
+      setLoading(true);
       try {
         const res = await axios.get(`/party-orders/${id}`);
         if (res.data) {
           setData(res.data);
-
-          console.log("Party Payments Data:", res.data);
+          if (typeof window !== "undefined") {
+            console.log("Party Payments Data:", res.data);
+          }
         }
-
       } catch (err) {
-        console.error("Failed to fetch terms & conditions", err);
+        console.error("Failed to fetch party orders", err);
       } finally {
         setLoading(false);
       }
     };
 
     fetchTermsConditions();
-
-
-
-
-    // // make API call if no stored data
-    // fetch(`party-orders/${id}`)
-    //   .then((res) => res.json())
-    //   .then((res) => setData(res));
-
   }, [id]);
 
-  console.log("Party Settle Data:", data);
+  if (typeof window !== "undefined") {
+    console.log("Party Settle Data:", data);
+  }
 
   const sampleData = [
     {
@@ -84,7 +75,7 @@ export default function partypaymentsettle() {
       date: "2025-06-27",
       truckType: "Tata 709",
       amount: 4000,
-      status: "Complete"
+      status: "Complete",
     },
     {
       id: 2,
@@ -92,8 +83,8 @@ export default function partypaymentsettle() {
       date: "2025-06-28",
       truckType: "Ashok Leyland 1616",
       amount: 6000,
-      status: "Pending"
-    }
+      status: "Pending",
+    },
   ];
 
   const [selected, setSelected] = useState([]);
@@ -103,22 +94,24 @@ export default function partypaymentsettle() {
   const [settleDate, setSettleDate] = useState("");
   const [receipt, setReceipt] = useState(null);
 
-  const handleSelect = (id) => {
+  const handleSelect = (rowId) => {
     setSelected((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+      prev.includes(rowId) ? prev.filter((x) => x !== rowId) : [...prev, rowId]
     );
   };
 
-  const isSelected = (id) => selected.includes(id);
+  const isSelected = (rowId) => selected.includes(rowId);
 
   const handleSettle = () => {
-    const selectedRows = data.filter((item) => selected.includes(item.id));
+    const selectedRows = (data || []).filter((item) =>
+      selected.includes(item.id)
+    );
     const formatted = selectedRows.map((entry) => ({
-      name: entry?.party?.name, // Hardcoded, or dynamic if needed
+      name: entry?.party?.name,
       amount: entry?.final_amount,
       date: entry?.created_at,
       pay: entry?.final_amount,
-      id: entry?.id// Default to full amount
+      id: entry?.id,
     }));
     setFormRows(formatted);
     setRemark("");
@@ -127,7 +120,7 @@ export default function partypaymentsettle() {
     setOpenModal(true);
   };
 
-  const handleExtraInputChange = (index, field, value, id) => {
+  const handleExtraInputChange = (index, field, value) => {
     const updated = [...formRows];
     updated[index] = { ...updated[index], [field]: value };
     setFormRows(updated);
@@ -139,39 +132,25 @@ export default function partypaymentsettle() {
       remark,
       settleDate,
       receiptName: receipt?.name || null,
-      orderId: id
+      orderId: id,
     };
-
-
 
     try {
       const res = await axios.post("/party-settle", payload);
-
       setData(res.data);
       setRemark("");
       setSettleDate("");
       setReceipt(null);
       setOpenModal(false);
-
     } catch (error) {
-
+      console.error("Failed to submit party settle", error);
     } finally {
       setLoading(false);
     }
-
-
-
-
-
-    // setOpenModal(false);
-    // setSelected([]);
   };
 
-
-
-
   const getStatusChip = (status) => {
-    if (status === "completed") {
+    if (status === "completed" || status === "Complete") {
       return (
         <Chip
           label="Complete"
@@ -179,15 +158,14 @@ export default function partypaymentsettle() {
           sx={{ backgroundColor: "#c8f7c5", color: "#267326" }}
         />
       );
-    } else {
-      return (
-        <Chip
-          label="Pending"
-          size="small"
-          sx={{ backgroundColor: "#ffe0b2", color: "#f57c00" }}
-        />
-      );
     }
+    return (
+      <Chip
+        label="Pending"
+        size="small"
+        sx={{ backgroundColor: "#ffe0b2", color: "#f57c00" }}
+      />
+    );
   };
 
   const {
@@ -196,9 +174,9 @@ export default function partypaymentsettle() {
     rowsPerPage,
     filteredList,
     handleChangePage,
-    handleRequestSort
+    handleRequestSort,
   } = useMuiTable({
-    listData: sampleData
+    listData: sampleData,
   });
 
   return (
@@ -206,7 +184,12 @@ export default function partypaymentsettle() {
       <H3 mb={2}>Party Payment</H3>
 
       <Card sx={{ p: 3 }}>
-        <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={2}
+        >
           <Typography variant="h6">{data?.[0]?.party?.name}</Typography>
           <Button
             variant="contained"
@@ -216,7 +199,7 @@ export default function partypaymentsettle() {
             onClick={handleSettle}
             sx={{
               textTransform: "none",
-              backgroundColor: selected.length === 0 ? "#ddd" : undefined
+              backgroundColor: selected.length === 0 ? "#ddd" : undefined,
             }}
           >
             Settle Selected
@@ -228,16 +211,26 @@ export default function partypaymentsettle() {
             <TableHead sx={{ backgroundColor: "#f2f2f2" }}>
               <TableRow>
                 <TableCell padding="checkbox" />
-                <TableCell><strong>City</strong></TableCell>
-                <TableCell><strong>Date</strong></TableCell>
-                <TableCell><strong>Truck Type</strong></TableCell>
-                <TableCell><strong>Amount</strong></TableCell>
-                <TableCell><strong>Settle Status</strong></TableCell>
+                <TableCell>
+                  <strong>City</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Date</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Truck Type</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Amount</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Settle Status</strong>
+                </TableCell>
               </TableRow>
             </TableHead>
 
             <TableBody>
-              {data?.map((row) => (
+              {(data || []).map((row) => (
                 <TableRow key={row?.id} hover>
                   <TableCell padding="checkbox">
                     <Checkbox
@@ -248,7 +241,9 @@ export default function partypaymentsettle() {
                   <TableCell>{row?.order?.pickup_location}</TableCell>
                   <TableCell>{row?.created_at}</TableCell>
                   <TableCell>{row?.order?.truck_type}</TableCell>
-                  <TableCell>₹{row?.final_amount.toLocaleString()}</TableCell>
+                  <TableCell>
+                    ₹{Number(row?.final_amount || 0).toLocaleString()}
+                  </TableCell>
                   <TableCell>{getStatusChip(row?.status)}</TableCell>
                 </TableRow>
               ))}
@@ -258,7 +253,12 @@ export default function partypaymentsettle() {
       </Card>
 
       {/* Modal */}
-      <Dialog open={openModal} onClose={() => setOpenModal(false)} maxWidth="md" fullWidth>
+      <Dialog
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        maxWidth="md"
+        fullWidth
+      >
         <DialogTitle>Settle Party Payments</DialogTitle>
 
         <DialogContent dividers sx={{ maxHeight: "70vh", overflowY: "auto" }}>
@@ -270,20 +270,28 @@ export default function partypaymentsettle() {
                 borderRadius: 2,
                 border: "1px solid #e0e0e0",
                 backgroundColor: "#f9f9f9",
-                p: 2
+                p: 2,
               }}
             >
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={4}>
-                  <Typography variant="caption" color="text.secondary">Name</Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Name
+                  </Typography>
                   <Typography fontWeight={600}>{row.name}</Typography>
                 </Grid>
                 <Grid item xs={12} sm={4}>
-                  <Typography variant="caption" color="text.secondary">Amount</Typography>
-                  <Typography fontWeight={600} color="error">₹{row.amount}</Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Amount
+                  </Typography>
+                  <Typography fontWeight={600} color="error">
+                    ₹{row.amount}
+                  </Typography>
                 </Grid>
                 <Grid item xs={12} sm={4}>
-                  <Typography variant="caption" color="text.secondary">Date</Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Date
+                  </Typography>
                   <Typography fontWeight={600}>{row.date}</Typography>
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -294,14 +302,20 @@ export default function partypaymentsettle() {
                     type="number"
                     value={row.pay || ""}
                     inputProps={{ min: 0 }}
-                    onChange={(e) => handleExtraInputChange(idx, "pay", e.target.value, row?.id)}
+                    onChange={(e) =>
+                      handleExtraInputChange(idx, "pay", e.target.value)
+                    }
                   />
                 </Grid>
               </Grid>
             </Box>
           ))}
 
-          <Box mt={2} p={2} sx={{ borderRadius: 2, backgroundColor: "#f1f1f1" }}>
+          <Box
+            mt={2}
+            p={2}
+            sx={{ borderRadius: 2, backgroundColor: "#f1f1f1" }}
+          >
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <TextField
@@ -344,7 +358,11 @@ export default function partypaymentsettle() {
 
         <DialogActions>
           <Button onClick={() => setOpenModal(false)}>Cancel</Button>
-          <Button onClick={handleSettleSubmit} variant="contained" color="error">
+          <Button
+            onClick={handleSettleSubmit}
+            variant="contained"
+            color="error"
+          >
             Submit
           </Button>
         </DialogActions>
@@ -352,3 +370,8 @@ export default function partypaymentsettle() {
     </Box>
   );
 }
+
+// Attach layout AFTER definition
+PartyPaymentSettle.getLayout = function getLayout(page) {
+  return <VendorDashboardLayout>{page}</VendorDashboardLayout>;
+};

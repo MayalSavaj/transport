@@ -1,4 +1,6 @@
-import Router from "next/router";
+"use client";
+
+import { useRouter } from "next/router";
 import {
   Box,
   Card,
@@ -16,8 +18,7 @@ import useMuiTable from "hooks/useMuiTable";
 import Scrollbar from "components/Scrollbar";
 import TablePagination from "components/data-table/TablePagination";
 import { useEffect, useState } from "react";
-import axios from "utils/axios"; // import the custom axios
-
+import axios from "utils/axios";
 
 const tableHeading = [
   { id: "id", label: "ID", align: "left" },
@@ -25,35 +26,51 @@ const tableHeading = [
   { id: "amount", label: "Amount", align: "left" },
 ];
 
-partypaymentList.getLayout = function getLayout(page) {
-  return <VendorDashboardLayout>{page}</VendorDashboardLayout>;
-};
+function RowWithExpand({ item }) {
+  const router = useRouter();
+  const handleRedirect = () => {
+    const partyId = item?.party?.id;
+    if (partyId) router.push(`/admin/party-Settle/${partyId}`);
+  };
 
-export default function partypaymentList() {
+  return (
+    <TableRow hover sx={{ backgroundColor: "#fafafa" }}>
+      <TableCell>#{item?.id}</TableCell>
+      <TableCell
+        sx={{
+          cursor: "pointer",
+          color: "primary.main",
+          textDecoration: "underline",
+        }}
+        onClick={handleRedirect}
+      >
+        {item?.party?.name}
+      </TableCell>
+      <TableCell>{item?.final_amount}</TableCell>
+    </TableRow>
+  );
+}
+
+const PartyPaymentList = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchTermsConditions = async () => {
+    let mounted = true;
+    (async () => {
       try {
         const res = await axios.get("/party-payments");
-        if (res.data) {
-          setCategories(res.data);
-
-          console.log("Party Payments Data:", res.data);
-        }
-
+        if (mounted && res?.data) setCategories(res.data);
       } catch (err) {
-        console.error("Failed to fetch terms & conditions", err);
+        console.error("Failed to fetch party payments", err);
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
+    })();
+    return () => {
+      mounted = false;
     };
-
-    fetchTermsConditions();
   }, []);
-
-
 
   const {
     order,
@@ -62,14 +79,8 @@ export default function partypaymentList() {
     rowsPerPage,
     filteredList,
     handleChangePage,
-    handleRequestSort
-  } = useMuiTable({
-    listData: categories
-  });
-  const [expandedId, setExpandedId] = useState(null);
-  const toggleExpand = (id) => setExpandedId((prev) => (prev === id ? null : id));
-
-  console.log("Filtered List:", filteredList);
+    handleRequestSort,
+  } = useMuiTable({ listData: categories });
 
   return (
     <Box py={4}>
@@ -88,14 +99,13 @@ export default function partypaymentList() {
                 numSelected={selected.length}
                 onRequestSort={handleRequestSort}
               />
-
               <TableBody>
-                {filteredList.map((item) => (
+                {(filteredList || []).map((item) => (
                   <RowWithExpand
                     key={item.id}
                     item={item}
-                    isOpen={expandedId === item.id}
-                    toggleExpand={() => toggleExpand(item.id)}
+                    isOpen={false}
+                    toggleExpand={() => {}}
                   />
                 ))}
               </TableBody>
@@ -106,43 +116,19 @@ export default function partypaymentList() {
         <Stack alignItems="center" my={4}>
           <TablePagination
             onChange={handleChangePage}
-            count={Math.ceil(categories.length / rowsPerPage)}
+            count={Math.max(
+              1,
+              Math.ceil((categories.length || 0) / (rowsPerPage || 10))
+            )}
           />
         </Stack>
       </Card>
     </Box>
   );
-}
-function RowWithExpand({ item }) {
+};
 
-  const handleRedirect = (item) => {
+PartyPaymentList.getLayout = function getLayout(page) {
+  return <VendorDashboardLayout>{page}</VendorDashboardLayout>;
+};
 
-
-    Router.push(`/admin/party-Settle/${item.party.id}`);
-
-  };
-
-
-
-  return (
-    <>
-      <TableRow hover sx={{ backgroundColor: "#fafafa" }}>
-
-
-        <>
-          <TableCell>
-            #{item.id}
-          </TableCell>
-          <TableCell
-            sx={{ cursor: 'pointer', color: 'primary.main', textDecoration: 'underline' }}
-            onClick={() => handleRedirect(item)}
-          >
-            {item?.party?.name}
-          </TableCell>
-          <TableCell>{item?.final_amount}</TableCell>
-        </>
-
-      </TableRow>
-    </>
-  );
-}
+export default PartyPaymentList;

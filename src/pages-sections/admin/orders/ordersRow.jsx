@@ -1,44 +1,45 @@
 import { Delete, Edit } from "@mui/icons-material";
-import { StyledTableRow, CategoryWrapper, StyledIconButton, StyledTableCell } from "../StyledComponents";
+import {
+  StyledTableRow,
+  CategoryWrapper,
+  StyledIconButton,
+  StyledTableCell,
+} from "../StyledComponents";
 import { useRouter } from "next/router";
+import { memo, useCallback } from "react";
 
-const ordersRow = ({
-  item,
-}) => {
-  const {
-    id, party, city, date, lrNo, freight, status
-  } = item;
+function OrdersRow({ item }) {
+  const { id, party, city, date, lrNo, freight, status } = item || {};
   const router = useRouter();
-  const handleNavigate = () => console.log("dadasdasd"); router.push(`/admin/orderdetails/create/${id}`);
-  return <StyledTableRow>
-    <StyledTableCell align="left">#{id.split("-")[0]}</StyledTableCell>
-    <StyledTableCell align="left">{date}</StyledTableCell>
 
-    <StyledTableCell align="left">{lrNo}</StyledTableCell>
+  const handleNavigate = useCallback(() => {
+    console.log("dadasdasd");
+    if (id) router.push(`/admin/orderdetails/create/${id}`);
+  }, [id, router]);
 
-    <StyledTableCell align="left">
-      <CategoryWrapper>{party}</CategoryWrapper>
-    </StyledTableCell>
+  return (
+    <StyledTableRow>
+      <StyledTableCell align="left">
+        #{id?.split?.("-")?.[0] ?? ""}
+      </StyledTableCell>
+      <StyledTableCell align="left">{date}</StyledTableCell>
+      <StyledTableCell align="left">{lrNo}</StyledTableCell>
+      <StyledTableCell align="left">
+        <CategoryWrapper>{party}</CategoryWrapper>
+      </StyledTableCell>
+      <StyledTableCell align="left">{city}</StyledTableCell>
+      <StyledTableCell align="left">{freight}</StyledTableCell>
+      <StyledTableCell align="left">{status}</StyledTableCell>
+      <StyledTableCell align="center">
+        <StyledIconButton onClick={handleNavigate}>
+          <Edit />
+        </StyledIconButton>
+        <StyledIconButton>
+          <Delete />
+        </StyledIconButton>
+      </StyledTableCell>
+    </StyledTableRow>
+  );
+}
 
-    <StyledTableCell align="left">{city}</StyledTableCell>
-
-
-
-    <StyledTableCell align="left">{freight}</StyledTableCell>
-
-    <StyledTableCell align="left">{status}</StyledTableCell>
-
-
-    <StyledTableCell align="center">
-      <StyledIconButton onClick={handleNavigate}>
-        <Edit />
-      </StyledIconButton>
-
-
-      <StyledIconButton>
-        <Delete />
-      </StyledIconButton>
-    </StyledTableCell>
-  </StyledTableRow>;
-};
-export default ordersRow;
+export default memo(OrdersRow);

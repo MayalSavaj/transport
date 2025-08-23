@@ -96,7 +96,8 @@ export default function Profile() {
           // Loop over the keys of the fetched user object
           for (const key in fetchedUser) {
             // If the value is null, replace it with an empty string, otherwise keep it
-            sanitizedUser[key] = fetchedUser[key] === null ? "" : fetchedUser[key];
+            sanitizedUser[key] =
+              fetchedUser[key] === null ? "" : fetchedUser[key];
           }
           // ++ END: Sanitize the fetched data ++
 
@@ -130,9 +131,6 @@ export default function Profile() {
       .catch((err) => {
         console.error("Failed to update profile:", err);
       });
-
-      
-
   };
 
   // --- Initialize Formik ---
@@ -189,123 +187,182 @@ export default function Profile() {
   );
 
   return (
-    <>
-
     <CustomerDashboardLayout>
-    
       <>
-
-      <UserDashboardHeader
-        icon={Person}
-        title="My Profile"
-        button={HEADER_LINK}
-
-        navigation={<CustomerDashboardNavigation />}
-      />
-      <Box mb={4}>
-
-        navigation={<CustomerDashboardNavigation />} 
+        <UserDashboardHeader
+          icon={Person}
+          title="My Profile"
+          button={HEADER_LINK}
+          navigation={<CustomerDashboardNavigation />}
         />
         <Box mb={4}>
+          <Card sx={{ p: 4 }}>
+            <form onSubmit={formik.handleSubmit}>
+              <FlexBox alignItems="center" mb={4}>
+                <Avatar src={user?.avatar} sx={{ height: 80, width: 80 }} />
+                <Box ml={2}>
+                  <H5>{user?.name}</H5>
+                </Box>
+              </FlexBox>
 
-        <Card sx={{ p: 4 }}>
-          <form onSubmit={formik.handleSubmit}>
-            <FlexBox alignItems="center" mb={4}>
-              <Avatar src={user?.avatar} sx={{ height: 80, width: 80 }} />
-              <Box ml={2}>
-                <H5>{user?.name}</H5>
-              </Box>
-            </FlexBox>
-
-            <Section title="Business Details">
-              <Grid container spacing={2}>
-                <ProfileItem name="pan_number" title="PAN Number" formik={formik} editMode={editMode} />
-                <ProfileItem name="gst_number" title="GST Number" formik={formik} editMode={editMode} />
-                <ProfileItem name="contact_person" title="Contact Person" formik={formik} editMode={editMode} />
-                <ProfileItem name="email" title="Email" formik={formik} editMode={editMode} />
-
-                <ProfileItem name="mobile_number" title="Contact Mobile" formik={formik} editMode={editMode} />
-                <ProfileItem name="adress" title="Address" formik={formik} editMode={editMode} />
-                <ProfileItem name="city" title="City" formik={formik} editMode={editMode} />
-                <ProfileItem name="state" title="State" formik={formik} editMode={editMode} />
-                <ProfileItem name="pin_code" title="Pin Code" formik={formik} editMode={editMode} />
-                <ProfileItem name="msme_number" title="MSME Number" formik={formik} editMode={editMode} />
-              </Grid>
-            </Section>
-
-            <Section title="Bank Details">
-              <Grid container spacing={2}>
-                <ProfileItem name="bank_name" title="Bank Name" formik={formik} editMode={editMode} />
-                <ProfileItem name="ifsc_code" title="IFSC Code" formik={formik} editMode={editMode} />
-                <ProfileItem name="ac_number" title="Account Number" formik={formik} editMode={editMode} />
-                <ProfileItem name="branch" title="Branch" formik={formik} editMode={editMode} />
-              </Grid>
-            </Section>
-          </form>
-
-          {/* Signature section remains outside the formik form tag as it's handled separately */}
-          <Section title="Signature with Stamp">
-            <Grid item xs={12}>
-              {!signatureFile.length ? (
-                editMode && (
-                  <DropZone
-                    title="Upload Signature with Stamp"
-                    maxFiles={1}
-                    accept={{ "image/*": [] }}
-                    onChange={(selectedFiles) => {
-                      const file = selectedFiles[0];
-                      if (file) {
-                        const updatedFile = Object.assign(file, {
-                          preview: URL.createObjectURL(file),
-                        });
-                        setSignatureFile([updatedFile]);
-                        setImgLoaded(false);
-                      }
-                    }}
+              <Section title="Business Details">
+                <Grid container spacing={2}>
+                  <ProfileItem
+                    name="pan_number"
+                    title="PAN Number"
+                    formik={formik}
+                    editMode={editMode}
                   />
-                )
-              ) : (
-                <FlexBox flexDirection="row" mt={2} flexWrap="wrap" gap={1}>
-                  {signatureFile.map((file, index) => (
-                    <UploadImageBox key={index}>
-                      {!imgLoaded && (
-                        <CircularProgress
-                          size={24}
-                          sx={{ position: "absolute", top: "40%", left: "40%" }}
+                  <ProfileItem
+                    name="gst_number"
+                    title="GST Number"
+                    formik={formik}
+                    editMode={editMode}
+                  />
+                  <ProfileItem
+                    name="contact_person"
+                    title="Contact Person"
+                    formik={formik}
+                    editMode={editMode}
+                  />
+                  <ProfileItem
+                    name="email"
+                    title="Email"
+                    formik={formik}
+                    editMode={editMode}
+                  />
+
+                  <ProfileItem
+                    name="mobile_number"
+                    title="Contact Mobile"
+                    formik={formik}
+                    editMode={editMode}
+                  />
+                  <ProfileItem
+                    name="adress"
+                    title="Address"
+                    formik={formik}
+                    editMode={editMode}
+                  />
+                  <ProfileItem
+                    name="city"
+                    title="City"
+                    formik={formik}
+                    editMode={editMode}
+                  />
+                  <ProfileItem
+                    name="state"
+                    title="State"
+                    formik={formik}
+                    editMode={editMode}
+                  />
+                  <ProfileItem
+                    name="pin_code"
+                    title="Pin Code"
+                    formik={formik}
+                    editMode={editMode}
+                  />
+                  <ProfileItem
+                    name="msme_number"
+                    title="MSME Number"
+                    formik={formik}
+                    editMode={editMode}
+                  />
+                </Grid>
+              </Section>
+
+              <Section title="Bank Details">
+                <Grid container spacing={2}>
+                  <ProfileItem
+                    name="bank_name"
+                    title="Bank Name"
+                    formik={formik}
+                    editMode={editMode}
+                  />
+                  <ProfileItem
+                    name="ifsc_code"
+                    title="IFSC Code"
+                    formik={formik}
+                    editMode={editMode}
+                  />
+                  <ProfileItem
+                    name="ac_number"
+                    title="Account Number"
+                    formik={formik}
+                    editMode={editMode}
+                  />
+                  <ProfileItem
+                    name="branch"
+                    title="Branch"
+                    formik={formik}
+                    editMode={editMode}
+                  />
+                </Grid>
+              </Section>
+            </form>
+
+            {/* Signature section remains outside the formik form tag as it's handled separately */}
+            <Section title="Signature with Stamp">
+              <Grid item xs={12}>
+                {!signatureFile.length ? (
+                  editMode && (
+                    <DropZone
+                      title="Upload Signature with Stamp"
+                      maxFiles={1}
+                      accept={{ "image/*": [] }}
+                      onChange={(selectedFiles) => {
+                        const file = selectedFiles[0];
+                        if (file) {
+                          const updatedFile = Object.assign(file, {
+                            preview: URL.createObjectURL(file),
+                          });
+                          setSignatureFile([updatedFile]);
+                          setImgLoaded(false);
+                        }
+                      }}
+                    />
+                  )
+                ) : (
+                  <FlexBox flexDirection="row" mt={2} flexWrap="wrap" gap={1}>
+                    {signatureFile.map((file, index) => (
+                      <UploadImageBox key={index}>
+                        {!imgLoaded && (
+                          <CircularProgress
+                            size={24}
+                            sx={{
+                              position: "absolute",
+                              top: "40%",
+                              left: "40%",
+                            }}
+                          />
+                        )}
+                        <BazaarImage
+                          src={file.preview}
+                          width="100%"
+                          height="100%"
+                          alt="Signature"
+                          style={{ objectFit: "contain" }}
+                          onLoad={() => setImgLoaded(true)}
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = "/placeholder-signature.png";
+                          }}
                         />
-                      )}
-                      <BazaarImage
-                        src={file.preview}
-                        width="100%"
-                        height="100%"
-                        alt="Signature"
-                        style={{ objectFit: "contain" }}
-                        onLoad={() => setImgLoaded(true)}
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = "/placeholder-signature.png";
-                        }}
-                      />
-                      {editMode && (
-                        <StyledClear onClick={handleFileDelete(file)}>
-                          <ClearIcon fontSize="small" />
-                        </StyledClear>
-                      )}
-                    </UploadImageBox>
-                  ))}
-                </FlexBox>
-              )}
-            </Grid>
-          </Section>
-        </Card>
-
-      </Box>
-    </>
-
-      </Box></>
-
-    </CustomerDashboardLayout> 
-
+                        {editMode && (
+                          <StyledClear onClick={handleFileDelete(file)}>
+                            <ClearIcon fontSize="small" />
+                          </StyledClear>
+                        )}
+                      </UploadImageBox>
+                    ))}
+                  </FlexBox>
+                )}
+              </Grid>
+            </Section>
+          </Card>
+        </Box>
+      </>
+    </CustomerDashboardLayout>
   );
 }
 
