@@ -22,7 +22,7 @@ import {
 } from "@mui/material";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
@@ -35,6 +35,8 @@ import BusinessIcon from "@mui/icons-material/Business";
 import DescriptionIcon from "@mui/icons-material/Description";
 import PaymentsIcon from "@mui/icons-material/Payments";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import axios from "utils/axios"; // import the custom axios
+
 
 const initialValues = {
   partyName: "",
@@ -65,6 +67,27 @@ const validationSchema = Yup.object().shape({
 const OrderdetailsForm = () => {
   const [activeTab, setActiveTab] = useState(0);
   const router = useRouter();
+  const { id } = router.query;
+
+  const [order, setOrder] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!id) return;
+
+    axios.get(`/api/order/${id}`) // Replace with your API URL
+      .then((res) => {
+        setOrder(res.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch order:", err);
+        setLoading(false);
+      });
+  }, [id]);
+
+
+  console.log("Order details:", order);
 
   // Modals
   const [openAdvanceModal, setOpenAdvanceModal] = useState(false);
@@ -433,6 +456,7 @@ const OrderdetailsForm = () => {
 
               )}
 
+
               <Dialog open={openPodModal} onClose={() => setOpenPodModal(false)}>
                 <DialogTitle>POD</DialogTitle>
                 <DialogContent>
@@ -508,29 +532,43 @@ const OrderdetailsForm = () => {
                           </Box>
                         </Box>
 
+
+
                         <Box pl={2} mb={2}>
                           <Typography variant="body2">(-) Advance</Typography>
-                          <Box display="flex" justifyContent="space-between" mt={2}>
-                            <Typography fontWeight={700}>Advance Party Balance</Typography>
-                            <Typography color="primary" fontWeight={700}>
-                              ₹500
-                            </Typography>
-                          </Box>
-                          <Button size="small" color="primary" onClick={() => {
-                            setAdvanceType("party"); setOpenAdvanceModal(true);
-                          }}>Add Advance</Button>
+                          {order?.advance_details?.map((oneOrder, index) => (
+                            <Box key={index} mt={2} p={1} border="1px solid #ccc" borderRadius={1}>
+                              <Box display="flex" justifyContent="space-between">
+                                <Typography fontWeight={700}>Advance Party Balance</Typography>
+                                <Typography color="primary" fontWeight={700}>
+                                  ₹{parseFloat(oneOrder.advance_amount || 0).toFixed(2)}
+                                </Typography>
+                              </Box>
+                              <Typography variant="body2" color="text.secondary">
+                                Date: {oneOrder.advance_payment_date}
+                              </Typography>
+                              <Typography variant="body2" color="text.secondary">
+                                Note: {oneOrder.advance_note}
+                              </Typography>
+                            </Box>
+                          ))}
 
-                          <Typography variant="body2" mt={2}>(+) Charges</Typography>
-                          <Box display="flex" justifyContent="space-between" mt={2}>
-                            <Typography fontWeight={700}>Charges Party Balance</Typography>
-                            <Typography color="primary" fontWeight={700}>
-                              ₹500
-                            </Typography>
-                          </Box>
-                          <Button size="small" color="primary" onClick={() => {
-                            setChargeType("party"); setOpenChargeModal(true);
-                          }}>Add Charge</Button>
+                          {/* Add Advance button at last */}
+                          <Button
+                            size="small"
+                            color="primary"
+                            onClick={() => {
+                              setAdvanceType("party");
+                              setOpenAdvanceModal(true);
+                            }}
+                            sx={{ mt: 2 }}
+                          >
+                            Add Advance
+                          </Button>
                         </Box>
+
+
+
 
                         <Box display="flex" justifyContent="space-between" mt={2}>
                           <Typography fontWeight={700}>Pending Party Balance</Typography>

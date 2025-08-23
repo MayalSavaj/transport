@@ -16,6 +16,7 @@ import { H1 } from "components/Typography";
 import BazaarImage from "components/BazaarImage";
 import BazaarTextField from "components/BazaarTextField";
 import OtpInput from "react-otp-input";
+import axios from "utils/axios";
 
 // Styled card wrapper
 const Wrapper = styled(Card)(({ theme }) => ({
@@ -34,6 +35,7 @@ const initialValues = {
   panNumber: "",
   gstNumber: "",
   firmname: "",
+  name: ""
 };
 
 const Login = () => {
@@ -116,27 +118,61 @@ const Login = () => {
     initialValues,
     validationSchema,
     enableReinitialize: true,
-    onSubmit: (values) => {
-      if (tabIndex === 0) {
-        if (!showOtp) {
-          console.log("Sign In: Send OTP to", values.mobile);
-          setShowOtp(true);
-          startResendCountdown();
+    onSubmit: async (values) => {
+      try {
+        console.log("Form Values:", values);
+        if (tabIndex === 0) {
+          // === Sign In Flow ===
+
+          if (!showOtp) {
+
+            console.log("Sending OTP to:", values.mobile);
+            // Send OTP
+            await axios.post("/send-otp", {
+              mobile_number: values.mobile,
+            });
+            setShowOtp(true);
+            startResendCountdown();
+          } else {
+            // Verify OTP
+            const { data } = await axios.post("/verify-otp", {
+              mobile_number: values.mobile,
+              otp: values.otp,
+            });
+
+            localStorage.setItem("token", data.access_token); // Save token
+            router.push("/admin/orders");
+          }
+
         } else {
-          console.log("Sign In OTP Verified:", values.otp);
-          router.push("/admin/orders");
+          // === Sign Up Flow ===
+
+          if (!showSignUpOtp) {
+            await axios.post("/register", {
+              mobile_number: values.mobile,
+              user_type: values.userType == "transportor" ? 1 : 2,
+              gst_number: values.gstNumber,
+              pan_number: values.panNumber,
+              firm_name: 'dadas',
+            });
+
+            setShowSignUpOtp(true);
+          } else {
+            const { data } = await axios.post("/verify-otp", {
+              mobile_number: values.mobile,
+              otp: values.otp,
+            });
+
+            localStorage.setItem("token", data.access_token);
+            alert("Sign up successful!");
+            router.push("/admin/orders");
+            resetForm();
+            setShowSignUpOtp(false);
+          }
         }
-      } else {
-        if (!showSignUpOtp) {
-          console.log("Sign Up: Send OTP to", values.mobile);
-          setShowSignUpOtp(true);
-        } else {
-          console.log("Sign Up Complete:", values);
-          alert("Sign up successful!");
-          router.push("/admin/orders");
-          resetForm();
-          setShowSignUpOtp(false);
-        }
+      } catch (err) {
+        console.error(err);
+        alert("Something went wrong");
       }
     },
   });
@@ -266,7 +302,7 @@ const Login = () => {
               size="small"
               variant="outlined"
               onBlur={handleBlur}
-              value={values.firmname}
+              value={values.name}
               onChange={handleChange}
               label="Firm Name"
               placeholder="Name as per GST"
@@ -300,7 +336,7 @@ const Login = () => {
               size="small"
               variant="outlined"
               onBlur={handleBlur}
-              value={values.firmname}
+              value={values.name}
               onChange={handleChange}
               label="Firm Name"
               placeholder="Name as Per PAN"

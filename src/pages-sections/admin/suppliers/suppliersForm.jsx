@@ -25,21 +25,15 @@ const validationSchema = yup.object().shape({
   contact_number: yup.string().required("Contact number is required"),
 });
 
-const initialValues = {
-  name: "",
-  pan_number: "",
-  gst_number: "",
-  route_name: "",
-  address: "",
-  city: "",
-  state: "",
-  pin_code: "",
-  contact_person: "",
-  contact_number: "",
-};
+const SuppliersForm = (props) => {
 
-const SuppliersForm = ({ handleFormSubmit }) => {
+
+
+
   const [files, setFiles] = useState([]);
+
+  const { initialValues, validationSchema, handleFormSubmit } = props;
+
 
   const handleChangeDropZone = (files) => {
     files.forEach((file) =>

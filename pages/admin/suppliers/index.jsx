@@ -13,8 +13,11 @@ import TablePagination from "components/data-table/TablePagination";
 import VendorDashboardLayout from "components/layouts/vendor-dashboard";
 import Scrollbar from "components/Scrollbar";
 import { H3 } from "components/Typography";
-import { SuppliersRow } from "pages-sections/admin"; 
+import { SuppliersRow } from "pages-sections/admin";
 import useMuiTable from "hooks/useMuiTable";
+
+import axios from "utils/axios"; // import the custom axios
+import { useEffect, useState } from "react";
 
 // Table Headings
 const tableHeading = [
@@ -34,6 +37,27 @@ const tableHeading = [
 ];
 
 export default function BrandList({ brands }) {
+
+
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchParties = async () => {
+      try {
+        const response = await axios.get("/supplier");
+        console.log("Fetched Parties:", response.data);
+        setData(response.data); // based on your example response
+        setLoading(false);
+      } catch (error) {
+        console.error("Failed to fetch parties:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchParties();
+  }, []);
+
   const {
     order,
     orderBy,
@@ -43,7 +67,7 @@ export default function BrandList({ brands }) {
     handleChangePage,
     handleRequestSort
   } = useMuiTable({
-    listData: brands,
+    listData: data,
     defaultSort: "name"
   });
 
@@ -52,7 +76,7 @@ export default function BrandList({ brands }) {
       <H3 mb={2}>Suppliers</H3>
 
       <SearchArea
-        handleSearch={() => {}}
+        handleSearch={() => { }}
         buttonText="Add Supplier"
         searchPlaceholder="Search Supplier..."
         handleBtnClick={() => Router.push("/admin/suppliers/create")}
@@ -103,82 +127,11 @@ BrandList.getLayout = function getLayout(page) {
 
 // ✅ Static supplier data
 export const getStaticProps = async () => {
-  const brands = [
-    {
-      id: 1,
-      name: "Apex Traders",
-      pan_number: "ABCDE1234F",
-      gst_number: "22ABCDE1234F1Z5",
-      route_name: "Route 1",
-      rood: "Rood 1",
-      address: "12, Industrial Area",
-      city: "Surat",
-      state: "Gujarat",
-      pin_code: "395006",
-      contact_person: "Ramesh Patel",
-      contact_number: "9876543210"
-    },
-    {
-      id: 2,
-      name: "Spark Suppliers",
-      pan_number: "PQRES6789K",
-      gst_number: "24PQRES6789K2Z3",
-      route_name: "Route 2",
-      rood: "Rood 2",
-      address: "56, Market Road",
-      city: "Ahmedabad",
-      state: "Gujarat",
-      pin_code: "380015",
-      contact_person: "Meena Shah",
-      contact_number: "9876511223"
-    },
-    {
-      id: 3,
-      name: "Global Tech",
-      pan_number: "LMNOP3456Z",
-      gst_number: "27LMNOP3456Z3W7",
-      route_name: "Route 3",
-      rood: "Rood 3",
-      address: "101, Silicon Valley",
-      city: "Bangalore",
-      state: "Karnataka",
-      pin_code: "560001",
-      contact_person: "Vikram Rao",
-      contact_number: "9123456789"
-    },
-    {
-      id: 4,
-      name: "Urban Wholesales",
-      pan_number: "GHIJK8910M",
-      gst_number: "29GHIJK8910M5X2",
-      route_name: "Route 4",
-      rood: "Rood 4",
-      address: "Sector 18",
-      city: "Delhi",
-      state: "Delhi",
-      pin_code: "110018",
-      contact_person: "Anita Mehta",
-      contact_number: "9988776655"
-    },
-    {
-      id: 5,
-      name: "EcoMart Distributors",
-      pan_number: "TUVWX2345P",
-      gst_number: "21TUVWX2345P7Y4",
-      route_name: "Route 5",
-      rood: "Rood 5",
-      address: "Eco Street, MG Road",
-      city: "Pune",
-      state: "Maharashtra",
-      pin_code: "411001",
-      contact_person: "Rahul Jadhav",
-      contact_number: "9011223344"
-    }
-  ];
+
 
   return {
     props: {
-      brands
+      data: [],
     }
   };
 };

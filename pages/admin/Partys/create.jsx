@@ -1,8 +1,11 @@
 import { Box } from "@mui/material";
 import * as yup from "yup";
 import { H3 } from "components/Typography";
-import {PartysForm} from "pages-sections/admin";
+import { PartysForm } from "pages-sections/admin";
+import axios from "utils/axios"; // import the custom axios
+
 import VendorDashboardLayout from "components/layouts/vendor-dashboard";
+import { useSnackbar } from "notistack";
 
 CreateParty.getLayout = function getLayout(page) {
   return <VendorDashboardLayout>{page}</VendorDashboardLayout>;
@@ -13,14 +16,14 @@ export default function CreateParty() {
     name: "",
     gst_number: "",
     pan_number: "",
-    vendoe_code: "",
+    vendor_code: "",
     contact_person: "",
     contact_number: "",
     address: "",
     city: "",
     state: "",
     pincode: "",
-    create_period: ""
+    period_days: ""
   };
 
   const validationSchema = yup.object().shape({
@@ -39,12 +42,42 @@ export default function CreateParty() {
       .string()
       .required("Pincode is required")
       .matches(/^\d{6}$/, "Enter a valid 6-digit pincode"),
-    create_period: yup.string().required("Create Period is required"),
-    vendoe_code: yup.string().required("Vendor Code is required")
+    period_days: yup.string().required("Create Period is required"),
+    vendor_code: yup.string().required("Vendor Code is required")
   });
 
-  const handleFormSubmit = (values) => {
-    console.log("Submitted Party Data:", values);
+  const { enqueueSnackbar } = useSnackbar();
+
+
+  const handleFormSubmit = async (values, { setSubmitting }) => {
+    try {
+      const response = await axios.post("/parties", values);
+
+      enqueueSnackbar("Party created successfully 🎉", { variant: "success" });
+
+      console.log("Form submitted successfully:", response.data);
+    } catch (error) {
+      console.log(error.response?.data?.error);
+
+      // if validation errors (422)
+      if (error.response?.status === 422 && error.response?.data?.error) {
+        const errors = error.response.data.error;
+        // show all validation messages
+        Object.values(errors).flat().forEach((msg) => {
+          enqueueSnackbar(msg, { variant: "error" });
+        });
+      }
+      // else if server error (500 or other)
+      else if (error.response?.data?.error) {
+        enqueueSnackbar(error.response.data.error, { variant: "error" });
+      }
+      // fallback
+      else {
+        enqueueSnackbar("Server not responding ❌", { variant: "error" });
+      }
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (

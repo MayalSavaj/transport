@@ -29,7 +29,7 @@ const SuppliersRow = ({
   } = brand;
   const router = useRouter();
 
-  const handleNavigate = () => router.push(`/admin/suppliers/${slug}`);
+  const handleNavigate = () => router.push(`/admin/suppliers/${id}`);
   return <StyledTableRow>
     <StyledTableCell align="center">#{id}</StyledTableCell>
 

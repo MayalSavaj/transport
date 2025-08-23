@@ -15,7 +15,9 @@ import { H3 } from "components/Typography";
 import useMuiTable from "hooks/useMuiTable";
 import Scrollbar from "components/Scrollbar";
 import TablePagination from "components/data-table/TablePagination";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "utils/axios"; // import the custom axios
+
 
 const tableHeading = [
   { id: "id", label: "ID", align: "left" },
@@ -28,85 +30,30 @@ partypaymentList.getLayout = function getLayout(page) {
 };
 
 export default function partypaymentList() {
-  const categories = [
-    {
-      id: "1",
-      name: "ABC Traders",
-      amount: "₹10,000",
-      moreInfo: [
-        {
-          city: "Ahmedabad",
-          date: "27-06-2025",
-          truckType: "Tata 709",
-          amount: "₹4,000",
-          settle: "Complete"
-        },
-        {
-          city: "Surat",
-          date: "28-06-2025",
-          truckType: "Ashok Leyland 1616",
-          amount: "₹6,000",
-          settle: "Pending"
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTermsConditions = async () => {
+      try {
+        const res = await axios.get("/party-payments");
+        if (res.data) {
+          setCategories(res.data);
+
+          console.log("Party Payments Data:", res.data);
         }
-      ]
-    },
-    {
-      id: "2",
-      name: "XYZ Distributors",
-      amount: "₹15,500",
-      moreInfo: [
-        {
-          city: "Vadodara",
-          date: "29-06-2025",
-          truckType: "Mahindra Loadking",
-          amount: "₹7,500",
-          settle: "Complete"
-        },
-        {
-          city: "Ahmedabad",
-          date: "30-06-2025",
-          truckType: "Tata 709",
-          amount: "₹8,000",
-          settle: "Pending"
-        }
-      ]
-    },
-    {
-      id: "3",
-      name: "KLM Enterprises",
-      amount: "₹7,250",
-      moreInfo: [
-        {
-          city: "Rajkot",
-          date: "25-06-2025",
-          truckType: "Ashok Leyland 2012",
-          amount: "₹7,250",
-          settle: "Complete"
-        }
-      ]
-    },
-    {
-      id: "4",
-      name: "PQR Supplies",
-      amount: "₹12,100",
-      moreInfo: [
-        {
-          city: "Bhavnagar",
-          date: "26-06-2025",
-          truckType: "Tata Ace",
-          amount: "₹5,000",
-          settle: "Pending"
-        },
-        {
-          city: "Mehsana",
-          date: "27-06-2025",
-          truckType: "Mahindra Loadking",
-          amount: "₹7,100",
-          settle: "Complete"
-        }
-      ]
-    }
-  ];
+
+      } catch (err) {
+        console.error("Failed to fetch terms & conditions", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTermsConditions();
+  }, []);
+
+
 
   const {
     order,
@@ -121,6 +68,9 @@ export default function partypaymentList() {
   });
   const [expandedId, setExpandedId] = useState(null);
   const toggleExpand = (id) => setExpandedId((prev) => (prev === id ? null : id));
+
+  console.log("Filtered List:", filteredList);
+
   return (
     <Box py={4}>
       <H3 mb={2}>Party Payment</H3>
@@ -165,19 +115,33 @@ export default function partypaymentList() {
 }
 function RowWithExpand({ item }) {
 
+  const handleRedirect = (item) => {
+
+
+    Router.push(`/admin/party-Settle/${item.party.id}`);
+
+  };
+
+
+
   return (
     <>
       <TableRow hover sx={{ backgroundColor: "#fafafa" }}>
-        <TableCell>
-          #{item.id}
-        </TableCell>
-        <TableCell
-          sx={{ cursor: 'pointer', color: 'primary.main', textDecoration: 'underline' }}
-          onClick={() => Router.push('/admin/party-Settle')}
-        >
-          {item.name}
-        </TableCell>
-        <TableCell>{item.amount}</TableCell>
+
+
+        <>
+          <TableCell>
+            #{item.id}
+          </TableCell>
+          <TableCell
+            sx={{ cursor: 'pointer', color: 'primary.main', textDecoration: 'underline' }}
+            onClick={() => handleRedirect(item)}
+          >
+            {item?.party?.name}
+          </TableCell>
+          <TableCell>{item?.final_amount}</TableCell>
+        </>
+
       </TableRow>
     </>
   );

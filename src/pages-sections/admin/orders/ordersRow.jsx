@@ -9,7 +9,7 @@ const ordersRow = ({
     id, party, city, date, lrNo, freight, status
   } = item;
   const router = useRouter();
-  const handleNavigate = () => router.push(`/admin/orders/${slug}`);
+  const handleNavigate = () => console.log("dadasdasd"); router.push(`/admin/orderdetails/create/${id}`);
   return <StyledTableRow>
     <StyledTableCell align="left">#{id.split("-")[0]}</StyledTableCell>
     <StyledTableCell align="left">{date}</StyledTableCell>

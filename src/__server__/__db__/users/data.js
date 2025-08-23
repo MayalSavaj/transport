@@ -10,7 +10,7 @@ export const users = [
     name: "Nick",
     pan_number: "ABCDE1234F",
     gst_number: "22ABCDE1234F1Z5",
-    contact_person: "Rajesh Patel",
+    contact_person: "Rajesh sss",
     contact_mobile: "9876543210",
     address: "123 Market Street",
     city: "Mumbai",

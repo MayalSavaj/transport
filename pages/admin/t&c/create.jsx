@@ -2,6 +2,8 @@ import { Box } from "@mui/material";
 import * as yup from "yup";
 import { H3 } from "components/Typography";
 import { LCForm } from "pages-sections/admin";
+import axios from "utils/axios"; // import the custom axios
+
 import VendorDashboardLayout from "components/layouts/vendor-dashboard";
 
 // Apply layout
@@ -20,8 +22,22 @@ export default function CreateLC() {
     type: yup.string().required("T & C Type is required")
   });
 
-  const handleFormSubmit = (values) => {
-    console.log("Submitted T & C:", values);
+  const handleFormSubmit = async (values) => {
+    try {
+      const res = await axios.post("/terms-conditions", {
+
+        'type': values.dropdownField == 'invoice' ? 'invoice' : 'lr',
+        'content': values.textField
+      });
+
+
+    } catch (error) {
+      console.error("Error fetching number series:", error);
+    } finally {
+      setLoading(false);
+    }
+
+
   };
 
   return (
@@ -30,7 +46,7 @@ export default function CreateLC() {
 
       <LCForm
         initialValues={INITIAL_VALUES}
-        validationSchema={validationSchema}
+        // validationSchema={validationSchema}
         handleFormSubmit={handleFormSubmit}
       />
     </Box>

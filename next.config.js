@@ -8,4 +8,15 @@ module.exports = {
     theme: "DEFAULT",
     currency: "USD",
   },
+
+  // ++ Add this redirects function below ++
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/login',
+        permanent: true,
+      },
+    ];
+  },
 };

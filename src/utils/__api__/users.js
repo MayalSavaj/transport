@@ -1,13 +1,16 @@
-import axios from "axios";
-export const getUser = async () => {
-  const response = await axios.get("/api/user-list/1");
-  return response.data;
+import axios from "utils/axios"; // import the custom axios
+
+const getUser = async () => {
+  const res = await axios.get("/myprofile");
+  return res.data;
 };
-export const getUserIds = async () => {
-  const response = await axios.get("/api/user-list/id-list");
-  return response.data;
+
+const updateUser = async (data) => {
+  const res = await axios.post("/myprofile", data);
+  return res.data;
 };
+
 export default {
   getUser,
-  getUserIds
+  updateUser
 };

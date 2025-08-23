@@ -14,8 +14,9 @@ import {
 
 import { Formik } from "formik";
 import * as Yup from "yup";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import axios from "utils/axios"; // import the custom axios
 
 const initialValues = {
   partyName: "",
@@ -43,52 +44,96 @@ const validationSchema = Yup.object().shape({
 
 const OrdersForm = () => {
   const [formData, setFormData] = useState(null);
+  const [partyOptions, setPartyOptions] = useState([]);
+  const [supplierOptions, setSupplierOptions] = useState([]);
+
+
+
+  useEffect(() => {
+    const fetchParties = async () => {
+      try {
+        const res = await axios.get("/parties"); // adjust base URL if needed
+        const options = res.data.map((party) => ({
+          label: party.name,
+          value: party.id,
+        }));
+        setPartyOptions(options);
+      } catch (error) {
+        console.error("Error fetching parties:", error);
+      }
+    };
+
+    const fetchSuppliers = async () => {
+      try {
+        const res = await axios.get("/supplier");
+        const options = res.data.map((supplier) => ({
+          label: supplier.name,
+          value: supplier.id,
+        }));
+        setSupplierOptions(options);
+      } catch (error) {
+        console.error("Error fetching suppliers:", error);
+      }
+    };
+
+    fetchParties();
+    fetchSuppliers();
+  }, []);
   const router = useRouter();
 
-  const partyOptions = [
-    { label: "Party A", value: "Party A" },
-    { label: "B", value: "Party B" },
+  const dropPointOptions = [
+    { label: "Ahmedabad", value: "Ahmedabad" },
+    { label: "Mumbai", value: "Mumbai" },
+    { label: "Delhi", value: "Delhi" },
+    { label: "Bengaluru", value: "Bengaluru" },
+    { label: "Chennai", value: "Chennai" },
+    { label: "Hyderabad", value: "Hyderabad" },
+    { label: "Pune", value: "Pune" },
+    { label: "Jaipur", value: "Jaipur" },
+    { label: "Kolkata", value: "Kolkata" },
+    { label: "Surat", value: "Surat" },
   ];
 
-  const supplierOptions = [
-    { label: "Supplier One", value: "Supplier One" },
-    { label: "Supplier Two", value: "Supplier Two" },
-    { label: "Supplier Three", value: "Supplier Three" },
+  const pickupOptions = [
+    { label: "Ahmedabad", value: "Ahmedabad" },
+    { label: "Mumbai", value: "Mumbai" },
+    { label: "Delhi", value: "Delhi" },
+    { label: "Bengaluru", value: "Bengaluru" },
+    { label: "Chennai", value: "Chennai" },
+    { label: "Hyderabad", value: "Hyderabad" },
+    { label: "Pune", value: "Pune" },
+    { label: "Jaipur", value: "Jaipur" },
+    { label: "Kolkata", value: "Kolkata" },
+    { label: "Surat", value: "Surat" },
   ];
-const dropPointOptions = [
-  { label: "Ahmedabad", value: "Ahmedabad" },
-  { label: "Mumbai", value: "Mumbai" },
-  { label: "Delhi", value: "Delhi" },
-  { label: "Bengaluru", value: "Bengaluru" },
-  { label: "Chennai", value: "Chennai" },
-  { label: "Hyderabad", value: "Hyderabad" },
-  { label: "Pune", value: "Pune" },
-  { label: "Jaipur", value: "Jaipur" },
-  { label: "Kolkata", value: "Kolkata" },
-  { label: "Surat", value: "Surat" },
-];
-
-const pickupOptions = [
-  { label: "Ahmedabad", value: "Ahmedabad" },
-  { label: "Mumbai", value: "Mumbai" },
-  { label: "Delhi", value: "Delhi" },
-  { label: "Bengaluru", value: "Bengaluru" },
-  { label: "Chennai", value: "Chennai" },
-  { label: "Hyderabad", value: "Hyderabad" },
-  { label: "Pune", value: "Pune" },
-  { label: "Jaipur", value: "Jaipur" },
-  { label: "Kolkata", value: "Kolkata" },
-  { label: "Surat", value: "Surat" },
-];
 
   return (
     <Card sx={{ p: 3 }}>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
-        onSubmit={(values) => {
+        onSubmit={async (values) => {
           setFormData(values);
-          router.push("/admin/orderdetails/create");
+          const payload = {
+            party_id: values.partyName,
+            truck_type: values.truckType,
+            truck_number: values.truckNo,
+            pay_by: values.payBy,
+            pickup_location: values.pickup,
+            drop_location_1: values.dropPoints[0], // map first drop point
+            supplier_id: values.settleSupplier,
+            freight_charge: Number(values.freight),
+            hiring_cost: Number(values.hiringCost),
+          };
+
+          try {
+            const res = await axios.post("/order", payload);
+            console.log("Order created:", res.data);    
+            router.push(`/admin/orderdetails/create/${res.data.data.id}`);
+          } catch (error) {
+            console.error("Order creation failed:", error);
+          }
+
         }}
       >
         {({
@@ -123,7 +168,7 @@ const pickupOptions = [
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                       size="medium"
+                        size="medium"
                         label="Party Name"
                         name="partyName"
                         error={!!touched.partyName && !!errors.partyName}

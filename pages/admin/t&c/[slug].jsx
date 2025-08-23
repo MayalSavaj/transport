@@ -21,13 +21,13 @@ const validationSchema = yup.object().shape({
 });
 
 export default function EditLC() {
-  const { query } = useRouter(); 
+  const { query } = useRouter();
   const [formData, setFormData] = useState(INITIAL_VALUES);
 
   useEffect(() => {
     if (query.id) {
       const mockLCs = [
-        { id: "1", terms: "You must be 18+ to use this service.", type: "Invoice" },
+        { id: "1", terms: "You must be 18+ to use this servisssce.", type: "Invoice" },
         { id: "2", terms: "Data is stored securely in compliance with GDPR.", type: "L-R" },
         { id: "3", terms: "Refund requests must be made within 7 days.", type: "L-R" }
       ];

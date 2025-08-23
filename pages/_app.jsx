@@ -13,6 +13,7 @@ import nextI18NextConfig from "../next-i18next.config";
 import "nprogress/nprogress.css";
 import "simplebar/dist/simplebar.min.css";
 import "../src/__server__";
+import ProfileCheckModal from "./ProfileCheckModal";
 //Binding events.
 Router.events.on("routeChangeStart", () => nProgress.start());
 Router.events.on("routeChangeComplete", () => nProgress.done());
@@ -28,25 +29,35 @@ const App = ({
   const AnyComponent = Component;
   const getLayout = AnyComponent.getLayout ?? (page => page);
   return <Fragment>
-      <Head>
-        <meta charSet="utf-8" />
-        <meta name="description" content="React Next.js ecommerce template. Build SEO friendly Online store, delivery app and Multivendor store" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
-        <OpenGraphTags />
-        <title>Bazaar - Next.js Ecommerce Template</title>
-      </Head>
+    <Head>
+      <meta charSet="utf-8" />
+      <meta name="description" content="React Next.js ecommerce template. Build SEO friendly Online store, delivery app and Multivendor store" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
+      <OpenGraphTags />
+      <title>Bazaar - Next.js Ecommerce Template</title>
+    </Head>
 
-      <SettingsProvider>
-        <AppProvider>
-          <MuiTheme>
-            <SnackbarProvider>
+    <SettingsProvider>
+      <AppProvider>
+        <MuiTheme>
+          <SnackbarProvider
+            maxSnack={3}
+            anchorOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+            autoHideDuration={3000}
+          >            <ProfileCheckModal>
+
               <RTL>{getLayout(<AnyComponent {...pageProps} />)}</RTL>
-            </SnackbarProvider>
-          </MuiTheme>
-        </AppProvider>
-      </SettingsProvider>
-    </Fragment>;
+            </ProfileCheckModal>
+
+          </SnackbarProvider>
+        </MuiTheme>
+      </AppProvider>
+    </SettingsProvider>
+  </Fragment>;
 };
 
 // Only uncomment this method if you have blocking data requirements for

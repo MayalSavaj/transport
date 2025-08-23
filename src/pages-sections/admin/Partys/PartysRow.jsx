@@ -13,9 +13,12 @@ const PartysRow = ({
     contact_number,
     city
   } = product;
+
+
+
   const router = useRouter();
   return <StyledTableRow>
-    <StyledTableCell align="left">#{id.split("-")[0]}</StyledTableCell>
+    <StyledTableCell align="left">#{id}</StyledTableCell>
     <StyledTableCell align="left">{name}</StyledTableCell>
     <StyledTableCell align="left">{gst_number}</StyledTableCell>
     <StyledTableCell align="left">{contact_person}</StyledTableCell>
@@ -23,7 +26,7 @@ const PartysRow = ({
     <StyledTableCell align="left">{city}</StyledTableCell>
 
     <StyledTableCell align="center">
-      <StyledIconButton onClick={() => router.push(`/admin/Partys/${slug}`)}>
+      <StyledIconButton onClick={() => router.push(`/admin/Partys/${id}`)}>
         <Edit />
       </StyledIconButton>
 
