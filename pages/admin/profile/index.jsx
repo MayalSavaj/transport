@@ -190,13 +190,24 @@ export default function Profile() {
 
   return (
     <>
+
+    <CustomerDashboardLayout>
+    
+      <>
+
       <UserDashboardHeader
         icon={Person}
         title="My Profile"
         button={HEADER_LINK}
+
         navigation={<CustomerDashboardNavigation />}
       />
       <Box mb={4}>
+
+        navigation={<CustomerDashboardNavigation />} 
+        />
+        <Box mb={4}>
+
         <Card sx={{ p: 4 }}>
           <form onSubmit={formik.handleSubmit}>
             <FlexBox alignItems="center" mb={4}>
@@ -287,8 +298,14 @@ export default function Profile() {
             </Grid>
           </Section>
         </Card>
+
       </Box>
     </>
+
+      </Box></>
+
+    </CustomerDashboardLayout> 
+
   );
 }
 

@@ -46,11 +46,11 @@ const UserDashboardHeader = ({
           </H2>
         </FlexBox>
 
-        <Box className="sidenav">
+        {/* <Box className="sidenav">
           <Sidenav position="left" handle={<Menu fontSize="small" />}>
             {navigation}
           </Sidenav>
-        </Box>
+        </Box> */}
 
         {!isTablet && button}
       </FlexBox>
