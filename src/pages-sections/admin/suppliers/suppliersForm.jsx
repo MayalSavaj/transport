@@ -1,13 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Button,
   Card,
   Grid,
   TextField,
-  Typography
+  Typography,
+  MenuItem
 } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
+import axios from "axios";
 
 const validationSchema = yup.object().shape({
   name: yup.string().required("Name is required"),
@@ -26,14 +28,37 @@ const validationSchema = yup.object().shape({
 });
 
 const SuppliersForm = (props) => {
-
-
-
-
   const [files, setFiles] = useState([]);
+  const [cities, setCities] = useState([]);
+  const [states, setStates] = useState([]);
+  const [filteredCities, setFilteredCities] = useState([]);
 
-  const { initialValues, validationSchema, handleFormSubmit } = props;
+  const { initialValues, handleFormSubmit } = props;
 
+  // Fetch states and cities from API
+  useEffect(() => {
+    axios.get("https://biltozbackend.growmoon.top/api/cities").then((response) => {
+      const cityList = response?.data?.city || [];
+      setCities(cityList);
+
+      // Extract unique states
+      const uniqueStates = [...new Set(cityList.map((item) => item.city_state))];
+      setStates(uniqueStates);
+
+      // Pre-filter cities if state is already selected (edit mode)
+      if (initialValues.state) {
+        const filtered = cityList.filter((c) => c.city_state === initialValues.state);
+        setFilteredCities(filtered);
+      }
+    });
+  }, [initialValues.state]);
+
+  const handleStateChange = (selectedState, setFieldValue) => {
+    setFieldValue("state", selectedState);
+    setFieldValue("city", ""); // Reset city when state changes
+    const filtered = cities.filter((c) => c.city_state === selectedState);
+    setFilteredCities(filtered);
+  };
 
   const handleChangeDropZone = (files) => {
     files.forEach((file) =>
@@ -65,11 +90,11 @@ const SuppliersForm = (props) => {
           touched,
           handleChange,
           handleBlur,
-          handleSubmit
+          handleSubmit,
+          setFieldValue
         }) => (
           <form onSubmit={handleSubmit}>
             <Grid container spacing={3}>
-
               {/* Basic Information */}
               <Grid item xs={12}>
                 <Typography variant="subtitle1" fontWeight={800} mb={1}>
@@ -166,34 +191,49 @@ const SuppliersForm = (props) => {
                 />
               </Grid>
 
+              {/* State Dropdown */}
               <Grid item sm={6} xs={12}>
                 <TextField
-                  fullWidth
-                  name="city"
-                  label="City"
-                  placeholder="City"
-                  size="medium"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.city}
-                  error={!!touched.city && !!errors.city}
-                  helperText={touched.city && errors.city}
-                />
-              </Grid>
-
-              <Grid item sm={6} xs={12}>
-                <TextField
+                  select
                   fullWidth
                   name="state"
                   label="State"
-                  placeholder="State"
                   size="medium"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
                   value={values.state}
+                  onBlur={handleBlur}
+                  onChange={(e) => handleStateChange(e.target.value, setFieldValue)}
                   error={!!touched.state && !!errors.state}
                   helperText={touched.state && errors.state}
-                />
+                >
+                  {states.map((state, index) => (
+                    <MenuItem key={index} value={state}>
+                      {state}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+
+              {/* City Dropdown */}
+              <Grid item sm={6} xs={12}>
+                <TextField
+                  select
+                  fullWidth
+                  name="city"
+                  label="City"
+                  size="medium"
+                  value={values.city}
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  disabled={!values.state}
+                  error={!!touched.city && !!errors.city}
+                  helperText={touched.city && errors.city}
+                >
+                  {filteredCities.map((city) => (
+                    <MenuItem key={city.id} value={city.city_name}>
+                      {city.city_name}
+                    </MenuItem>
+                  ))}
+                </TextField>
               </Grid>
 
               <Grid item sm={6} xs={12}>

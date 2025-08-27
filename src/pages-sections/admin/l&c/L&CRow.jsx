@@ -9,8 +9,9 @@ const LCRow = ({
     id, content, type
   } = item;
   const router = useRouter();
-  const handleNavigate = () => router.push(`/admin/t&c/${slug}`);
-
+  const handleNavigate = (id) => {
+    router.push(`/admin/t&c/${id}`);
+  }
 
   return <StyledTableRow>
     <StyledTableCell align="left">#{id}</StyledTableCell>
@@ -22,17 +23,17 @@ const LCRow = ({
     <StyledTableCell align="left">{type}</StyledTableCell>
 
     <StyledTableCell align="center">
-      <StyledIconButton onClick={handleNavigate}>
+      <StyledIconButton onClick={() => handleNavigate(id)}>
         <Edit />
       </StyledIconButton>
 
-      <StyledIconButton onClick={handleNavigate}>
+      <StyledIconButton onClick={() => handleNavigate(id)}>
         <RemoveRedEye />
       </StyledIconButton>
 
-      <StyledIconButton>
+      {/* <StyledIconButton>
         <Delete />
-      </StyledIconButton>
+      </StyledIconButton> */}
     </StyledTableCell>
   </StyledTableRow>;
 };

@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import { PartysRow } from "pages-sections/admin";
 import axios from "utils/axios"; // import the custom axios
 
+
 const tableHeading = [
   { id: "id", label: "ID", align: "left" },
   { id: "name", label: "Name", align: "left" },

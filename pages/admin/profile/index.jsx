@@ -16,7 +16,7 @@ import {
 import { styled } from "@mui/material/styles";
 import ClearIcon from "@mui/icons-material/Clear";
 import { Person } from "@mui/icons-material";
-import axios from "utils/axios"; // import the custom axios
+import axios from "utils/axios"; // custom axios
 
 // --- Formik & Yup Imports ---
 import { useFormik } from "formik";
@@ -31,7 +31,7 @@ import CustomerDashboardLayout from "components/layouts/customer-dashboard";
 import CustomerDashboardNavigation from "components/layouts/customer-dashboard/Navigations";
 import VendorDashboardLayout from "components/layouts/vendor-dashboard";
 
-// Styled components (no changes here)
+// Styled components
 const UploadImageBox = styled("div")(() => ({
   position: "relative",
   width: 120,
@@ -56,7 +56,6 @@ const StyledClear = styled(IconButton)(() => ({
 const validationSchema = Yup.object().shape({
   pan_number: Yup.string().required("PAN Number is required"),
   email: Yup.string().required("Email Account is required"),
-
   gst_number: Yup.string().required("GST Number is required"),
   contact_person: Yup.string().required("Contact Person is required"),
   mobile_number: Yup.string()
@@ -73,13 +72,19 @@ const validationSchema = Yup.object().shape({
     .required("IFSC Code is required"),
   ac_number: Yup.string().required("Account Number is required"),
   branch: Yup.string().required("Branch is required"),
+
+  // NEW required validations
+  profile_photo: Yup.mixed().required("Profile photo is required"),
+  signature_stamp: Yup.mixed().required("Signature with stamp is required"),
 });
+
 
 export default function Profile() {
   const downMd = useMediaQuery((theme) => theme.breakpoints.down("md"));
   const [editMode, setEditMode] = useState(false);
   const [user, setUser] = useState({});
   const [signatureFile, setSignatureFile] = useState([]);
+  const [profilePhotoFile, setProfilePhotoFile] = useState([]);
   const [imgLoaded, setImgLoaded] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -89,19 +94,40 @@ export default function Profile() {
         .get(`/myprofile`)
         .then((res) => {
           const fetchedUser = res.data.user || {};
-
-          // ++ START: Sanitize the fetched data ++
-          // Create a new object to hold the cleaned data
           const sanitizedUser = {};
-          // Loop over the keys of the fetched user object
           for (const key in fetchedUser) {
-            // If the value is null, replace it with an empty string, otherwise keep it
-            sanitizedUser[key] = fetchedUser[key] === null ? "" : fetchedUser[key];
+            sanitizedUser[key] =
+              fetchedUser[key] === null ? "" : fetchedUser[key];
           }
-          // ++ END: Sanitize the fetched data ++
-
           setUser(sanitizedUser);
-          formik.setValues(sanitizedUser); // Use the clean data for Formik
+          formik.setValues(sanitizedUser);
+
+          console.log(user?.profile_photo);
+          console.log(sanitizedUser);
+          // preload profile photo + signature if available
+          if (sanitizedUser.profile_photo) {
+
+            console.log("https://biltozbackend.growmoon.top/storage/" + user?.profile_photo);
+            setProfilePhotoFile([
+              {
+                name: "profile_photo.jpg",
+                preview: "https://biltozbackend.growmoon.top/storage/" + sanitizedUser?.profile_photo,
+                uploaded: true,
+              },
+            ]);
+          }
+          if (sanitizedUser.signature_stamp) {
+            console.log("https://biltozbackend.growmoon.top/storage" + sanitizedUser?.signature_stamp);
+
+            setSignatureFile([
+              {
+                name: "signature_stamp.jpg",
+                preview: "https://biltozbackend.growmoon.top/storage/" + sanitizedUser?.signature_stamp,
+                uploaded: true,
+              },
+            ]);
+          }
+
           setLoading(false);
         })
         .catch((err) => {
@@ -111,36 +137,54 @@ export default function Profile() {
     };
 
     fetchUser();
-  }, []); // The empty dependency array is correct here
+  }, []);
 
-  const handleFileDelete = (fileToRemove) => () => {
-    setSignatureFile((prev) =>
-      prev.filter((file) => file.preview !== fileToRemove.preview)
-    );
+  const handleFileDelete = (fileToRemove, type) => () => {
+    if (type === "profile") {
+      setProfilePhotoFile([]);
+      formik.setFieldValue("profile_photo", null); // ✅ clear from formik
+    } else {
+      setSignatureFile([]);
+      formik.setFieldValue("signature_stamp", null); // ✅ clear from formik
+    }
   };
 
-  const handleSave = (values) => {
-    axios
-      .put(`/update-profile`, values)
-      .then((res) => {
-        setUser(values);
-        setEditMode(false);
-        Router.push("/admin/profile");
-      })
-      .catch((err) => {
-        console.error("Failed to update profile:", err);
+
+  const handleSave = async (values) => {
+    try {
+      const formData = new FormData();
+
+      // Append all form fields
+      Object.keys(values).forEach((key) => {
+        formData.append(key, values[key] ?? "");
       });
 
-      
+      // Append profile photo
+      if (profilePhotoFile.length > 0 && !profilePhotoFile[0].uploaded) {
+        formData.append("profile_photo", profilePhotoFile[0]);
+      }
 
+      // Append signature stamp
+      if (signatureFile.length > 0 && !signatureFile[0].uploaded) {
+        formData.append("signature_stamp", signatureFile[0]);
+      }
+
+      const res = await axios.post(`/update-profile`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      console.log("Profile updated:", res.data);
+      setEditMode(false);
+    } catch (err) {
+      console.error("Failed to update profile:", err);
+    }
   };
 
-  // --- Initialize Formik ---
   const formik = useFormik({
     initialValues: user,
     validationSchema: validationSchema,
     onSubmit: handleSave,
-    enableReinitialize: true, // This allows the form to update when `user` state changes
+    enableReinitialize: true,
   });
 
   const HEADER_LINK = (
@@ -150,7 +194,7 @@ export default function Profile() {
           <Button
             variant="contained"
             color="success"
-            onClick={formik.handleSubmit} // Use formik's submit handler
+            onClick={formik.handleSubmit}
           >
             Save
           </Button>
@@ -159,12 +203,23 @@ export default function Profile() {
             color="error"
             onClick={() => {
               setEditMode(false);
-              formik.resetForm({ values: user }); // Reset form to original user data
-              if (user.signature_url) {
+              formik.resetForm({ values: user });
+              if (user.profile_photo) {
+                setProfilePhotoFile([
+                  {
+                    name: "profile_photo.jpg",
+                    preview: "https://biltozbackend.growmoon.top/storage/profile/7_68a590150de47.jpg",
+                    uploaded: true,
+                  },
+                ]);
+              } else {
+                setProfilePhotoFile([]);
+              }
+              if (user.signature_stamp) {
                 setSignatureFile([
                   {
-                    name: "signature.jpg",
-                    preview: user.signature_url,
+                    name: "signature_stamp.jpg",
+                    preview: "https://biltozbackend.growmoon.top/storage/profile/7_68a590150de47.jpg",
                     uploaded: true,
                   },
                 ]);
@@ -190,112 +245,258 @@ export default function Profile() {
 
   return (
     <CustomerDashboardLayout>
-    
       <>
-      <UserDashboardHeader
-        icon={Person}
-        title="My Profile"
-        button={HEADER_LINK}
-        navigation={<CustomerDashboardNavigation />} 
+        <UserDashboardHeader
+          icon={Person}
+          title="My Profile"
+          button={HEADER_LINK}
+          navigation={<CustomerDashboardNavigation />}
         />
         <Box mb={4}>
-        <Card sx={{ p: 4 }}>
-          <form onSubmit={formik.handleSubmit}>
-            <FlexBox alignItems="center" mb={4}>
-              <Avatar src={user?.avatar} sx={{ height: 80, width: 80 }} />
-              <Box ml={2}>
-                <H5>{user?.name}</H5>
-              </Box>
-            </FlexBox>
+          <Card sx={{ p: 4 }}>
+            <form onSubmit={formik.handleSubmit}>
+              {/* Profile Photo Section */}
+              <Section title="Profile Photo">
+                <Grid item xs={12}>
+                  {!profilePhotoFile.length ? (
+                    editMode && (
+                      <DropZone
+                        title="Upload Profile Photo"
+                        maxFiles={1}
+                        accept={{ "image/*": [] }}
+                        onChange={(selectedFiles) => {
+                          const file = selectedFiles[0];
+                          if (file) {
+                            const updatedFile = Object.assign(file, {
+                              preview: URL.createObjectURL(file),
+                            });
+                            setProfilePhotoFile([updatedFile]);
+                            setImgLoaded(false);
+                            formik.setFieldValue("profile_photo", updatedFile); // ✅ update formik
 
-            <Section title="Business Details">
-              <Grid container spacing={2}>
-                <ProfileItem name="pan_number" title="PAN Number" formik={formik} editMode={editMode} />
-                <ProfileItem name="gst_number" title="GST Number" formik={formik} editMode={editMode} />
-                <ProfileItem name="contact_person" title="Contact Person" formik={formik} editMode={editMode} />
-                <ProfileItem name="email" title="Email" formik={formik} editMode={editMode} />
-
-                <ProfileItem name="mobile_number" title="Contact Mobile" formik={formik} editMode={editMode} />
-                <ProfileItem name="adress" title="Address" formik={formik} editMode={editMode} />
-                <ProfileItem name="city" title="City" formik={formik} editMode={editMode} />
-                <ProfileItem name="state" title="State" formik={formik} editMode={editMode} />
-                <ProfileItem name="pin_code" title="Pin Code" formik={formik} editMode={editMode} />
-                <ProfileItem name="msme_number" title="MSME Number" formik={formik} editMode={editMode} />
-              </Grid>
-            </Section>
-
-            <Section title="Bank Details">
-              <Grid container spacing={2}>
-                <ProfileItem name="bank_name" title="Bank Name" formik={formik} editMode={editMode} />
-                <ProfileItem name="ifsc_code" title="IFSC Code" formik={formik} editMode={editMode} />
-                <ProfileItem name="ac_number" title="Account Number" formik={formik} editMode={editMode} />
-                <ProfileItem name="branch" title="Branch" formik={formik} editMode={editMode} />
-              </Grid>
-            </Section>
-          </form>
-
-          {/* Signature section remains outside the formik form tag as it's handled separately */}
-          <Section title="Signature with Stamp">
-            <Grid item xs={12}>
-              {!signatureFile.length ? (
-                editMode && (
-                  <DropZone
-                    title="Upload Signature with Stamp"
-                    maxFiles={1}
-                    accept={{ "image/*": [] }}
-                    onChange={(selectedFiles) => {
-                      const file = selectedFiles[0];
-                      if (file) {
-                        const updatedFile = Object.assign(file, {
-                          preview: URL.createObjectURL(file),
-                        });
-                        setSignatureFile([updatedFile]);
-                        setImgLoaded(false);
-                      }
-                    }}
-                  />
-                )
-              ) : (
-                <FlexBox flexDirection="row" mt={2} flexWrap="wrap" gap={1}>
-                  {signatureFile.map((file, index) => (
-                    <UploadImageBox key={index}>
-                      {!imgLoaded && (
-                        <CircularProgress
-                          size={24}
-                          sx={{ position: "absolute", top: "40%", left: "40%" }}
-                        />
-                      )}
-                      <BazaarImage
-                        src={file.preview}
-                        width="100%"
-                        height="100%"
-                        alt="Signature"
-                        style={{ objectFit: "contain" }}
-                        onLoad={() => setImgLoaded(true)}
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = "/placeholder-signature.png";
+                          }
                         }}
-                      />
-                      {editMode && (
-                        <StyledClear onClick={handleFileDelete(file)}>
-                          <ClearIcon fontSize="small" />
-                        </StyledClear>
-                      )}
-                    </UploadImageBox>
-                  ))}
-                </FlexBox>
-              )}
-            </Grid>
-          </Section>
-        </Card>
-      </Box></>
 
-    </CustomerDashboardLayout> 
+
+                      />
+                    )
+                  ) : (
+                    <FlexBox flexDirection="row" mt={2} flexWrap="wrap" gap={1}>
+                      {profilePhotoFile.map((file, index) => (
+                        <UploadImageBox key={index}>
+                          {!imgLoaded && (
+                            <CircularProgress
+                              size={24}
+                              sx={{
+                                position: "absolute",
+                                top: "40%",
+                                left: "40%",
+                              }}
+                            />
+                          )}
+                          <BazaarImage
+                            src={file.preview}
+                            width="100%"
+                            height="100%"
+                            alt="Profile"
+                            style={{ objectFit: "cover" }}
+                            onLoad={() => setImgLoaded(true)}
+                          />
+                          {editMode && (
+                            <StyledClear
+                              onClick={handleFileDelete(file, "profile")}
+                            >
+                              <ClearIcon fontSize="small" />
+                            </StyledClear>
+                          )}
+                        </UploadImageBox>
+                      ))}
+
+
+
+                    </FlexBox>
+
+                  )}
+                </Grid>
+                {formik.touched.profile_photo && formik.errors.profile_photo && (
+                  <Typography color="error" fontSize={12}>
+                    {formik.errors.profile_photo}
+                  </Typography>
+                )}
+              </Section>
+
+              {/* Business Details */}
+              <Section title="Business Details">
+                <Grid container spacing={2}>
+                  <ProfileItem
+                    name="pan_number"
+                    title="PAN Number"
+                    formik={formik}
+                    editMode={editMode}
+                  />
+                  <ProfileItem
+                    name="gst_number"
+                    title="GST Number"
+                    formik={formik}
+                    editMode={editMode}
+                  />
+                  <ProfileItem
+                    name="contact_person"
+                    title="Contact Person"
+                    formik={formik}
+                    editMode={editMode}
+                  />
+                  <ProfileItem
+                    name="email"
+                    title="Email"
+                    formik={formik}
+                    editMode={editMode}
+                  />
+                  <ProfileItem
+                    name="mobile_number"
+                    title="Contact Mobile"
+                    formik={formik}
+                    editMode={editMode}
+                  />
+                  <ProfileItem
+                    name="adress"
+                    title="Address"
+                    formik={formik}
+                    editMode={editMode}
+                  />
+                  <ProfileItem
+                    name="city"
+                    title="City"
+                    formik={formik}
+                    editMode={editMode}
+                  />
+                  <ProfileItem
+                    name="state"
+                    title="State"
+                    formik={formik}
+                    editMode={editMode}
+                  />
+                  <ProfileItem
+                    name="pin_code"
+                    title="Pin Code"
+                    formik={formik}
+                    editMode={editMode}
+                  />
+                  <ProfileItem
+                    name="msme_number"
+                    title="MSME Number"
+                    formik={formik}
+                    editMode={editMode}
+                  />
+                </Grid>
+              </Section>
+
+              {/* Bank Details */}
+              <Section title="Bank Details">
+                <Grid container spacing={2}>
+                  <ProfileItem
+                    name="bank_name"
+                    title="Bank Name"
+                    formik={formik}
+                    editMode={editMode}
+                  />
+                  <ProfileItem
+                    name="ifsc_code"
+                    title="IFSC Code"
+                    formik={formik}
+                    editMode={editMode}
+                  />
+                  <ProfileItem
+                    name="ac_number"
+                    title="Account Number"
+                    formik={formik}
+                    editMode={editMode}
+                  />
+                  <ProfileItem
+                    name="branch"
+                    title="Branch"
+                    formik={formik}
+                    editMode={editMode}
+                  />
+                </Grid>
+              </Section>
+            </form>
+
+            {/* Signature Section */}
+            <Section title="Signature with Stamp">
+              <Grid item xs={12}>
+                {!signatureFile.length ? (
+                  editMode && (
+                    <DropZone
+                      title="Upload Signature with Stamp"
+                      maxFiles={1}
+                      accept={{ "image/*": [] }}
+                      onChange={(selectedFiles) => {
+                        const file = selectedFiles[0];
+                        if (file) {
+                          const updatedFile = Object.assign(file, {
+                            preview: URL.createObjectURL(file),
+                          });
+                          setSignatureFile([updatedFile]);
+                          setImgLoaded(false);
+                          formik.setFieldValue("signature_stamp", updatedFile); // ✅ update formik
+
+                        }
+                      }}
+                    />
+                  )
+                ) : (
+                  <FlexBox flexDirection="row" mt={2} flexWrap="wrap" gap={1}>
+                    {signatureFile.map((file, index) => (
+                      <UploadImageBox key={index}>
+                        {!imgLoaded && (
+                          <CircularProgress
+                            size={24}
+                            sx={{
+                              position: "absolute",
+                              top: "40%",
+                              left: "40%",
+                            }}
+                          />
+                        )}
+                        <BazaarImage
+                          src={file.preview}
+                          width="100%"
+                          height="100%"
+                          alt="Signature"
+                          style={{ objectFit: "contain" }}
+                          onLoad={() => setImgLoaded(true)}
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = "/placeholder-signature.png";
+                          }}
+                        />
+                        {editMode && (
+                          <StyledClear
+                            onClick={handleFileDelete(file, "signature")}
+                          >
+                            <ClearIcon fontSize="small" />
+                          </StyledClear>
+                        )}
+                      </UploadImageBox>
+                    ))}
+                  </FlexBox>
+                )}
+              </Grid>
+              {formik.touched.signature_stamp && formik.errors.signature_stamp && (
+                <Typography color="error" fontSize={12}>
+                  {formik.errors.signature_stamp}
+                </Typography>
+              )}
+            </Section>
+          </Card>
+        </Box>
+      </>
+    </CustomerDashboardLayout>
   );
 }
 
-// --- Updated ProfileItem to handle Formik props ---
+// --- ProfileItem helper ---
 const ProfileItem = ({ title, name, formik, editMode }) => (
   <Grid item xs={12} md={6}>
     <Typography color="grey.600" fontSize={13}>
@@ -318,7 +519,7 @@ const ProfileItem = ({ title, name, formik, editMode }) => (
   </Grid>
 );
 
-// Section wrapper (no changes here)
+// --- Section Wrapper ---
 const Section = ({ title, children }) => (
   <Box mb={4}>
     <H4 mb={2}>{title}</H4>
@@ -327,7 +528,7 @@ const Section = ({ title, children }) => (
   </Box>
 );
 
-// Dashboard layout wrapper (no changes here)
+// --- Layout Wrapper ---
 Profile.getLayout = function getLayout(page) {
   return <VendorDashboardLayout>{page}</VendorDashboardLayout>;
 };

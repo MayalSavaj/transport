@@ -1,8 +1,45 @@
-import { Button, Card, Grid, TextField, Typography } from "@mui/material";
+import { Button, Card, Grid, MenuItem, TextField, Typography } from "@mui/material";
 import { Formik } from "formik";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 const PartysForm = (props) => {
   const { initialValues, validationSchema, handleFormSubmit } = props;
+
+  const [cities, setCities] = useState([]);
+  const [states, setStates] = useState([]);
+  const [filteredCities, setFilteredCities] = useState([]);
+  const [country] = useState("India"); // Country fixed as India
+
+  // ✅ Fetch city & state data from API
+  useEffect(() => {
+    axios.get("https://biltozbackend.growmoon.top/api/cities").then((response) => {
+      const cityList = response?.data?.city || [];
+      setCities(cityList);
+
+      // ✅ Extract unique states from city list
+      const uniqueStates = [...new Set(cityList.map((item) => item.city_state))];
+      setStates(uniqueStates);
+    });
+  }, []);
+
+  // ✅ Handle State Change
+  const handleStateChange = (selectedState, setFieldValue) => {
+    setFieldValue("state", selectedState);
+    setFieldValue("city", ""); // Reset city when state changes
+
+    // ✅ Filter cities based on selected state
+    const filtered = cities.filter((c) => c.city_state === selectedState);
+    setFilteredCities(filtered);
+  };
+
+  // ✅ When editing (update mode) - prepopulate cities list for selected state
+  useEffect(() => {
+    if (initialValues.state) {
+      const filtered = cities.filter((c) => c.city_state === initialValues.state);
+      setFilteredCities(filtered);
+    }
+  }, [initialValues.state, cities]);
 
   return (
     <Card sx={{ p: 6 }}>
@@ -10,8 +47,8 @@ const PartysForm = (props) => {
         onSubmit={handleFormSubmit}
         initialValues={initialValues}
         validationSchema={validationSchema}
+        enableReinitialize // ✅ Ensures form updates when initialValues change
       >
-        
         {({
           values,
           errors,
@@ -19,10 +56,10 @@ const PartysForm = (props) => {
           handleChange,
           handleBlur,
           handleSubmit,
+          setFieldValue,
         }) => (
           <form onSubmit={handleSubmit}>
             <Grid container spacing={3}>
-
               {/* GST & PAN */}
               <Grid item xs={12}>
                 <Typography variant="subtitle1" fontWeight={800} mb={1}>
@@ -90,7 +127,7 @@ const PartysForm = (props) => {
                 />
               </Grid>
 
-              {/* Party Info */}
+              {/* Contact Info */}
               <Grid item xs={12}>
                 <Typography variant="subtitle1" fontWeight={800} mb={1}>
                   Contact & Address
@@ -112,8 +149,6 @@ const PartysForm = (props) => {
                   helperText={touched.contact_person && errors.contact_person}
                 />
               </Grid>
-
-              {/* Contact & Address */}
 
               <Grid item sm={6} xs={12}>
                 <TextField
@@ -146,37 +181,66 @@ const PartysForm = (props) => {
                 />
               </Grid>
 
-
+              {/* State Dropdown */}
               <Grid item sm={6} xs={12}>
                 <TextField
-                  fullWidth
-                  name="city"
-                  label="City"
-                  color="info"
-                  size="medium"
-                  placeholder="City"
-                  value={values.city}
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  error={!!touched.city && !!errors.city}
-                  helperText={touched.city && errors.city}
-                />
-              </Grid>
-              <Grid item sm={6} xs={12}>
-                <TextField
+                  select
                   fullWidth
                   name="state"
                   label="State"
                   color="info"
                   size="medium"
-                  placeholder="State"
                   value={values.state}
                   onBlur={handleBlur}
-                  onChange={handleChange}
+                  onChange={(e) => handleStateChange(e.target.value, setFieldValue)}
                   error={!!touched.state && !!errors.state}
                   helperText={touched.state && errors.state}
+                >
+                  {states.map((state, index) => (
+                    <MenuItem key={index} value={state}>
+                      {state}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+
+              {/* City Dropdown */}
+              <Grid item sm={6} xs={12}>
+                <TextField
+                  select
+                  fullWidth
+                  name="city"
+                  label="City"
+                  color="info"
+                  size="medium"
+                  value={values.city}
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  disabled={!values.state}
+                  error={!!touched.city && !!errors.city}
+                  helperText={touched.city && errors.city}
+                >
+                  {filteredCities.map((city) => (
+                    <MenuItem key={city.id} value={city.city_name}>
+                      {city.city_name}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+
+              {/* Country */}
+              <Grid item sm={6} xs={12}>
+                <TextField
+                  fullWidth
+                  name="country"
+                  label="Country"
+                  color="info"
+                  size="medium"
+                  value={country}
+                  InputProps={{ readOnly: true }}
                 />
               </Grid>
+
               <Grid item sm={6} xs={12}>
                 <TextField
                   fullWidth

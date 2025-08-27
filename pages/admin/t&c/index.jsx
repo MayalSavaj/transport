@@ -64,12 +64,10 @@ export default function LCList() {
     <Box py={4}>
       <H3 mb={2}>T & C</H3>
 
-      <SearchArea
+      {/* <SearchArea
         handleSearch={() => { }}
-        buttonText="Add T & C"
         searchPlaceholder="Search T & C..."
-        handleBtnClick={() => Router.push("/admin/t&c/create")}
-      />
+      /> */}
 
       <Card>
         <Scrollbar>

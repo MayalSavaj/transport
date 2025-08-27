@@ -1,12 +1,11 @@
 import { Button, Card, Grid, MenuItem, TextField } from "@mui/material";
 import { Formik } from "formik";
 
-const LCForm = (props) => {
-  const { initialValues, validationSchema, handleFormSubmit } = props;
-
+const LCForm = ({ initialValues, validationSchema, handleFormSubmit }) => {
   return (
     <Card sx={{ p: 6 }}>
       <Formik
+        enableReinitialize
         onSubmit={handleFormSubmit}
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -21,9 +20,6 @@ const LCForm = (props) => {
         }) => (
           <form onSubmit={handleSubmit}>
             <Grid container spacing={3}>
-              {/* Text Field */}
-             
-
               {/* Dropdown Field */}
               <Grid item sm={6} xs={12}>
                 <TextField
@@ -31,34 +27,37 @@ const LCForm = (props) => {
                   fullWidth
                   color="info"
                   size="medium"
-                  name="dropdownField"
+                  name="type"
                   onBlur={handleBlur}
-                  value={values.dropdownField}
+                  value={values.type == "invoice" ? "Invoice" : "L-R"}
                   onChange={handleChange}
                   label="T & C Type"
                   placeholder="Select Option"
+                  error={!!touched.type && !!errors.type}
+                  helperText={touched.type && errors.type}
                 >
-                  <MenuItem value="invoice">Invoice</MenuItem>
-                  <MenuItem value="lr">L-R</MenuItem>
+                  <MenuItem value="Invoice">Invoice</MenuItem>
+                  <MenuItem value="L-R">L-R</MenuItem>
                 </TextField>
               </Grid>
-               <Grid item sm={12} xs={12}>
+
+              {/* Text Field */}
+              <Grid item sm={12} xs={12}>
                 <TextField
                   fullWidth
-                  name="textField"
+                  name="terms"
                   label="Terms and Conditions"
                   color="info"
                   size="medium"
                   placeholder="Enter text"
                   multiline
-                  minRows={20} // or use rows={4} if you want fixed height
-                  value={values.textField}
+                  minRows={10}
+                  value={values.terms}
                   onBlur={handleBlur}
                   onChange={handleChange}
-                  error={!!touched.textField && !!errors.textField}
-                  helperText={touched.textField && errors.textField}
+                  error={!!touched.terms && !!errors.terms}
+                  helperText={touched.terms && errors.terms}
                 />
-
               </Grid>
 
               {/* Submit Button */}

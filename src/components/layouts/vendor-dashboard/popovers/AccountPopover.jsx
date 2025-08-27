@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { Avatar, Box, IconButton, Menu, MenuItem, styled } from "@mui/material";
 import { H6, Small } from "components/Typography";
+import axios from "utils/axios"; // custom axios
+
 
 // styled components
 const Divider = styled(Box)(({ theme }) => ({
@@ -10,12 +12,48 @@ const Divider = styled(Box)(({ theme }) => ({
 }));
 
 const AccountPopover = () => {
-  const router = useRouter(); 
+  const router = useRouter();
   const [anchorEl, setAnchorEl] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState([]);
+
+
   const open = Boolean(anchorEl);
 
   const handleClose = () => setAnchorEl(null);
   const handleClick = (event) => setAnchorEl(event.currentTarget);
+
+  useEffect(() => {
+    const fetchUser = () => {
+      axios
+        .get(`/myprofile`)
+        .then((res) => {
+          setUser(res?.data?.user);
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.error("Failed to fetch user:", err);
+          setLoading(false);
+        });
+    };
+
+    fetchUser();
+  }, []);
+
+
+  const handleLogout = () => {
+
+    axios
+      .post(`/logout`)
+      .then((res) => {
+        Router.push("/login")
+      })
+      .catch((err) => {
+        console.error("Failed to fetch user:", err);
+        setLoading(false);
+      });
+  };
+
 
   // Navigate to profile page
   const handleProfileClick = () => {
@@ -32,8 +70,12 @@ const AccountPopover = () => {
         aria-expanded={open ? "true" : undefined}
         aria-controls={open ? "account-menu" : undefined}
       >
-        <Avatar alt="Remy Sharp" src="/assets/images/avatars/001-man.svg" />
+        <Avatar
+          alt={user?.name || "User"}
+          src={user?.profile_photo ? `https://biltozbackend.growmoon.top/storage/${user.profile_photo}` : ""}
+        />
       </IconButton>
+
 
       <Menu
         open={open}
@@ -75,7 +117,7 @@ const AccountPopover = () => {
         }}
       >
         <Box px={2} pt={1}>
-          <H6>Gage Paquette</H6>
+          <H6>{user?.name}</H6>
           <Small color="grey.500">Admin</Small>
         </Box>
 
@@ -83,7 +125,7 @@ const AccountPopover = () => {
         <MenuItem onClick={handleProfileClick}>Profile</MenuItem>
 
         <Divider />
-        <MenuItem>Logout</MenuItem>
+        <MenuItem onClick={() => handleLogout()} >Logout</MenuItem>
       </Menu>
     </Box>
   );

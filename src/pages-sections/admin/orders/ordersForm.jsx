@@ -41,18 +41,18 @@ const validationSchema = Yup.object().shape({
   hiringCost: Yup.number().required("Required")
 });
 
-
 const OrdersForm = () => {
   const [formData, setFormData] = useState(null);
   const [partyOptions, setPartyOptions] = useState([]);
   const [supplierOptions, setSupplierOptions] = useState([]);
+  const [cityOptions, setCityOptions] = useState([]); // ✅ Dynamic city list
 
-
+  const router = useRouter();
 
   useEffect(() => {
     const fetchParties = async () => {
       try {
-        const res = await axios.get("/parties"); // adjust base URL if needed
+        const res = await axios.get("/parties");
         const options = res.data.map((party) => ({
           label: party.name,
           value: party.id,
@@ -76,36 +76,23 @@ const OrdersForm = () => {
       }
     };
 
+    const fetchCities = async () => {
+      try {
+        const res = await axios.get("https://biltozbackend.growmoon.top/api/cities"); // ✅ Your API
+        const options = res.data.city.map((city) => ({
+          label: `${city.city_name}, ${city.city_state}`,
+          value: city.city_name, // ✅ Use ID for backend
+        }));
+        setCityOptions(options);
+      } catch (error) {
+        console.error("Error fetching cities:", error);
+      }
+    };
+
     fetchParties();
     fetchSuppliers();
+    fetchCities();
   }, []);
-  const router = useRouter();
-
-  const dropPointOptions = [
-    { label: "Ahmedabad", value: "Ahmedabad" },
-    { label: "Mumbai", value: "Mumbai" },
-    { label: "Delhi", value: "Delhi" },
-    { label: "Bengaluru", value: "Bengaluru" },
-    { label: "Chennai", value: "Chennai" },
-    { label: "Hyderabad", value: "Hyderabad" },
-    { label: "Pune", value: "Pune" },
-    { label: "Jaipur", value: "Jaipur" },
-    { label: "Kolkata", value: "Kolkata" },
-    { label: "Surat", value: "Surat" },
-  ];
-
-  const pickupOptions = [
-    { label: "Ahmedabad", value: "Ahmedabad" },
-    { label: "Mumbai", value: "Mumbai" },
-    { label: "Delhi", value: "Delhi" },
-    { label: "Bengaluru", value: "Bengaluru" },
-    { label: "Chennai", value: "Chennai" },
-    { label: "Hyderabad", value: "Hyderabad" },
-    { label: "Pune", value: "Pune" },
-    { label: "Jaipur", value: "Jaipur" },
-    { label: "Kolkata", value: "Kolkata" },
-    { label: "Surat", value: "Surat" },
-  ];
 
   return (
     <Card sx={{ p: 3 }}>
@@ -119,11 +106,10 @@ const OrdersForm = () => {
             truck_type: values.truckType,
             truck_number: values.truckNo,
             pay_by: values.payBy,
-            pickup_location: values.pickup,
+            pickup_location: values.pickup, // ✅ Will send ID
             drop_location_1: values.dropPoints[0],
             drop_location_2: values.dropPoints[1] ?? " ",
             drop_location_3: values.dropPoints[2] ?? "",
-
             supplier_id: values.settleSupplier,
             freight_charge: Number(values.freight),
             hiring_cost: Number(values.hiringCost),
@@ -136,7 +122,6 @@ const OrdersForm = () => {
           } catch (error) {
             console.error("Order creation failed:", error);
           }
-
         }}
       >
         {({
@@ -149,9 +134,7 @@ const OrdersForm = () => {
           setFieldValue,
         }) => (
           <form onSubmit={handleSubmit}>
-            <Grid
-            >
-
+            <Grid>
               {/* Order Information */}
               <Typography variant="subtitle1" fontWeight={800} mb={2}>
                 Order Information
@@ -163,7 +146,9 @@ const OrdersForm = () => {
                     size="medium"
                     options={partyOptions}
                     getOptionLabel={(option) => option.label}
-                    value={partyOptions.find((opt) => opt.value === values.partyName) || null}
+                    value={
+                      partyOptions.find((opt) => opt.value === values.partyName) || null
+                    }
                     onChange={(e, newValue) =>
                       setFieldValue("partyName", newValue ? newValue.value : "")
                     }
@@ -194,7 +179,6 @@ const OrdersForm = () => {
                     helperText={touched.truckType && errors.truckType}
                   />
                 </Grid>
-
 
                 <Grid item sm={6} xs={12}>
                   <TextField
@@ -237,9 +221,9 @@ const OrdersForm = () => {
                   <Autocomplete
                     fullWidth
                     size="medium"
-                    options={pickupOptions}
+                    options={cityOptions}
                     getOptionLabel={(option) => option.label}
-                    value={pickupOptions.find((opt) => opt.value === values.pickup) || null}
+                    value={cityOptions.find((opt) => opt.value === values.pickup) || null}
                     onChange={(e, newValue) =>
                       setFieldValue("pickup", newValue ? newValue.value : "")
                     }
@@ -254,7 +238,7 @@ const OrdersForm = () => {
                   />
                 </Grid>
 
-                {/* Right Side - Drop Points + Add Button */}
+                {/* Right Side - Drop Points */}
                 <Grid item sm={6} xs={12}>
                   <Grid container spacing={2}>
                     {values.dropPoints.map((drop, index) => (
@@ -262,10 +246,10 @@ const OrdersForm = () => {
                         <Autocomplete
                           fullWidth
                           size="medium"
-                          options={dropPointOptions}
+                          options={cityOptions}
                           getOptionLabel={(option) => option.label}
                           value={
-                            dropPointOptions.find((opt) => opt.value === drop) || null
+                            cityOptions.find((opt) => opt.value === drop) || null
                           }
                           onChange={(event, newValue) => {
                             const updatedPoints = [...values.dropPoints];
@@ -301,8 +285,10 @@ const OrdersForm = () => {
                 </Grid>
               </Grid>
 
+              {/* Rest of your form remains unchanged */}
+              {/* Additional Details, Charges, Supplier, Submit */}
+              {/* ... SAME AS YOUR ORIGINAL CODE ... */}
 
-              {/* Additional Info */}
               <Typography variant="subtitle1" fontWeight={800} mb={2}>
                 Additional Details
               </Typography>
@@ -320,12 +306,10 @@ const OrdersForm = () => {
                 </Grid>
               </Grid>
 
-              {/* Charges */}
               <Typography variant="subtitle1" fontWeight={800} mb={2}>
                 Charges & Supplier
               </Typography>
               <Grid container spacing={3} mb={4}>
-
                 <Grid item sm={6} xs={12}>
                   <Autocomplete
                     fullWidth
@@ -383,7 +367,6 @@ const OrdersForm = () => {
                 </Grid>
               </Grid>
 
-              {/* Submit */}
               <Box textAlign="right">
                 <Button variant="contained" color="primary" size="large" type="submit">
                   Save & Continue
@@ -393,8 +376,7 @@ const OrdersForm = () => {
           </form>
         )}
       </Formik>
-
-    </Card >
+    </Card>
   );
 };
 

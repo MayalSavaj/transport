@@ -84,7 +84,13 @@ const Login = () => {
 
     gstNumber: yup.string().when("userType", {
       is: "company",
-      then: (schema) => schema.required("GST Number is required"),
+      then: (schema) =>
+        schema
+          .required("GST Number is required")
+          .matches(
+            /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/,
+            "Please enter a valid GST Number"
+          ),
     }),
 
     panNumber: yup.string().when("userType", {
@@ -125,10 +131,10 @@ const Login = () => {
           // === Sign In Flow ===
 
           if (!showOtp) {
-
+            
             console.log("Sending OTP to:", values.mobile);
             // Send OTP
-            await axios.post("/send-otp", {
+            await axios.post("/login", {
               mobile_number: values.mobile,
             });
             setShowOtp(true);
@@ -220,24 +226,31 @@ const Login = () => {
           variant="outlined"
           onBlur={handleBlur}
           value={values.mobile}
-          onChange={handleChange}
+          onChange={(e) => {
+            const onlyNums = e.target.value.replace(/[^0-9]/g, ""); // allow only digits
+            if (onlyNums.length <= 10) {
+              handleChange(e); // update Formik state
+            }
+          }}
           label="Mobile Number"
           placeholder="Enter your mobile number"
           error={!!touched.mobile && !!errors.mobile}
           helperText={touched.mobile && errors.mobile}
           disabled={(tabIndex === 0 && showOtp) || (tabIndex === 1 && showSignUpOtp)}
+          inputProps={{ maxLength: 10 }} // ✅ restrict typing beyond 10 digits
           sx={{
-            '& .MuiInputBase-input.Mui-disabled': {
-              color: 'black',
-              fontWeight: 'bold',
-              WebkitTextFillColor: 'black',
+            "& .MuiInputBase-input.Mui-disabled": {
+              color: "black",
+              fontWeight: "bold",
+              WebkitTextFillColor: "black",
             },
-            '& .MuiInputLabel-root.Mui-disabled': {
-              color: 'black',
-              fontWeight: 'bold',
+            "& .MuiInputLabel-root.Mui-disabled": {
+              color: "black",
+              fontWeight: "bold",
             },
           }}
         />
+
 
 
 
@@ -353,13 +366,22 @@ const Login = () => {
             <Box mb={2} display="flex" justifyContent="center">
               <OtpInput
                 value={values.otp}
-                onChange={(otp) => setFieldValue("otp", otp)}
+                onChange={(otp) => {
+                  // keep only digits
+                  const numericOtp = otp.replace(/\D/g, "");
+                  setFieldValue("otp", numericOtp);
+                }}
                 numInputs={6}
                 shouldAutoFocus
                 isInputNum
                 renderInput={(props) => (
                   <input
                     {...props}
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    onInput={(e) => {
+                      e.target.value = e.target.value.replace(/\D/g, "");
+                    }}
                     style={{
                       width: "45px",
                       height: "50px",
@@ -374,6 +396,7 @@ const Login = () => {
                   />
                 )}
               />
+
             </Box>
             {touched.otp && errors.otp && (
               <Typography color="error" mt={1} fontSize={12} textAlign="center">

@@ -118,11 +118,14 @@ const OrderdetailsForm = () => {
     //     notes: "",
     // });
 
+    const today = new Date().toISOString().split("T")[0];
+
     const [partyAdvances, setPartyAdvances] = useState([
-        { date: "", advance_note: "", amount: "" }
+        { advance_date: today, advance_note: "", advance_amount: "" }
     ]);
+
     const [supplierAdvances, setSupplierAdvances] = useState([
-        { date: "", advance_note: "", amount: "" }
+        { advance_date: today, advance_note: "", advance_amount: "" }
     ]);
 
     const [chargeData, setChargeData] = useState([]);
@@ -224,119 +227,107 @@ const OrderdetailsForm = () => {
     };
 
     const currentType = tabIndex === 0 ? "party" : "supplier";
+    const [selectedAdvance, setSelectedAdvance] = useState(null); // holds {type, index, data}
 
 
     console.log("order is an ", order);
-    const handleConfirm = () => {
+    const handleConfirm = (type) => {
+        let updatedParty = [...(order?.PartyPayments?.advance_details || [])];
+        let updatedSupplier = [...(order?.SupplierPayments?.advance_details || [])];
 
-
-        console.log(order?.PartyPayments?.advance_details);
-        const payload = {
-            party: {
-                advance_details: [
-                    ...(order?.PartyPayments?.advance_details || []),
-                    ...(partyAdvances ? partyAdvances : [])
-                ]
-            },
-            supplier: {
-                advance_details: [
-                    ...(order?.SupplierPayments?.advance_details || []),
-                    ...(supplierAdvances ? supplierAdvances : [])
-                ]
+        if (selectedAdvance) {
+            // Editing
+            if (selectedAdvance.type === "party") {
+                updatedParty[selectedAdvance.index] = partyAdvances[0];
+            } else {
+                updatedSupplier[selectedAdvance.index] = supplierAdvances[0];
             }
-        };
+        } else {
+            // Adding
+            updatedParty = [...updatedParty, ...partyAdvances];
+            updatedSupplier = [...updatedSupplier, ...supplierAdvances];
+        }
+
+
+        let payload = {};
+        if (type == "party") {
+
+            payload = {
+                party: { advance_details: updatedParty },
+            };
+        } else {
+
+            payload = {
+                supplier: { advance_details: updatedSupplier }
+            };
+        }
+
+
 
         axios.post(`/order/additional-charges/${id}`, payload).then((response) => {
-
-            setOpenAdvanceModal(false);
-            console.log(response.data);
             setOrder((prevOrder) => ({
                 ...prevOrder,
-                PartyPayments: response.data.partyPayments
-            }));
-
-            setOrder((prevOrder) => ({
-                ...prevOrder,
+                PartyPayments: response.data.partyPayments,
                 SupplierPayments: response.data.supplierPayment
             }));
-
+            setOpenAdvanceModal(false);
+            setSelectedAdvance(null); // reset mode
         });
-
-
-
-        console.log("payload is an d", payload);
     };
 
+    const [selectedCharge, setSelectedCharge] = useState(null);
 
-    const handleCharge = () => {
+
+
+
+    const handleCharge = (type) => {
         const entry = {
             additional_charge: parseFloat(chargeData.amount),
             additional_charge_note: chargeData.description
         };
 
-        if (chargeType === "party") {
-            setPartyCharges([...partyCharges, entry]);
+        let updatedParty = [...(order?.PartyPayments?.additional_charges || [])];
+        let updatedSupplier = [...(order?.SupplierPayments?.additional_charges || [])];
+
+        if (selectedCharge) {
+            // Editing existing charge
+            if (selectedCharge.type === "party") {
+                updatedParty[selectedCharge.index] = entry;
+            } else {
+                updatedSupplier[selectedCharge.index] = entry;
+            }
         } else {
-            setSupplierCharges([...supplierCharges, entry]);
+            // Adding new charge
+            if (type === "party") {
+                updatedParty.push(entry);
+            } else {
+                updatedSupplier.push(entry);
+            }
         }
 
-        var payload = {};
-        if (chargeType === 'party') {
-            payload = {
-                party: {
-                    additional_charges: [
-                        ...(order?.PartyPayments?.additional_charges || []), // existing from API
-                        ...partyCharges, // existing from local state
-                        entry // the newly added one
-                    ]
-                }
-            };
-        }
-        if (chargeType === 'supplier') {
-            payload = {
-                party: {
-                    additional_charges: [
-                        ...(order?.SupplierPayments?.additional_charges || []), // existing from API
-                        ...supplierCharges, // existing from local state
-                        entry // the newly added one
-                    ]
-                }
-            };
-        }
+        const payload = {
+            party: { additional_charges: updatedParty },
+            supplier: { additional_charges: updatedSupplier }
+        };
 
-
-        // setOpenChargeModal(false);
         axios.post(`/order/additional-charges/${id}`, payload).then((response) => {
-
-            setOpenAdvanceModal(false);
-            console.log(response.data);
             setOrder((prevOrder) => ({
                 ...prevOrder,
-                PartyPayments: response.data.partyPayments
-            }));
-
-            setOrder((prevOrder) => ({
-                ...prevOrder,
+                PartyPayments: response.data.partyPayments,
                 SupplierPayments: response.data.supplierPayment
             }));
-
+            setOpenChargeModal(false);
+            setChargeData({ amount: "", description: "" });
+            setSelectedCharge(null); // Reset after edit
         });
-
-        setChargeData({ amount: "", description: "" });
-        setPartyAdvances = [
-            { advance_date: "", advance_note: "", advance_amount: "" }
-        ]
-        setSupplierAdvances = [
-            { advance_date: "", advance_note: "", advance_amount: "" }
-        ]
-
-    }
+    };
 
 
-    console.log("tab index", tabIndex);
 
-    console.log("party advances", partyAdvances);
-    console.log("supplier advances", supplierAdvances);
+    // console.log("tab index", tabIndex);
+
+    // console.log("party advances", partyAdvances);
+    // console.log("supplier advances", supplierAdvances);
 
 
     const handleCreateLr = (value) => {
@@ -443,6 +434,35 @@ const OrderdetailsForm = () => {
         });
 
     }
+
+    const handleAddAdvance = (type) => {
+
+        console.log("type is an ", type);
+        setSelectedAdvance(null); // reset edit mode
+        if (type === "party") {
+            setTabIndex(0);
+            setPartyAdvances([{ advance_date: new Date().toISOString().slice(0, 10), advance_note: "", advance_amount: "" }]);
+        } else {
+            setTabIndex(1);
+            setSupplierAdvances([{ advance_date: new Date().toISOString().slice(0, 10), advance_note: "", advance_amount: "" }]);
+        }
+        setOpenAdvanceModal(true);
+    };
+
+    // open modal for editing existing entry
+    const handleEditAdvance = (type, index, data) => {
+        setSelectedAdvance({ type, index });
+        if (type === "party") {
+            setTabIndex(0);
+            setPartyAdvances([{ ...data }]); // prefill
+        } else {
+            setTabIndex(1);
+            setSupplierAdvances([{ ...data }]); // prefill
+        }
+        setOpenAdvanceModal(true);
+    }
+
+
     const handleDownload = async () => {
         try {
             const response = await axios.get(`/download-invoice/${id}`, {
@@ -484,6 +504,74 @@ const OrderdetailsForm = () => {
             .catch((error) => {
                 console.error("Upload failed:", error);
             });
+    };
+
+
+    const handleDeleteAdvance = async (type, index) => {
+        if (!window.confirm("Are you sure you want to delete this advance?")) return;
+
+        if (type === "party") {
+            const updated = partyAdvances.filter((_, i) => i !== index);
+            setPartyAdvances(updated);
+
+            // call API with updated advances
+            await axios.post(`/order/additional-charges/${id}`, {
+                party: { advance_details: updated },
+                supplier: { advance_details: supplierAdvances }
+            });
+        } else {
+            const updated = supplierAdvances.filter((_, i) => i !== index);
+            setSupplierAdvances(updated);
+
+            await axios.post(`/order/additional-charges/${id}`, {
+                party: { advance_details: partyAdvances },
+                supplier: { advance_details: updated }
+            });
+        }
+    };
+
+
+    const handleDeleteAdditionalCharge = async (type, index) => {
+        if (!window.confirm("Are you sure you want to delete this additional charge?")) return;
+
+        // Clone current state
+        let updatedParty = [...(order?.PartyPayments?.additional_charges || [])];
+        let updatedSupplier = [...(order?.SupplierPayments?.additional_charges || [])];
+
+        if (type === "party") {
+            updatedParty.splice(index, 1);
+        } else {
+            updatedSupplier.splice(index, 1);
+        }
+
+        // Update state
+        setOrder((prevOrder) => ({
+            ...prevOrder,
+            PartyPayments: { ...prevOrder.PartyPayments, additional_charges: updatedParty },
+            SupplierPayments: { ...prevOrder.SupplierPayments, additional_charges: updatedSupplier }
+        }));
+
+        // Send updated list to API
+        try {
+            await axios.post(`/order/additional-charges/${id}`, {
+                party: { additional_charges: updatedParty },
+                supplier: { additional_charges: updatedSupplier }
+            });
+        } catch (error) {
+            console.error("Failed to delete additional charge:", error);
+        }
+    };
+
+
+
+    const handleEditAdditionalCharge = (type, index, data) => {
+        setChargeType(type);
+        setChargeData({
+            amount: data.additional_charge,
+            description: data.additional_charge_note
+        });
+        setSelectedCharge({ type, index });
+        setOpenChargeModal(true);
     };
 
 
@@ -927,30 +1015,53 @@ const OrderdetailsForm = () => {
                                                 <Box pl={2} mb={2}>
                                                     <Typography variant="body2">(-) Advance</Typography>
                                                     {order?.PartyPayments?.advance_details?.map((oneOrder, index) => (
-                                                        <Box key={index} mt={2} p={1} border="1px solid #ccc" borderRadius={1}>
-                                                            <Box display="flex" justifyContent="space-between">
-                                                                <Typography fontWeight={700}>Advance Party Balance</Typography>
-                                                                <Typography color="primary" fontWeight={700}>
-                                                                    ₹{parseFloat(oneOrder.advance_amount || 0).toFixed(2)}
-                                                                </Typography>
+                                                        <Box
+                                                            key={index}
+                                                            mt={2}
+                                                            p={1}
+                                                            border="1px solid #ccc"
+                                                            borderRadius={1}
+                                                        >
+                                                            <Box display="flex" justifyContent="space-between" alignItems="center">
+                                                                {/* Left side: details + edit on click */}
+                                                                <Box
+                                                                    onClick={() => handleEditAdvance("party", index, oneOrder)}
+                                                                    sx={{ cursor: "pointer", flex: 1 }}
+                                                                >
+                                                                    <Typography fontWeight={700}>Advance Party Balance</Typography>
+                                                                    <Typography color="primary" fontWeight={700}>
+                                                                        ₹{parseFloat(oneOrder.advance_amount || 0).toFixed(2)}
+                                                                    </Typography>
+                                                                    <Typography variant="body2" color="text.secondary">
+                                                                        Date: {oneOrder.advance_date}
+                                                                    </Typography>
+                                                                    <Typography variant="body2" color="text.secondary">
+                                                                        Note: {oneOrder.advance_note}
+                                                                    </Typography>
+                                                                </Box>
+
+                                                                {/* Delete button */}
+                                                                <Button
+                                                                    variant="outlined"
+                                                                    color="error"
+                                                                    size="small"
+                                                                    onClick={() => handleDeleteAdvance("party", index)}
+                                                                >
+                                                                    Delete
+                                                                </Button>
                                                             </Box>
-                                                            <Typography variant="body2" color="text.secondary">
-                                                                Date: {oneOrder.advance_payment_date}
-                                                            </Typography>
-                                                            <Typography variant="body2" color="text.secondary">
-                                                                Note: {oneOrder.advance_note}
-                                                            </Typography>
                                                         </Box>
                                                     ))}
+
+
+
+
 
                                                     {/* Add Advance button at last */}
                                                     <Button
                                                         size="small"
                                                         color="primary"
-                                                        onClick={() => {
-                                                            setAdvanceType("party");
-                                                            setOpenAdvanceModal(true);
-                                                        }}
+                                                        onClick={() => handleAddAdvance("party")}
                                                         sx={{ mt: 2 }}
                                                     >
                                                         Add Advance
@@ -960,24 +1071,47 @@ const OrderdetailsForm = () => {
                                                 <Box pl={2} mb={2}>
                                                     <Typography variant="body2">(+) Charge </Typography>
                                                     {order?.PartyPayments?.additional_charges?.map((oneOrder, index) => (
-                                                        <Box key={index} mt={2} p={1} border="1px solid #ccc" borderRadius={1}>
-                                                            <Box display="flex" justifyContent="space-between">
-                                                                <Typography fontWeight={700}>Advance Party Balance</Typography>
-                                                                <Typography color="primary" fontWeight={700}>
-                                                                    ₹{parseFloat(oneOrder.additional_charge || 0).toFixed(2)}
-                                                                </Typography>
-                                                            </Box>
+                                                        <Box
+                                                            key={index}
+                                                            mt={2}
+                                                            p={1}
+                                                            border="1px solid #ccc"
+                                                            borderRadius={1}
+                                                        >
+                                                            <Box display="flex" justifyContent="space-between" alignItems="center">
+                                                                {/* Left side (Edit on click) */}
+                                                                <Box
+                                                                    onClick={() => handleEditAdditionalCharge("party", index, oneOrder)}
+                                                                    sx={{ cursor: "pointer", flex: 1 }}
+                                                                >
+                                                                    <Typography fontWeight={700}>Party Additional Charge</Typography>
+                                                                    <Typography color="primary" fontWeight={700}>
+                                                                        ₹{parseFloat(oneOrder.additional_charge || 0).toFixed(2)}
+                                                                    </Typography>
+                                                                    <Typography variant="body2" color="text.secondary">
+                                                                        Note: {oneOrder.additional_charge_note}
+                                                                    </Typography>
+                                                                </Box>
 
-                                                            <Typography variant="body2" color="text.secondary">
-                                                                Note: {oneOrder.additional_charge_note}
-                                                            </Typography>
+                                                                {/* Delete button */}
+                                                                <Button
+                                                                    variant="outlined"
+                                                                    color="error"
+                                                                    size="small"
+                                                                    onClick={() => handleDeleteAdditionalCharge("party", index)}
+                                                                >
+                                                                    Delete
+                                                                </Button>
+                                                            </Box>
                                                         </Box>
                                                     ))}
 
+
                                                     {/* Add Advance button at last */}
+
                                                     <Button size="small" color="primary" onClick={() => {
                                                         setChargeType("party"); setOpenChargeModal(true);
-                                                    }}>Add party Charge</Button>
+                                                    }}>Add Party     Charge</Button>
                                                 </Box>
 
                                                 <Box display="flex" justifyContent="space-between" mt={2}>
@@ -1026,20 +1160,99 @@ const OrderdetailsForm = () => {
                                                 <Box pl={2} mb={2}>
                                                     <Typography variant="body2">(-) Advance</Typography>
 
+
+
+
+
+
                                                     {order?.SupplierPayments?.advance_details?.map((oneOrder, index) => (
-                                                        <Box key={index} mt={2} p={1} border="1px solid #ccc" borderRadius={1}>
-                                                            <Box display="flex" justifyContent="space-between">
-                                                                <Typography fontWeight={700}>Advance Supplier Balance</Typography>
-                                                                <Typography color="primary" fontWeight={700}>
-                                                                    ₹{parseFloat(oneOrder.advance_amount || 0).toFixed(2)}
-                                                                </Typography>
+                                                        <Box
+                                                            key={index}
+                                                            mt={2}
+                                                            p={1}
+                                                            border="1px solid #ccc"
+                                                            borderRadius={1}
+                                                            sx={{ cursor: "pointer" }}
+                                                        >
+                                                            <Box display="flex" justifyContent="space-between" alignItems="center">
+                                                                <Box onClick={() => handleEditAdvance("supplier", index, oneOrder)} style={{ flex: 1, cursor: "pointer" }}>
+
+                                                                    <Typography fontWeight={700}>Advance Supplier Balance</Typography>
+                                                                    <Typography color="primary" fontWeight={700}>
+                                                                        ₹{parseFloat(oneOrder.advance_amount || 0).toFixed(2)}
+                                                                    </Typography>
+                                                                    <Typography variant="body2" color="text.secondary">
+                                                                        Date: {oneOrder.advance_date}
+                                                                    </Typography>
+                                                                    <Typography variant="body2" color="text.secondary">
+                                                                        Note: {oneOrder.advance_note}
+                                                                    </Typography>
+                                                                </Box>
+
+                                                                {/* Delete Button */}
+                                                                <Button
+                                                                    variant="outlined"
+                                                                    color="error"
+                                                                    size="small"
+                                                                    onClick={() => handleDeleteAdvance("supplier", index)}
+                                                                >
+                                                                    Delete
+                                                                </Button>
                                                             </Box>
-                                                            <Typography variant="body2" color="text.secondary">
-                                                                Date: {oneOrder.advance_payment_date}
-                                                            </Typography>
-                                                            <Typography variant="body2" color="text.secondary">
-                                                                Note: {oneOrder.advance_note}
-                                                            </Typography>
+                                                        </Box>
+                                                    ))}
+
+
+                                                    <Button
+                                                        size="small"
+                                                        color="primary"
+                                                        onClick={() => handleAddAdvance("supplier")}
+                                                        sx={{ mt: 2 }}
+                                                    >
+                                                        Add Advance
+                                                    </Button>
+
+
+
+
+
+                                                </Box>
+
+
+                                                <Box pl={2} mb={2}>
+                                                    <Typography variant="body2"> (+) Supplier Charge</Typography>
+
+                                                    {order?.SupplierPayments?.additional_charges?.map((oneOrder, index) => (
+                                                        <Box
+                                                            key={index}
+                                                            mt={2}
+                                                            p={1}
+                                                            border="1px solid #ccc"
+                                                            borderRadius={1}
+                                                        >
+                                                            <Box display="flex" justifyContent="space-between" alignItems="center">
+                                                                <Box
+                                                                    onClick={() => handleEditAdditionalCharge("supplier", index, oneOrder)}
+                                                                    sx={{ cursor: "pointer", flex: 1 }}
+                                                                >
+                                                                    <Typography fontWeight={700}>Supplier Additional Charge</Typography>
+                                                                    <Typography color="primary" fontWeight={700}>
+                                                                        ₹{parseFloat(oneOrder.additional_charge || 0).toFixed(2)}
+                                                                    </Typography>
+                                                                    <Typography variant="body2" color="text.secondary">
+                                                                        Note: {oneOrder.additional_charge_note}
+                                                                    </Typography>
+                                                                </Box>
+
+                                                                <Button
+                                                                    variant="outlined"
+                                                                    color="error"
+                                                                    size="small"
+                                                                    onClick={() => handleDeleteAdditionalCharge("supplier", index)}
+                                                                >
+                                                                    Delete
+                                                                </Button>
+                                                            </Box>
                                                         </Box>
                                                     ))}
 
@@ -1047,42 +1260,15 @@ const OrderdetailsForm = () => {
                                                         size="small"
                                                         color="primary"
                                                         onClick={() => {
-                                                            setAdvanceType("supplier");
-                                                            setOpenAdvanceModal(true);
+                                                            setChargeType("supplier");
+                                                            setOpenChargeModal(true);
                                                         }}
                                                         sx={{ mt: 2 }}
                                                     >
-                                                        Add Advance
+                                                        Add Supplier Charge
                                                     </Button>
-
-
                                                 </Box>
 
-
-                                                <Box pl={2} mb={2}>
-                                                    <Typography variant="body2">(-) Advance</Typography>
-
-                                                    {order?.SupplierPayments?.additional_charges?.map((oneOrder, index) => (
-                                                        <Box key={index} mt={2} p={1} border="1px solid #ccc" borderRadius={1}>
-                                                            <Box display="flex" justifyContent="space-between">
-                                                                <Typography fontWeight={700}>Advance Supplier Balance</Typography>
-                                                                <Typography color="primary" fontWeight={700}>
-                                                                    ₹{parseFloat(oneOrder.additional_charge || 0).toFixed(2)}
-                                                                </Typography>
-                                                            </Box>
-
-                                                            <Typography variant="body2" color="text.secondary">
-                                                                Note: {oneOrder.additional_charge_note}
-                                                            </Typography>
-                                                        </Box>
-                                                    ))}
-
-
-
-                                                    <Button size="small" color="primary" onClick={() => {
-                                                        setChargeType("party"); setOpenChargeModal(true);
-                                                    }}>Add Supplier Charge</Button>
-                                                </Box>
 
                                                 <Box display="flex" justifyContent="space-between" mt={2}>
                                                     <Typography fontWeight={700}>Pending Party Balance</Typography>
@@ -1215,12 +1401,6 @@ const OrderdetailsForm = () => {
 
                             <DialogContent>
                                 {/* Tabs for Party / Supplier */}
-                                <Tabs value={tabIndex} onChange={(_, v) => setTabIndex(v)}>
-                                    <Tab label="Party" />
-                                    <Tab label="Supplier" />
-                                </Tabs>
-
-
                                 {currentList.map((adv, idx) => (
                                     <div key={idx} style={{ marginTop: 12 }}>
 
@@ -1229,7 +1409,7 @@ const OrderdetailsForm = () => {
                                             fullWidth
                                             label="Date"
                                             type="date"
-                                            value={isParty ? partyAdvances[idx]?.advance_date || "" : supplierAdvances[idx]?.advance_date}
+                                            value={isParty ? partyAdvances[idx]?.advance_date || today : supplierAdvances[idx]?.advance_date || today}
                                             onChange={(e) =>
                                                 handleAdvanceChange(currentType, idx, "advance_date", e.target.value)
                                             }
@@ -1274,8 +1454,9 @@ const OrderdetailsForm = () => {
 
                         {/* Charge Modal */}
                         <Dialog open={openChargeModal} onClose={() => setOpenChargeModal(false)} fullWidth maxWidth="xs">
-                            <DialogTitle>Add {chargeType === "party" ? "Party" : "Supplier"} Charge</DialogTitle>
-                            <DialogContent sx={{ pt: 2 }}>
+                            <DialogTitle>
+                                {selectedCharge ? `Edit ${chargeType === "party" ? "Party" : "Supplier"} Charge` : `Add ${chargeType === "party" ? "Party" : "Supplier"} Charge`}
+                            </DialogTitle>                            <DialogContent sx={{ pt: 2 }}>
                                 <TextField
                                     fullWidth label="Charge Amount" type="number"
                                     value={chargeData.amount}
@@ -1290,8 +1471,8 @@ const OrderdetailsForm = () => {
                             </DialogContent>
                             <DialogActions>
                                 <Button onClick={() => setOpenChargeModal(false)}>Close</Button>
-                                <Button variant="contained" onClick={() => handleCharge()}>
-                                    Confirm
+                                <Button variant="contained" onClick={() => handleCharge(chargeType)}>
+                                    {selectedCharge ? "Update" : "Confirm"}
                                 </Button>
 
                             </DialogActions>
