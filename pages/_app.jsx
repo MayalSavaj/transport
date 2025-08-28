@@ -20,44 +20,43 @@ Router.events.on("routeChangeComplete", () => nProgress.done());
 Router.events.on("routeChangeError", () => nProgress.done());
 // small change
 nProgress.configure({
-  showSpinner: false
+  showSpinner: false,
 });
-const App = ({
-  Component,
-  pageProps
-}) => {
+const App = ({ Component, pageProps }) => {
   const AnyComponent = Component;
-  const getLayout = AnyComponent.getLayout ?? (page => page);
-  return <Fragment>
-    <Head>
-      <meta charSet="utf-8" />
-      <meta name="description" content="React Next.js ecommerce template. Build SEO friendly Online store, delivery app and Multivendor store" />
-      <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
-      <OpenGraphTags />
-      <title>Bazaar - Next.js Ecommerce Template</title>
-    </Head>
+  const getLayout = AnyComponent.getLayout ?? ((page) => page);
+  return (
+    <Fragment>
+      <Head>
+        <meta charSet="utf-8" />
+        <meta name="description" content="Biltoz - Transport Managmemt" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
+        <OpenGraphTags />
+        <title>Biltoz - Transport Managmemt</title>
+      </Head>
 
-    <SettingsProvider>
-      <AppProvider>
-        <MuiTheme>
-          <SnackbarProvider
-            maxSnack={3}
-            anchorOrigin={{
-              vertical: "top",
-              horizontal: "right",
-            }}
-            autoHideDuration={3000}
-          >            <ProfileCheckModal>
-
-              <RTL>{getLayout(<AnyComponent {...pageProps} />)}</RTL>
-            </ProfileCheckModal>
-
-          </SnackbarProvider>
-        </MuiTheme>
-      </AppProvider>
-    </SettingsProvider>
-  </Fragment>;
+      <SettingsProvider>
+        <AppProvider>
+          <MuiTheme>
+            <SnackbarProvider
+              maxSnack={3}
+              anchorOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+              autoHideDuration={3000}
+            >
+              {" "}
+              <ProfileCheckModal>
+                <RTL>{getLayout(<AnyComponent {...pageProps} />)}</RTL>
+              </ProfileCheckModal>
+            </SnackbarProvider>
+          </MuiTheme>
+        </AppProvider>
+      </SettingsProvider>
+    </Fragment>
+  );
 };
 
 // Only uncomment this method if you have blocking data requirements for

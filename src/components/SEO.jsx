@@ -7,11 +7,13 @@ import Head from "next/head";
 const SEO = ({
   title,
   description,
-  sitename = "Bazaar Next.js Ecommerce"
+  sitename = "Biltoz Transport Managemt",
 }) => {
-  return <Head>
+  return (
+    <Head>
       <title>{`${title} | ${sitename}`}</title>
       <meta name="description" content={description} />
-    </Head>;
+    </Head>
+  );
 };
 export default SEO;
