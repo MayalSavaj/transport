@@ -57,12 +57,14 @@ export default function OrdersList() {
   const [loading, setLoading] = useState(true);
   const [categoriess, setCategoriess] = useState([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [appliedStatus, setAppliedStatus] = useState([]);
+  const [appliedStatus, setAppliedStatus] = useState(["started", 'in_transit']);
   const [tempStatus, setTempStatus] = useState([]);
   const [appliedDateFrom, setAppliedDateFrom] = useState("");
   const [appliedDateTo, setAppliedDateTo] = useState("");
   const [tempDateFrom, setTempDateFrom] = useState("");
   const [tempDateTo, setTempDateTo] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+
 
   // useEffect and filter handlers remain exactly the same
   useEffect(() => {
@@ -124,6 +126,40 @@ export default function OrdersList() {
     setIsDrawerOpen(false);
   }
 
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      handleSearch(searchTerm);
+    }, 500); // wait 500ms after typing stops
+
+    return () => clearTimeout(delayDebounce);
+  }, [searchTerm, appliedStatus, appliedDateFrom, appliedDateTo]);
+
+
+  const handleSearch = async (value) => {
+    try {
+      setLoading(true);
+      const params = new URLSearchParams();
+
+      // existing filters
+      if (appliedStatus.length > 0) {
+        appliedStatus.forEach((status) => params.append("status[]", status));
+      }
+      if (appliedDateFrom) params.append("from_date", appliedDateFrom);
+      if (appliedDateTo) params.append("to_date", appliedDateTo);
+
+      // 🔍 add search parameter
+      if (value) params.append("search", value);
+
+      const response = await axios.get(`/orders?${params.toString()}`);
+      setCategoriess(response.data.orders);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
   const {
     order,
     orderBy,
@@ -151,8 +187,11 @@ export default function OrdersList() {
             variant="outlined"
             size="small"
             placeholder="Search Orders"
+            value={searchTerm}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+            }}
           />
-
           {/* The two buttons are here, next to the search bar */}
           <Button
             onClick={handleOpenDrawer}
@@ -235,16 +274,16 @@ export default function OrdersList() {
                         "-"
                       )}
                     </TableCell>
-                    <TableCell>{item.party.name}</TableCell>
-                    <TableCell>{item.pickup_location}</TableCell>
-                    <TableCell>{item.freight_charge}</TableCell>
+                    <TableCell>{item?.party?.name}</TableCell>
+                    <TableCell>{item?.pickup_location}</TableCell>
+                    <TableCell>{item?.freight_charge}</TableCell>
                     <TableCell>
                       <Chip
-                        label={item.status}
+                        label={item?.status}
                         color={
-                          item.status === "completed"
+                          item?.status === "completed"
                             ? "success"
-                            : item.status === "started"
+                            : item?.status === "started"
                               ? "warning"
                               : "info"
                         }
@@ -290,7 +329,7 @@ export default function OrdersList() {
             <FormControl component="fieldset" fullWidth>
               <FormLabel component="legend">Status</FormLabel>
               <FormGroup>
-                {['completed', 'started', 'pending'].map((status) => (
+                {['completed', 'started', 'in_transit'].map((status) => (
                   <FormControlLabel
                     key={status}
                     control={

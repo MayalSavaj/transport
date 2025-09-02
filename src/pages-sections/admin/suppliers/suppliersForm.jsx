@@ -22,7 +22,7 @@ const validationSchema = yup.object().shape({
   address: yup.string().required("Address is required"),
   city: yup.string().required("City is required"),
   state: yup.string().required("State is required"),
-  pin_code: yup.string().required("Pin code is required"),
+  pincode: yup.string().required("Pin code is required"),
   contact_person: yup.string().required("Contact person is required"),
   contact_number: yup.string().required("Contact number is required"),
 });
@@ -37,7 +37,7 @@ const SuppliersForm = (props) => {
 
   // Fetch states and cities from API
   useEffect(() => {
-    axios.get("https://biltozbackend.growmoon.top/api/cities").then((response) => {
+    axios.get("http://127.0.0.1:8000/api/cities").then((response) => {
       const cityList = response?.data?.city || [];
       setCities(cityList);
 
@@ -239,15 +239,15 @@ const SuppliersForm = (props) => {
               <Grid item sm={6} xs={12}>
                 <TextField
                   fullWidth
-                  name="pin_code"
+                  name="pincode"
                   label="Pin Code"
                   placeholder="Pin Code"
                   size="medium"
                   onBlur={handleBlur}
                   onChange={handleChange}
-                  value={values.pin_code}
-                  error={!!touched.pin_code && !!errors.pin_code}
-                  helperText={touched.pin_code && errors.pin_code}
+                  value={values.pincode}
+                  error={!!touched.pincode && !!errors.pincode}
+                  helperText={touched.pincode && errors.pincode}
                 />
               </Grid>
 
@@ -291,7 +291,7 @@ const SuppliersForm = (props) => {
               {/* Submit */}
               <Grid item xs={12}>
                 <Button variant="contained" color="info" type="submit">
-                  Save Supplier
+                  {values?.id ? "Update Supplier" : "Save Supplier"}
                 </Button>
               </Grid>
             </Grid>

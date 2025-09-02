@@ -1,16 +1,21 @@
 import Router from "next/router";
-import { Box, Card, Stack, Table, TableContainer } from "@mui/material";
+import { Box, Button, Card, Stack, Table, TableContainer, TextField } from "@mui/material";
 import TableBody from "@mui/material/TableBody";
 import SearchArea from "components/dashboard/SearchArea";
 import TableHeader from "components/data-table/TableHeader";
 import TablePagination from "components/data-table/TablePagination";
 import VendorDashboardLayout from "components/layouts/vendor-dashboard";
 import { H3 } from "components/Typography";
+import debounce from "lodash.debounce";
+
 import useMuiTable from "hooks/useMuiTable";
 import Scrollbar from "components/Scrollbar";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import AddIcon from '@mui/icons-material/Add';
+
 import { PartysRow } from "pages-sections/admin";
 import axios from "utils/axios"; // import the custom axios
+import { useSnackbar } from "notistack";
 
 
 const tableHeading = [
@@ -66,27 +71,93 @@ PartyList.getLayout = function getLayout(page) {
 //     create_period: "2024-03-01"
 //   }
 // ];
-export default function PartyList() {
 
-  const [products, setProducts] = useState([]);
+
+export default function PartyList() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [parties, setParties] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch data from API
-  useEffect(() => {
-    const fetchParties = async () => {
-      try {
-        const response = await axios.get("/parties");
-        console.log("Fetched Parties:", response.data);
-        setProducts(response.data); // based on your example response
-        setLoading(false);
-      } catch (error) {
-        console.error("Failed to fetch parties:", error);
-        setLoading(false);
-      }
-    };
+  const fetchParties = async (search = "") => {
+    try {
+      const res = await axios.get(`/parties`, {
+        params: { search },
+      });
+      setParties(res.data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Failed to fetch parties:", error);
+    }
+  };
 
-    fetchParties();
+  useEffect(() => {
+    fetchParties(); // load initially
   }, []);
+
+  // ✅ stable debounced function
+  const debouncedFetch = useMemo(
+    () =>
+      debounce((value) => {
+        fetchParties(value);
+      }, 500),
+    []
+  );
+
+  const handleSearch = (value) => {
+    console.log("Search input:", value);
+    setSearchTerm(value);
+    debouncedFetch(value);
+  };
+
+  // cleanup debounce
+  useEffect(() => {
+    return () => {
+      debouncedFetch.cancel();
+    };
+  }, [debouncedFetch]);
+
+  const { enqueueSnackbar } = useSnackbar();
+
+  const handleDelete = async (id) => {
+
+
+    console.log(id);
+
+    try {
+      const response = await axios.delete(`/parties/${id}`);
+
+      enqueueSnackbar("Party Deleted successfully 🎉", { variant: "success" });
+
+      setParties(response.data);
+
+    } catch (error) {
+      console.log(error.response?.data?.error);
+
+      // if validation errors (422)
+      if (error.response?.status === 422 && error.response?.data?.error) {
+        const errors = error.response.data.error;
+        // show all validation messages
+        Object.values(errors).flat().forEach((msg) => {
+          enqueueSnackbar(msg, { variant: "error" });
+        });
+      }
+      // else if server error (500 or other)
+      else if (error.response?.data?.error) {
+        enqueueSnackbar(error.response.data.error, { variant: "error" });
+      }
+      // fallback
+      else {
+        enqueueSnackbar("Server not responding ❌", { variant: "error" });
+      }
+    } finally {
+    }
+  }
+
+
+
+
+
+
   const {
     order,
     orderBy,
@@ -95,7 +166,11 @@ export default function PartyList() {
     filteredList,
     handleChangePage,
     handleRequestSort
-  } = useMuiTable({ listData: products });
+  } = useMuiTable({ listData: parties });
+
+  const handleBtnClick = () => {
+    Router.push("/admin/Partys/create")
+  }
 
 
   console.log("Filtered List:", filteredList);
@@ -103,12 +178,57 @@ export default function PartyList() {
     <Box py={4}>
       <H3 mb={2}>Party List</H3>
 
-      <SearchArea
-        handleSearch={() => { }}
+
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        {/* Search Box */}
+        <TextField
+          placeholder="Search Party"
+          size="small"
+          onChange={(e) => handleSearch(e.target.value)}
+          InputProps={{
+            style: {
+              borderRadius: "10px",
+              background: "#fff",
+            },
+          }}
+          sx={{ width: "350px" }}
+        />
+
+        {/* Button */}
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />} // Add this line
+
+          onClick={handleBtnClick}
+          sx={{
+            backgroundColor: "#4e97FD",
+            borderRadius: "8px",
+            color: "white",
+            textTransform: "none",
+            fontWeight: 500,
+            padding: "6px 18px",
+            "&:hover": {
+              backgroundColor: "#4e97FD",
+            },
+          }}
+        >
+          Add Party
+        </Button>
+      </Box>
+
+      {/* <SearchArea
+        handleSearch={handleSearch}
         buttonText="Add Party"
         searchPlaceholder="Search Party..."
         handleBtnClick={() => Router.push("/admin/Partys/create")}
       />
+
+      <TextField
+        fullWidth
+        size="small"
+        onChange={(e) => handleSearch(e.target.value)} // <-- calls parent fn
+      /> */}
+
 
       <Card>
         <Scrollbar autoHide={false}>
@@ -119,13 +239,14 @@ export default function PartyList() {
                 hideSelectBtn
                 orderBy={orderBy}
                 heading={tableHeading}
-                rowCount={products.length}
+                rowCount={parties.length}
                 numSelected={selected.length}
                 onRequestSort={handleRequestSort}
               />
               <TableBody>
                 {filteredList.map((product, index) => (
-                  <PartysRow product={product} key={index} />
+
+                  <PartysRow product={product} key={index} handleDelete={handleDelete} />
                 ))}
               </TableBody>
             </Table>
@@ -135,7 +256,7 @@ export default function PartyList() {
         <Stack alignItems="center" my={4}>
           <TablePagination
             onChange={handleChangePage}
-            count={Math.ceil(products.length / rowsPerPage)}
+            count={Math.ceil(parties.length / rowsPerPage)}
           />
         </Stack>
       </Card>

@@ -5,7 +5,9 @@ import {
   Stack,
   Table,
   TableContainer,
-  TableBody
+  TableBody,
+  Button,
+  TextField
 } from "@mui/material";
 import SearchArea from "components/dashboard/SearchArea";
 import TableHeader from "components/data-table/TableHeader";
@@ -14,10 +16,15 @@ import VendorDashboardLayout from "components/layouts/vendor-dashboard";
 import Scrollbar from "components/Scrollbar";
 import { H3 } from "components/Typography";
 import { SuppliersRow } from "pages-sections/admin";
+import AddIcon from '@mui/icons-material/Add';
+
 import useMuiTable from "hooks/useMuiTable";
+import debounce from "lodash.debounce";
+
 
 import axios from "utils/axios"; // import the custom axios
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSnackbar } from "notistack";
 
 // Table Headings
 const tableHeading = [
@@ -36,27 +43,90 @@ const tableHeading = [
   { id: "action", label: "Action", align: "center" }
 ];
 
-export default function BrandList({ brands }) {
+
+SupplierList.getLayout = function getLayout(page) {
+  return <VendorDashboardLayout>{page}</VendorDashboardLayout>;
+};
 
 
-  const [data, setData] = useState([]);
+
+export default function SupplierList() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [suppliers, setSuppliers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchParties = async () => {
-      try {
-        const response = await axios.get("/supplier");
-        console.log("Fetched Parties:", response.data);
-        setData(response.data); // based on your example response
-        setLoading(false);
-      } catch (error) {
-        console.error("Failed to fetch parties:", error);
-        setLoading(false);
-      }
-    };
+  const { enqueueSnackbar } = useSnackbar();
 
-    fetchParties();
+  // ✅ Fetch suppliers from API
+  const fetchSuppliers = async (search = "") => {
+    try {
+      const res = await axios.get(`/supplier`, {
+        params: { search },
+      });
+      setSuppliers(res.data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Failed to fetch suppliers:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchSuppliers(); // initial load
   }, []);
+
+  // ✅ stable debounced function
+  const debouncedFetch = useMemo(
+    () =>
+      debounce((value) => {
+        fetchSuppliers(value);
+      }, 500),
+    []
+  );
+
+  const handleSearch = (value) => {
+    setSearchTerm(value);
+    debouncedFetch(value);
+  };
+
+
+  const handleDelete = async (id) => {
+
+
+    try {
+      const response = await axios.delete(`/supplier/${id}`);
+
+      enqueueSnackbar("Supplier Deleted successfully 🎉", { variant: "success" });
+
+      setSuppliers(response.data);
+
+    } catch (error) {
+      console.log(error.response?.data?.error);
+
+      // if validation errors (422)
+      if (error.response?.status === 422 && error.response?.data?.error) {
+        const errors = error.response.data.error;
+        // show all validation messages
+        Object.values(errors).flat().forEach((msg) => {
+          enqueueSnackbar(msg, { variant: "error" });
+        });
+      }
+      // else if server error (500 or other)
+      else if (error.response?.data?.error) {
+        enqueueSnackbar(error.response.data.error, { variant: "error" });
+      }
+      // fallback
+
+    } finally {
+    }
+  }
+
+  // cleanup debounce
+  useEffect(() => {
+    return () => {
+      debouncedFetch.cancel();
+    };
+  }, [debouncedFetch]);
+
 
   const {
     order,
@@ -67,21 +137,53 @@ export default function BrandList({ brands }) {
     handleChangePage,
     handleRequestSort
   } = useMuiTable({
-    listData: data,
+    listData: suppliers,
     defaultSort: "name"
   });
+
+  const handleBtnClick = () => {
+    Router.push("/admin/suppliers/create");
+  };
 
   return (
     <Box py={4}>
       <H3 mb={2}>Suppliers</H3>
 
-      <SearchArea
-        handleSearch={() => { }}
-        buttonText="Add Supplier"
-        searchPlaceholder="Search Supplier..."
-        handleBtnClick={() => Router.push("/admin/suppliers/create")}
-      />
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        {/* Search Box */}
+        <TextField
+          placeholder="Search Supplier"
+          size="small"
+          onChange={(e) => handleSearch(e.target.value)}
+          InputProps={{
+            style: {
+              borderRadius: "10px",
+              background: "#fff",
+            },
+          }}
+          sx={{ width: "350px" }}
+        />
 
+        {/* Add Supplier Button */}
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={handleBtnClick}
+          sx={{
+            backgroundColor: "#4e97FD",
+            borderRadius: "8px",
+            color: "white",
+            textTransform: "none",
+            fontWeight: 500,
+            padding: "6px 18px",
+            "&:hover": {
+              backgroundColor: "#4e97FD",
+            },
+          }}
+        >
+          Add Supplier
+        </Button>
+      </Box>
       <Card>
         <Scrollbar>
           <TableContainer sx={{ minWidth: 1200 }}>
@@ -102,6 +204,7 @@ export default function BrandList({ brands }) {
                     brand={brand}
                     key={brand.id}
                     selected={selected}
+                    handleDelete={handleDelete}
                   />
                 ))}
               </TableBody>
@@ -121,17 +224,4 @@ export default function BrandList({ brands }) {
 }
 
 // Attach layout
-BrandList.getLayout = function getLayout(page) {
-  return <VendorDashboardLayout>{page}</VendorDashboardLayout>;
-};
 
-// ✅ Static supplier data
-export const getStaticProps = async () => {
-
-
-  return {
-    props: {
-      data: [],
-    }
-  };
-};

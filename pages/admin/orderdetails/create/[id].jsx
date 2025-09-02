@@ -35,6 +35,8 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import PaymentsIcon from "@mui/icons-material/Payments";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import axios from "utils/axios"; // import the custom axios
+import VendorDashboardLayout from "components/layouts/vendor-dashboard";
+
 
 
 const initialValues = {
@@ -63,7 +65,11 @@ const validationSchema = Yup.object().shape({
     hiringCost: Yup.number().required("Required"),
 });
 
+
+
 const OrderdetailsForm = () => {
+
+
     const [activeTab, setActiveTab] = useState(0);
     const router = useRouter();
     const { id } = router.query;
@@ -230,7 +236,6 @@ const OrderdetailsForm = () => {
     const [selectedAdvance, setSelectedAdvance] = useState(null); // holds {type, index, data}
 
 
-    console.log("order is an ", order);
     const handleConfirm = (type) => {
         let updatedParty = [...(order?.PartyPayments?.advance_details || [])];
         let updatedSupplier = [...(order?.SupplierPayments?.advance_details || [])];
@@ -508,17 +513,31 @@ const OrderdetailsForm = () => {
 
 
     const handleDeleteAdvance = async (type, index) => {
-        if (!window.confirm("Are you sure you want to delete this advance?")) return;
+        // if (!window.confirm("Are you sure you want to delete this advance?")) return;
+
+        let updatedParty = [...(order?.PartyPayments?.advance_details || [])];
+        let updatedSupplier = [...(order?.SupplierPayments?.advance_details || [])];
 
         if (type === "party") {
+
             const updated = partyAdvances.filter((_, i) => i !== index);
             setPartyAdvances(updated);
+
+            console.log("updagted is an ");
+            console.log(updated);
+            console.log("supplierAdvances is an ");
+            console.log(supplierAdvances);
+
+
+            updatedParty.splice(index, 1);
 
             // call API with updated advances
             await axios.post(`/order/additional-charges/${id}`, {
                 party: { advance_details: updated },
                 supplier: { advance_details: supplierAdvances }
             });
+
+
         } else {
             const updated = supplierAdvances.filter((_, i) => i !== index);
             setSupplierAdvances(updated);
@@ -527,7 +546,19 @@ const OrderdetailsForm = () => {
                 party: { advance_details: partyAdvances },
                 supplier: { advance_details: updated }
             });
+            updatedSupplier.splice(index, 1);
+
         }
+
+
+
+
+        setOrder((prevOrder) => ({
+            ...prevOrder,
+            PartyPayments: { ...prevOrder.PartyPayments, advance_details: updatedParty },
+            SupplierPayments: { ...prevOrder.SupplierPayments, advance_details: updatedSupplier }
+        }));
+
     };
 
 
@@ -573,6 +604,13 @@ const OrderdetailsForm = () => {
         setSelectedCharge({ type, index });
         setOpenChargeModal(true);
     };
+
+
+    const dropLocations = [
+        order?.drop_location_1,
+        order?.drop_location_2,
+        order?.drop_location_3,
+    ];
 
 
 
@@ -851,7 +889,7 @@ const OrderdetailsForm = () => {
                                                             disabled={activeStep !== 2}
                                                             onClick={() => handleDownload()}
                                                         >
-                                                            View Receipt
+                                                            View Bill
                                                         </Button>
                                                     </span>
                                                 </Tooltip>
@@ -920,7 +958,7 @@ const OrderdetailsForm = () => {
                                                         size="small"
                                                         color="success"
                                                         sx={{ borderRadius: 2 }}
-                                                        onClick={() => window.open(`https://biltozbackend.growmoon.top/storage/${order.pod}`, "_blank")}
+                                                        onClick={() => window.open(`http://127.0.0.1:8000/storage/${order.pod}`, "_blank")}
                                                     >
                                                         View POD
                                                     </Button>
@@ -968,9 +1006,10 @@ const OrderdetailsForm = () => {
                                 </DialogActions>
                             </Dialog>
                             <Dialog open={t3lrModalOpen} onClose={() => setT3lrModalOpen(false)} maxWidth="xs" fullWidth>
-                                <DialogTitle sx={{ textAlign: "center", fontWeight: 600 }}>
-                                    T3LR
-                                </DialogTitle>
+                                <DialogTitle gTitle sx={{ textAlign: "center", fontWeight: 600 }}>
+                                    {dropLocations.filter(Boolean).length > 0 && (
+                                        <span>{dropLocations.filter(Boolean).length} LR</span>
+                                    )}                          </DialogTitle>
                                 <DialogContent sx={{ py: 3 }}>
                                     <Typography variant="body2" mt={1} align="center">
                                         Do you want Create LR Number
@@ -1485,3 +1524,8 @@ const OrderdetailsForm = () => {
 };
 
 export default OrderdetailsForm;
+
+
+OrderdetailsForm.getLayout = function getLayout(page) {
+    return <VendorDashboardLayout>{page}</VendorDashboardLayout>;
+};

@@ -240,13 +240,13 @@ const BiltyManager = () => {
             {/* Formik Form */}
             <Formik
               initialValues={{
-                consignee_mobile: "",
-                consignee_name: "",
-                consignee_gstNumber: "",
-                consignee_address1: "",
-                consignee_address2: "",
-                consignee_state: "",
-                consignee_pincode: "",
+                consignee_mobile: biltyList?.consignee?.contact_number,
+                consignee_name: biltyList?.consignee?.name,
+                consignee_gstNumber: biltyList?.consignee?.gst_number,
+                consignee_address1: biltyList?.consignee?.gst_number,
+                consignee_address2: biltyList?.consignee?.gst_number,
+                consignee_state: biltyList?.consignee?.gst_number,
+                consignee_pincode: biltyList?.consignee?.gst_number,
 
 
                 consigner_mobile: biltyList?.consigner?.contact_number,
@@ -546,7 +546,7 @@ const BiltyManager = () => {
             </Formik>
           </Card>
         </DialogContent>
-      </Dialog>
+      </Dialog >
     </>
   );
 };

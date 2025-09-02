@@ -98,16 +98,16 @@ const NotificationsPopover = () => {
     setTabValue(value);
   };
   return <ClickAwayListener onClickAway={handleClose}>
-      <Box>
-        <IconButton onClick={handleClick}>
+    <Box>
+      {/* <IconButton onClick={handleClick}>
           <Badge color="secondary" variant="dot" badgeContent={1}>
             <Notifications sx={{
             color: "grey.500"
           }} />
           </Badge>
-        </IconButton>
+        </IconButton> */}
 
-        <Popper transition open={open} anchorEl={anchorEl} placement="bottom-end" sx={{
+      <Popper transition open={open} anchorEl={anchorEl} placement="bottom-end" sx={{
         zIndex: 11111,
         maxWidth: 300,
         minWidth: 300,
@@ -131,37 +131,37 @@ const NotificationsPopover = () => {
           transform: "translateY(-50%) rotate(45deg)"
         }
       }}>
-          {({
+        {({
           TransitionProps
         }) => <Fade {...TransitionProps} timeout={150}>
-              <Paper>
-                <TabContext value={tabValue}>
-                  <StyledTabList onChange={handleTabChange}>
-                    <StyledTab disableRipple value="1" label={`Unread (2)`} />
-                    <StyledTab disableRipple value="2" label="Archived" />
-                  </StyledTabList>
+            <Paper>
+              <TabContext value={tabValue}>
+                <StyledTabList onChange={handleTabChange}>
+                  <StyledTab disableRipple value="1" label={`Unread (2)`} />
+                  <StyledTab disableRipple value="2" label="Archived" />
+                </StyledTabList>
 
-                  {orders.length === 0 ? <Paragraph fontWeight="500" textAlign="center" p={2}>
-                      There are no notifications
-                    </Paragraph> : <TabPanel value="1" sx={{
-                p: 0
-              }}>
-                      {orders.map(order => <ListItem key={order.id} type={order.type} Icon={order.icon} title={order.title} createdAt={order.createdAt} />)}
-                    </TabPanel>}
+                {orders.length === 0 ? <Paragraph fontWeight="500" textAlign="center" p={2}>
+                  There are no notifications
+                </Paragraph> : <TabPanel value="1" sx={{
+                  p: 0
+                }}>
+                  {orders.map(order => <ListItem key={order.id} type={order.type} Icon={order.icon} title={order.title} createdAt={order.createdAt} />)}
+                </TabPanel>}
 
-                  {archives.length === 0 ? <Paragraph fontWeight="500" textAlign="center" p={2}>
-                      There are no archives
-                    </Paragraph> : <TabPanel value="2" sx={{
-                p: 0
-              }}>
-                      {archives.map(item => <ListItem key={item.id} type={item.type} Icon={item.icon} title={item.title} createdAt={item.createdAt} />)}
-                    </TabPanel>}
-                </TabContext>
-              </Paper>
-            </Fade>}
-        </Popper>
-      </Box>
-    </ClickAwayListener>;
+                {archives.length === 0 ? <Paragraph fontWeight="500" textAlign="center" p={2}>
+                  There are no archives
+                </Paragraph> : <TabPanel value="2" sx={{
+                  p: 0
+                }}>
+                  {archives.map(item => <ListItem key={item.id} type={item.type} Icon={item.icon} title={item.title} createdAt={item.createdAt} />)}
+                </TabPanel>}
+              </TabContext>
+            </Paper>
+          </Fade>}
+      </Popper>
+    </Box>
+  </ClickAwayListener>;
 };
 
 // ListItem component props
@@ -173,16 +173,16 @@ function ListItem(props) {
     createdAt
   } = props;
   return <ListItemWrapper p={2} gap={2} alignItems="center">
-      <Icon color="info" />
+    <Icon color="info" />
 
-      <Box>
-        <H6 fontSize={13}>{title}</H6>
-        <Paragraph fontSize={11}>
-          {formatDistance(createdAt, new Date(), {
+    <Box>
+      <H6 fontSize={13}>{title}</H6>
+      <Paragraph fontSize={11}>
+        {formatDistance(createdAt, new Date(), {
           addSuffix: true
         })}
-        </Paragraph>
-      </Box>
-    </ListItemWrapper>;
+      </Paragraph>
+    </Box>
+  </ListItemWrapper>;
 }
 export default NotificationsPopover;

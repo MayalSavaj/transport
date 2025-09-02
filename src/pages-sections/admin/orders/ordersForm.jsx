@@ -17,6 +17,7 @@ import * as Yup from "yup";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import axios from "utils/axios"; // import the custom axios
+import { useSnackbar } from "notistack";
 
 const initialValues = {
   partyName: "",
@@ -41,12 +42,16 @@ const validationSchema = Yup.object().shape({
   hiringCost: Yup.number().required("Required")
 });
 
+
+
+
 const OrdersForm = () => {
   const [formData, setFormData] = useState(null);
   const [partyOptions, setPartyOptions] = useState([]);
   const [supplierOptions, setSupplierOptions] = useState([]);
   const [cityOptions, setCityOptions] = useState([]); // ✅ Dynamic city list
 
+  const { enqueueSnackbar } = useSnackbar();
   const router = useRouter();
 
   useEffect(() => {
@@ -78,7 +83,7 @@ const OrdersForm = () => {
 
     const fetchCities = async () => {
       try {
-        const res = await axios.get("https://biltozbackend.growmoon.top/api/cities"); // ✅ Your API
+        const res = await axios.get("http://127.0.0.1:8000/api/cities"); // ✅ Your API
         const options = res.data.city.map((city) => ({
           label: `${city.city_name}, ${city.city_state}`,
           value: city.city_name, // ✅ Use ID for backend
@@ -103,6 +108,7 @@ const OrdersForm = () => {
           setFormData(values);
           const payload = {
             party_id: values.partyName,
+            consingee_party_id: values.consigneePartyName,
             truck_type: values.truckType,
             truck_number: values.truckNo,
             pay_by: values.payBy,
@@ -118,9 +124,29 @@ const OrdersForm = () => {
           try {
             const res = await axios.post("/order", payload);
             console.log("Order created:", res.data);
+            enqueueSnackbar("Order created successfully 🎉", { variant: "success" });
+
             router.push(`/admin/orderdetails/create/${res.data.data.id}`);
           } catch (error) {
-            console.error("Order creation failed:", error);
+            console.log(error.response?.data?.error);
+
+            // if validation errors (422)
+            if (error.response?.status === 422 && error.response?.data?.error) {
+              const errors = error.response.data.error;
+              // show all validation messages
+              Object.values(errors).flat().forEach((msg) => {
+                enqueueSnackbar(msg, { variant: "error" });
+              });
+            }
+            // else if server error (500 or other)
+            else if (error.response?.data?.error) {
+              enqueueSnackbar(error.response.data.error, { variant: "error" });
+            }
+            // fallback
+            else {
+              enqueueSnackbar("Server not responding ❌", { variant: "error" });
+            }
+          } finally {
           }
         }}
       >
@@ -208,6 +234,35 @@ const OrdersForm = () => {
                     <FormControlLabel value="toPay" control={<Radio />} label="To Pay" />
                   </RadioGroup>
                 </Grid>
+
+                <>
+                  {values.payBy == "toPay" &&
+                    <Autocomplete
+                      fullWidth
+                      size="medium"
+                      options={partyOptions}
+                      getOptionLabel={(option) => option.label}
+                      value={
+                        partyOptions.find((opt) => opt.value === values.consigneePartyName) || null
+                      }
+                      onChange={(e, newValue) =>
+                        setFieldValue("consigneePartyName", newValue ? newValue.value : "")
+                      }
+                      onBlur={handleBlur}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          size="medium"
+                          label="Consignee Party  Name"
+                          name="consigneePartyName"
+                          error={!!touched.consigneePartyName && !!errors.consigneePartyName}
+                          helperText={touched.consigneePartyName && errors.consigneePartyName}
+                        />
+                      )}
+                    />
+                  }
+                </>
+
               </Grid>
 
               {/* Pickup & Drop */}
@@ -221,7 +276,9 @@ const OrdersForm = () => {
                   <Autocomplete
                     fullWidth
                     size="medium"
-                    options={cityOptions}
+                    options={cityOptions.filter(
+                      (opt) => !values.dropPoints.includes(opt.value) // 🚫 exclude already selected drops
+                    )}
                     getOptionLabel={(option) => option.label}
                     value={cityOptions.find((opt) => opt.value === values.pickup) || null}
                     onChange={(e, newValue) =>
@@ -246,11 +303,15 @@ const OrdersForm = () => {
                         <Autocomplete
                           fullWidth
                           size="medium"
-                          options={cityOptions}
+                          options={cityOptions.filter(
+                            (opt) =>
+                              opt.value !== values.pickup && // 🚫 exclude pickup
+                              !values.dropPoints.some(
+                                (d, i) => d === opt.value && i !== index // 🚫 exclude same city in other drop points
+                              )
+                          )}
                           getOptionLabel={(option) => option.label}
-                          value={
-                            cityOptions.find((opt) => opt.value === drop) || null
-                          }
+                          value={cityOptions.find((opt) => opt.value === drop) || null}
                           onChange={(event, newValue) => {
                             const updatedPoints = [...values.dropPoints];
                             updatedPoints[index] = newValue ? newValue.value : "";
@@ -284,6 +345,7 @@ const OrdersForm = () => {
                   </Grid>
                 </Grid>
               </Grid>
+
 
               {/* Rest of your form remains unchanged */}
               {/* Additional Details, Charges, Supplier, Submit */}
@@ -376,7 +438,7 @@ const OrdersForm = () => {
           </form>
         )}
       </Formik>
-    </Card>
+    </Card >
   );
 };
 

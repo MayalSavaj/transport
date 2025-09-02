@@ -102,7 +102,9 @@ const NumberseriesForm = (props) => {
                       error={touched.startingNumber && !!errors.startingNumber}
                       helperText={touched.startingNumber && errors.startingNumber}
                     />
+                    <h3>{values?.numberFormat + values?.startingNumber}</h3>
                   </Grid>
+
                 </>
               )}
 

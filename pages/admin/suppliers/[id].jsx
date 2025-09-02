@@ -6,6 +6,7 @@ import axios from "utils/axios";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import VendorDashboardLayout from "components/layouts/vendor-dashboard";
+import { useSnackbar } from "notistack";
 
 UpdateSupplier.getLayout = function getLayout(page) {
   return <VendorDashboardLayout>{page}</VendorDashboardLayout>;
@@ -27,7 +28,13 @@ const validationSchema = yup.object().shape({
   contact_number: yup.string().required("Contact number is required"),
 });
 
+
+console.log("vaa", validationSchema);
+
 export default function UpdateSupplier() {
+
+  const { enqueueSnackbar } = useSnackbar();
+
   const router = useRouter();
   const { id } = router.query; // /supplier/update/[id]
   const [initialValues, setInitialValues] = useState(null);
@@ -59,8 +66,11 @@ export default function UpdateSupplier() {
   const handleFormSubmit = (values) => {
 
 
+    console.log("dadad");
+
 
     axios.put(`/supplier/${id}`, {
+      id: values.id,
       name: values.name,
       gst_number: values.gst_number,
       pan_number: values.pan_number,
@@ -75,6 +85,8 @@ export default function UpdateSupplier() {
     })
       .then(() => {
         console.log("Supplier updated successfully");
+        enqueueSnackbar("Supplier Updated successfully 🎉", { variant: "success" });
+
         router.push("/admin/suppliers");
       })
       .catch((err) => {

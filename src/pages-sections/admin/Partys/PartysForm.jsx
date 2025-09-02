@@ -13,7 +13,7 @@ const PartysForm = (props) => {
 
   // ✅ Fetch city & state data from API
   useEffect(() => {
-    axios.get("https://biltozbackend.growmoon.top/api/cities").then((response) => {
+    axios.get("http://127.0.0.1:8000/api/cities").then((response) => {
       const cityList = response?.data?.city || [];
       setCities(cityList);
 
@@ -40,6 +40,9 @@ const PartysForm = (props) => {
       setFilteredCities(filtered);
     }
   }, [initialValues.state, cities]);
+
+  console.log("intial valus", initialValues);
+
 
   return (
     <Card sx={{ p: 6 }}>
@@ -282,8 +285,9 @@ const PartysForm = (props) => {
               {/* Submit Button */}
               <Grid item xs={12}>
                 <Button variant="contained" color="info" type="submit">
-                  Save Party
+                  {values?.id ? "Update Party" : "Create Party"}
                 </Button>
+
               </Grid>
             </Grid>
           </form>

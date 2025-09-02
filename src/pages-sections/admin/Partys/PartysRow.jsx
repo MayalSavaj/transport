@@ -3,7 +3,7 @@ import { Delete, Edit } from "@mui/icons-material";
 import { StyledTableRow, StyledTableCell, StyledIconButton } from "../StyledComponents";
 
 const PartysRow = ({
-  product
+  product, handleDelete
 }) => {
   const {
     id,
@@ -30,7 +30,7 @@ const PartysRow = ({
         <Edit />
       </StyledIconButton>
 
-      <StyledIconButton>
+      <StyledIconButton onClick={() => handleDelete(id)}>
         <Delete />
       </StyledIconButton>
     </StyledTableCell>

@@ -107,22 +107,22 @@ export default function Profile() {
           // preload profile photo + signature if available
           if (sanitizedUser.profile_photo) {
 
-            console.log("https://biltozbackend.growmoon.top/storage/" + user?.profile_photo);
+            console.log("http://127.0.0.1:8000/storage/" + user?.profile_photo);
             setProfilePhotoFile([
               {
                 name: "profile_photo.jpg",
-                preview: "https://biltozbackend.growmoon.top/storage/" + sanitizedUser?.profile_photo,
+                preview: "http://127.0.0.1:8000/storage/" + sanitizedUser?.profile_photo,
                 uploaded: true,
               },
             ]);
           }
           if (sanitizedUser.signature_stamp) {
-            console.log("https://biltozbackend.growmoon.top/storage" + sanitizedUser?.signature_stamp);
+            console.log("http://127.0.0.1:8000/storage" + sanitizedUser?.signature_stamp);
 
             setSignatureFile([
               {
                 name: "signature_stamp.jpg",
-                preview: "https://biltozbackend.growmoon.top/storage/" + sanitizedUser?.signature_stamp,
+                preview: "http://127.0.0.1:8000/storage/" + sanitizedUser?.signature_stamp,
                 uploaded: true,
               },
             ]);
@@ -208,7 +208,7 @@ export default function Profile() {
                 setProfilePhotoFile([
                   {
                     name: "profile_photo.jpg",
-                    preview: "https://biltozbackend.growmoon.top/storage/profile/7_68a590150de47.jpg",
+                    preview: "http://127.0.0.1:8000/storage/profile/7_68a590150de47.jpg",
                     uploaded: true,
                   },
                 ]);
@@ -219,7 +219,7 @@ export default function Profile() {
                 setSignatureFile([
                   {
                     name: "signature_stamp.jpg",
-                    preview: "https://biltozbackend.growmoon.top/storage/profile/7_68a590150de47.jpg",
+                    preview: "http://127.0.0.1:8000/storage/profile/7_68a590150de47.jpg",
                     uploaded: true,
                   },
                 ]);

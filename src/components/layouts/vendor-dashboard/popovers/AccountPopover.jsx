@@ -72,7 +72,7 @@ const AccountPopover = () => {
       >
         <Avatar
           alt={user?.name || "User"}
-          src={user?.profile_photo ? `https://biltozbackend.growmoon.top/storage/${user.profile_photo}` : ""}
+          src={user?.profile_photo ? `http://127.0.0.1:8000/storage/${user.profile_photo}` : ""}
         />
       </IconButton>
 
@@ -118,7 +118,7 @@ const AccountPopover = () => {
       >
         <Box px={2} pt={1}>
           <H6>{user?.name}</H6>
-          <Small color="grey.500">Admin</Small>
+          <Small color="grey.500">{user?.user_type ? "Transporter" : "Company"}</Small>
         </Box>
 
         <Divider />

@@ -6,6 +6,7 @@ import VendorDashboardLayout from "components/layouts/vendor-dashboard";
 import { prefix } from "stylis";
 import axios from "utils/axios"; // import the custom axios
 import { useEffect, useState } from "react";
+import { useSnackbar } from "notistack";
 
 // import api from "utils/__api__/products";
 
@@ -22,6 +23,10 @@ export default function CreateNumberSeries() {
     numberFormat: "",
     startingNumber: ""
   });
+
+
+  const { enqueueSnackbar } = useSnackbar();
+
 
   const [loading, setLoading] = useState(true);
 
@@ -93,9 +98,27 @@ export default function CreateNumberSeries() {
           numberFormat: res.data.data.prefix || "",
           startingNumber: res.data.data.start_number?.toString() || ""
         }));
+
+        enqueueSnackbar("Invoice Number created successfully 🎉", { variant: "success" });
+
         console.log("Invoice series created:", res.data);
+
       } catch (error) {
-        console.error("Error fetching parties:", error);
+        if (error.response?.status === 422 && error.response?.data?.error) {
+          const errors = error.response.data.error;
+          // show all validation messages
+          Object.values(errors).flat().forEach((msg) => {
+            enqueueSnackbar(msg, { variant: "error" });
+          });
+        }
+        // else if server error (500 or other)
+        else if (error.response?.data?.error) {
+          enqueueSnackbar(error.response.data.error, { variant: "error" });
+        }
+        // fallback
+        else {
+          enqueueSnackbar("Server not responding ❌", { variant: "error" });
+        }
       }
 
     }
@@ -109,8 +132,25 @@ export default function CreateNumberSeries() {
           numberFormat: "",
           startingNumber: res.data.data.start_number?.toString() || ""
         }));
+
+        enqueueSnackbar("Lr Number successfully 🎉", { variant: "success" });
+
       } catch (error) {
-        console.error("Error fetching parties:", error);
+        if (error.response?.status === 422 && error.response?.data?.error) {
+          const errors = error.response.data.error;
+          // show all validation messages
+          Object.values(errors).flat().forEach((msg) => {
+            enqueueSnackbar(msg, { variant: "error" });
+          });
+        }
+        // else if server error (500 or other)
+        else if (error.response?.data?.error) {
+          enqueueSnackbar(error.response.data.error, { variant: "error" });
+        }
+        // fallback
+        else {
+          enqueueSnackbar("Server not responding ❌", { variant: "error" });
+        }
       }
     }
 

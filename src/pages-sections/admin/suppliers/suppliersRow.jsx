@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { Avatar } from "@mui/material";
 import { useRouter } from "next/router";
-import { Delete, RemoveRedEye } from "@mui/icons-material";
+import { Delete, Edit, RemoveRedEye } from "@mui/icons-material";
+import axios from "utils/axios"; // import the custom axios
+
 import BazaarSwitch from "components/BazaarSwitch";
 import { StyledIconButton, StyledTableCell, StyledTableRow } from "../StyledComponents";
+import { useSnackbar } from "notistack";
 
 // ========================================================================
 
@@ -11,7 +14,8 @@ import { StyledIconButton, StyledTableCell, StyledTableRow } from "../StyledComp
 
 const SuppliersRow = ({
   brand,
-  selected
+  selected,
+  handleDelete
 }) => {
   const {
     name,
@@ -28,6 +32,10 @@ const SuppliersRow = ({
     contact_number,
   } = brand;
   const router = useRouter();
+
+
+
+
 
   const handleNavigate = () => router.push(`/admin/suppliers/${id}`);
   return <StyledTableRow>
@@ -49,10 +57,10 @@ const SuppliersRow = ({
 
     <StyledTableCell align="center">
       <StyledIconButton onClick={handleNavigate}>
-        <RemoveRedEye />
+        <Edit />
       </StyledIconButton>
 
-      <StyledIconButton>
+      <StyledIconButton onClick={() => handleDelete(id)}>
         <Delete />
       </StyledIconButton>
     </StyledTableCell>

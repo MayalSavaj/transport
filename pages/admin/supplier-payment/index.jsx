@@ -83,14 +83,17 @@ export default function SupplierpaymentList() {
               />
 
               <TableBody>
-                {filteredList.map((item) => (
-                  <RowWithExpand
-                    key={item.id}
-                    item={item}
-                    isOpen={expandedId === item.id}
-                    toggleExpand={() => toggleExpand(item.id)}
-                  />
-                ))}
+                {filteredList.map((item) =>
+                  item?.supplier ? (
+                    <RowWithExpand
+                      key={item.id}
+                      item={item}
+                      isOpen={expandedId === item.id}
+                      toggleExpand={() => toggleExpand(item.id)}
+                    />
+                  ) : null
+                )}
+
               </TableBody>
             </Table>
           </TableContainer>

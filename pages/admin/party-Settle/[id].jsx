@@ -50,7 +50,7 @@ export default function partypaymentsettle() {
 
   // --- 1. ADD STATE FOR FILTERS ---
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [appliedStatus, setAppliedStatus] = useState([]);
+  const [appliedStatus, setAppliedStatus] = useState(['pending']);
   const [tempStatus, setTempStatus] = useState([]);
 
   // --- 2. UPDATE useEffect TO HANDLE FILTERS ---
@@ -274,7 +274,7 @@ export default function partypaymentsettle() {
           <Divider sx={{ mb: 3 }} />
 
           <FormControl component="fieldset" fullWidth>
-            <FormLabel component="legend">Status</FormLabel>
+            <FormLabel component="legend">Settle Status</FormLabel>
             <FormGroup>
               {['completed', 'pending'].map((status) => (
                 <FormControlLabel

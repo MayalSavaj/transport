@@ -6,13 +6,19 @@ import axios from "utils/axios"; // import the custom axios
 
 import VendorDashboardLayout from "components/layouts/vendor-dashboard";
 import { useSnackbar } from "notistack";
+import { useRouter } from "next/router";
 
 CreateParty.getLayout = function getLayout(page) {
   return <VendorDashboardLayout>{page}</VendorDashboardLayout>;
 };
 
 export default function CreateParty() {
+
+
+  const router = useRouter();
+
   const INITIAL_VALUES = {
+    id: "",
     name: "",
     gst_number: "",
     pan_number: "",
@@ -54,6 +60,10 @@ export default function CreateParty() {
       const response = await axios.post("/parties", values);
 
       enqueueSnackbar("Party created successfully 🎉", { variant: "success" });
+
+
+      router.push("/admin/Partys"); // go back to list after update
+
 
       console.log("Form submitted successfully:", response.data);
     } catch (error) {

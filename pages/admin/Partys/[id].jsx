@@ -43,6 +43,7 @@ export default function UpdateParty() {
             axios.get(`/parties/${id}`).then((res) => {
                 const data = res.data;
                 setInitialValues({
+                    id: data.id || "",
                     name: data.name || "",
                     gst_number: data.gst_number || "",
                     pan_number: data.pan_number || "",

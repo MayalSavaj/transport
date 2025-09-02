@@ -50,7 +50,7 @@ export default function supplierpaymentsettle() {
 
   // --- 1. ADD STATE FOR FILTERS ---
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [appliedStatus, setAppliedStatus] = useState([]);
+  const [appliedStatus, setAppliedStatus] = useState(["pending"]);
   const [tempStatus, setTempStatus] = useState([]);
 
   // --- 2. UPDATE useEffect TO HANDLE FILTERS ---
@@ -163,6 +163,10 @@ export default function supplierpaymentsettle() {
     }
   };
 
+  const handleRowClick = (id) => {
+    router.push(`/admin/orderdetails/create/${id}`);
+  };
+
   // --- 4. FIX: Use fetched `data` instead of `sampleData` ---
   const { filteredList } = useMuiTable({
     listData: data, // Use the actual data from the API
@@ -196,7 +200,9 @@ export default function supplierpaymentsettle() {
         <TableContainer component={Paper}>
           <Table>
             <TableHead sx={{ backgroundColor: "#f2f2f2" }}>
-              <TableRow>
+              <TableRow
+
+              >
                 <TableCell padding="checkbox" />
                 <TableCell><strong>City</strong></TableCell>
                 <TableCell><strong>Date</strong></TableCell>
@@ -209,7 +215,11 @@ export default function supplierpaymentsettle() {
             <TableBody>
               {/* --- 6. FIX: Map over `filteredList` for sorting/pagination --- */}
               {filteredList.map((row) => (
-                <TableRow key={row?.id} hover>
+                <TableRow key={row?.id}
+                  hover
+                  onClick={() => handleRowClick(row?.id)}
+                  style={{ cursor: "pointer" }}
+                >
                   <TableCell padding="checkbox">
                     <Checkbox
                       disabled={row?.status === "completed"}
@@ -254,7 +264,7 @@ export default function supplierpaymentsettle() {
           <Divider sx={{ mb: 3 }} />
 
           <FormControl component="fieldset" fullWidth>
-            <FormLabel component="legend">Status</FormLabel>
+            <FormLabel component="legend"> SettleStatus</FormLabel>
             <FormGroup>
               {['completed', 'pending'].map((status) => (
                 <FormControlLabel

@@ -6,6 +6,7 @@ import axios from "utils/axios"; // import the custom axios
 
 import VendorDashboardLayout from "components/layouts/vendor-dashboard";
 import { useSnackbar } from "notistack";
+import { Router, useRouter } from "next/router";
 
 CreateBrand.getLayout = function getLayout(page) {
   return <VendorDashboardLayout>{page}</VendorDashboardLayout>;
@@ -44,6 +45,8 @@ export default function CreateBrand() {
 
   const { enqueueSnackbar } = useSnackbar();
 
+  const router = useRouter();
+
   const handleFormSubmit = async (values,) => {
 
     console.log("11111111111111111111111");
@@ -63,6 +66,8 @@ export default function CreateBrand() {
       });
 
       enqueueSnackbar("Supplier created successfully 🎉", { variant: "success" });
+
+      router.push('/admin/suppliers')
 
       console.log("Form submitted successfully:", response.data);
     } catch (error) {
