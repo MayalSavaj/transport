@@ -155,6 +155,35 @@ export default function supplierpaymentsettle() {
     }
   };
 
+
+  const handleSettleSubmit = async () => {
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append("remark", remark);
+      formData.append("settleDate", settleDate);
+      formData.append("orderId", id);
+      formData.append("payments", JSON.stringify(formRows));
+      if (receipt) {
+        formData.append("receipt", receipt);
+      }
+      const res = await axios.post("/supplier-settle", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+
+      setData(res.data);
+
+      // You should refetch or update state here after success
+      setOpenModal(false);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
   const getStatusChip = (status) => {
     if (status === "completed") {
       return <Chip label="Complete" size="small" sx={{ backgroundColor: "#c8f7c5", color: "#267326" }} />;
@@ -164,6 +193,7 @@ export default function supplierpaymentsettle() {
   };
 
   const handleRowClick = (id) => {
+    console.log("Navigating to order details for ID:", id);
     router.push(`/admin/orderdetails/create/${id}`);
   };
 
@@ -215,14 +245,15 @@ export default function supplierpaymentsettle() {
             <TableBody>
               {/* --- 6. FIX: Map over `filteredList` for sorting/pagination --- */}
               {filteredList.map((row) => (
-                <TableRow key={row?.id}
+                <TableRow
+                  key={row?.id}
                   hover
                   onClick={() => handleRowClick(row?.id)}
                   style={{ cursor: "pointer" }}
                 >
-                  <TableCell padding="checkbox">
+                  <TableCell padding="checkbox" onClick={(e) => e.stopPropagation()}>
                     <Checkbox
-                      disabled={row?.status === "completed"}
+                      disabled={row?.status == "completed"}
                       checked={isSelected(row?.id)}
                       onChange={() => handleSelect(row?.id)}
                     />
@@ -245,7 +276,95 @@ export default function supplierpaymentsettle() {
 
       {/* --- Settlement Modal (Existing code) --- */}
       <Dialog open={openModal} onClose={() => setOpenModal(false)} maxWidth="md" fullWidth>
-        {/* ... your existing modal content ... */}
+        <DialogTitle>Settle supplier Payments</DialogTitle>
+
+        <DialogContent dividers sx={{ maxHeight: "70vh", overflowY: "auto" }}>
+          {formRows.map((row, idx) => (
+            <Box
+              key={idx}
+              mb={3}
+              sx={{
+                borderRadius: 2,
+                border: "1px solid #e0e0e0",
+                backgroundColor: "#f9f9f9",
+                p: 2
+              }}
+            >
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={4}>
+                  <Typography variant="caption" color="text.secondary">Name</Typography>
+                  <Typography fontWeight={600}>{row.name}</Typography>
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <Typography variant="caption" color="text.secondary">Amount</Typography>
+                  <Typography fontWeight={600} color="error">₹{row.amount}</Typography>
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <Typography variant="caption" color="text.secondary">Date</Typography>
+                  <Typography fontWeight={600}>{row.date}</Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    label="Pay"
+                    fullWidth
+                    size="medium"
+                    type="number"
+                    value={row.pay || ""}
+                    inputProps={{ min: 0 }}
+                    onChange={(e) => handleExtraInputChange(idx, "pay", e.target.value)}
+                  />
+                </Grid>
+              </Grid>
+            </Box>
+          ))}
+
+          <Box mt={2} p={2} sx={{ borderRadius: 2, backgroundColor: "#f1f1f1" }}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Remark"
+                  size="medium"
+                  fullWidth
+                  value={remark}
+                  onChange={(e) => setRemark(e.target.value)}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Settle Date"
+                  type="date"
+                  size="medium"
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  value={settleDate}
+                  onChange={(e) => setSettleDate(e.target.value)}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <Button variant="outlined" fullWidth component="label">
+                  Upload Receipt
+                  <input
+                    type="file"
+                    hidden
+                    onChange={(e) => setReceipt(e.target.files[0])}
+                  />
+                </Button>
+                {receipt && (
+                  <Typography variant="body2" mt={1} color="text.secondary">
+                    📎 {receipt.name}
+                  </Typography>
+                )}
+              </Grid>
+            </Grid>
+          </Box>
+        </DialogContent>
+
+        <DialogActions>
+          <Button onClick={() => setOpenModal(false)}>Cancel</Button>
+          <Button onClick={handleSettleSubmit} variant="contained" color="error">
+            Submit
+          </Button>
+        </DialogActions>
       </Dialog>
 
       {/* --- 7. ADD THE FILTER DRAWER --- */}
@@ -292,6 +411,6 @@ export default function supplierpaymentsettle() {
           </Stack>
         </Box>
       </Drawer>
-    </Box>
+    </Box >
   );
 }

@@ -97,6 +97,8 @@ export default function partypaymentsettle() {
   const isSelected = (id) => selected.includes(id);
 
   const handleSettle = () => {
+
+    console.log("dsadasd");
     const selectedRows = data.filter((item) => selected.includes(item.id));
     const formatted = selectedRows.map((entry) => ({
       name: entry?.party?.name,
@@ -127,6 +129,9 @@ export default function partypaymentsettle() {
       const res = await axios.post("/party-settle", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+
+      setData(res.data);
+
       // You should refetch or update state here after success
       setOpenModal(false);
     } catch (error) {
@@ -254,7 +259,95 @@ export default function partypaymentsettle() {
 
       {/* --- Settlement Modal (Existing code) --- */}
       <Dialog open={openModal} onClose={() => setOpenModal(false)} maxWidth="md" fullWidth>
-        {/* ... your existing modal content ... */}
+        <DialogTitle>Settle supplier Payments</DialogTitle>
+
+        <DialogContent dividers sx={{ maxHeight: "70vh", overflowY: "auto" }}>
+          {formRows.map((row, idx) => (
+            <Box
+              key={idx}
+              mb={3}
+              sx={{
+                borderRadius: 2,
+                border: "1px solid #e0e0e0",
+                backgroundColor: "#f9f9f9",
+                p: 2
+              }}
+            >
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={4}>
+                  <Typography variant="caption" color="text.secondary">Name</Typography>
+                  <Typography fontWeight={600}>{row.name}</Typography>
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <Typography variant="caption" color="text.secondary">Amount</Typography>
+                  <Typography fontWeight={600} color="error">₹{row.amount}</Typography>
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <Typography variant="caption" color="text.secondary">Date</Typography>
+                  <Typography fontWeight={600}>{row.date}</Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    label="Pay"
+                    fullWidth
+                    size="medium"
+                    type="number"
+                    value={row.pay || ""}
+                    inputProps={{ min: 0 }}
+                    onChange={(e) => handleExtraInputChange(idx, "pay", e.target.value)}
+                  />
+                </Grid>
+              </Grid>
+            </Box>
+          ))}
+
+          <Box mt={2} p={2} sx={{ borderRadius: 2, backgroundColor: "#f1f1f1" }}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Remark"
+                  size="medium"
+                  fullWidth
+                  value={remark}
+                  onChange={(e) => setRemark(e.target.value)}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Settle Date"
+                  type="date"
+                  size="medium"
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  value={settleDate}
+                  onChange={(e) => setSettleDate(e.target.value)}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <Button variant="outlined" fullWidth component="label">
+                  Upload Receipt
+                  <input
+                    type="file"
+                    hidden
+                    onChange={(e) => setReceipt(e.target.files[0])}
+                  />
+                </Button>
+                {receipt && (
+                  <Typography variant="body2" mt={1} color="text.secondary">
+                    📎 {receipt.name}
+                  </Typography>
+                )}
+              </Grid>
+            </Grid>
+          </Box>
+        </DialogContent>
+
+        <DialogActions>
+          <Button onClick={() => setOpenModal(false)}>Cancel</Button>
+          <Button onClick={handleSubmit} variant="contained" color="error">
+            Submit
+          </Button>
+        </DialogActions>
       </Dialog>
 
 

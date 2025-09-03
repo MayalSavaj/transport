@@ -958,7 +958,7 @@ const OrderdetailsForm = () => {
                                                         size="small"
                                                         color="success"
                                                         sx={{ borderRadius: 2 }}
-                                                        onClick={() => window.open(`http://127.0.0.1:8000/storage/${order.pod}`, "_blank")}
+                                                        onClick={() => window.open(`https://biltozbackend.growmoon.top/storage/${order.pod}`, "_blank")}
                                                     >
                                                         View POD
                                                     </Button>
