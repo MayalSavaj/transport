@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 
 import VendorDashboardLayout from "components/layouts/vendor-dashboard";
+import { useSnackbar } from "notistack";
 
 UpdateParty.getLayout = function getLayout(page) {
     return <VendorDashboardLayout>{page}</VendorDashboardLayout>;
@@ -15,6 +16,8 @@ UpdateParty.getLayout = function getLayout(page) {
 export default function UpdateParty() {
     const router = useRouter();
     const { id } = router.query; // party ID from URL
+    const { enqueueSnackbar } = useSnackbar();
+
 
     const [initialValues, setInitialValues] = useState(null);
 
@@ -40,31 +43,80 @@ export default function UpdateParty() {
 
     useEffect(() => {
         if (id) {
-            axios.get(`/parties/${id}`).then((res) => {
-                const data = res.data;
-                setInitialValues({
-                    id: data.id || "",
-                    name: data.name || "",
-                    gst_number: data.gst_number || "",
-                    pan_number: data.pan_number || "",
-                    vendor_code: data.vendor_code || "",
-                    contact_person: data.contact_person || "",
-                    contact_number: data.contact_number || "",
-                    address: data.address || "",
-                    city: data.city || "",
-                    state: data.state || "",
-                    pincode: data.pincode || "",
-                    period_days: data.period_days || ""
+            try {
+
+                const response = axios.get(`/parties/${id}`).then((res) => {
+                    const data = res.data;
+                    setInitialValues({
+                        id: data.id || "",
+                        name: data.name || "",
+                        gst_number: data.gst_number || "",
+                        pan_number: data.pan_number || "",
+                        vendor_code: data.vendor_code || "",
+                        contact_person: data.contact_person || "",
+                        contact_number: data.contact_number || "",
+                        address: data.address || "",
+                        city: data.city || "",
+                        state: data.state || "",
+                        pincode: data.pincode || "",
+                        period_days: data.period_days || ""
+                    });
                 });
-            });
+            } catch (error) {
+                console.log(error.response?.data?.error);
+
+                // if validation errors (422)
+                if (error.response?.status === 422 && error.response?.data?.error) {
+                    const errors = error.response.data.error;
+                    // show all validation messages
+                    Object.values(errors).flat().forEach((msg) => {
+                        enqueueSnackbar(msg, { variant: "error" });
+                    });
+                }
+                // else if server error (500 or other)
+                else if (error.response?.data?.error) {
+                    enqueueSnackbar(error.response.data.error, { variant: "error" });
+                }
+                // fallback
+                else {
+                    enqueueSnackbar("Server not responding ❌", { variant: "error" });
+                }
+            } finally {
+
+            }
         }
     }, [id]);
 
-    const handleFormSubmit = (values) => {
-        axios.put(`/parties/${id}`, values).then(() => {
-            console.log("Party updated successfully");
-            router.push("/admin/Partys"); // go back to list after update
-        });
+    const handleFormSubmit = async (values) => {
+
+        try {
+
+            const response = await axios.put(`/parties/${id}`, values).then(() => {
+                console.log("Party updated successfully");
+                router.push("/admin/Partys"); // go back to list after update
+            })
+        } catch (error) {
+            console.log(error.response?.data?.error);
+
+            // if validation errors (422)
+            if (error.response?.status === 422 && error.response?.data?.error) {
+                const errors = error.response.data.error;
+                // show all validation messages
+                Object.values(errors).flat().forEach((msg) => {
+                    enqueueSnackbar(msg, { variant: "error" });
+                });
+            }
+            // else if server error (500 or other)
+            else if (error.response?.data?.error) {
+                enqueueSnackbar(error.response.data.error, { variant: "error" });
+            }
+            // fallback
+            else {
+                enqueueSnackbar("Server not responding ❌", { variant: "error" });
+            }
+        } finally {
+        }
+
     };
 
     if (!initialValues) {

@@ -36,6 +36,7 @@ import PaymentsIcon from "@mui/icons-material/Payments";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import axios from "utils/axios"; // import the custom axios
 import VendorDashboardLayout from "components/layouts/vendor-dashboard";
+import { useSnackbar } from "notistack";
 
 
 
@@ -72,6 +73,7 @@ const OrderdetailsForm = () => {
 
     const [activeTab, setActiveTab] = useState(0);
     const router = useRouter();
+    const { enqueueSnackbar } = useSnackbar();
     const { id } = router.query;
 
 
@@ -335,7 +337,7 @@ const OrderdetailsForm = () => {
     // console.log("supplier advances", supplierAdvances);
 
 
-    const handleCreateLr = (value) => {
+    const handleCreateLr = async (value) => {
 
         if (value == true) {
 
@@ -351,12 +353,34 @@ const OrderdetailsForm = () => {
 
             });
 
-            axios.post(`/order/create-lr-number/${id}`).then((response) => {
+            try {
+                const response = await axios.post(`/order/create-lr-number/${id}`).then((response) => {
 
+                    setT3lrModalOpen(false);
+                    router.push(`/admin/bilty/${id}`);
+
+                });
+            } catch (error) {
                 setT3lrModalOpen(false);
-                router.push(`/admin/bilty/${id}`);
 
-            });
+                // if validation errors (422)
+                if (error.response?.status === 422 && error.response?.data?.error) {
+                    const errors = error.response.data.error;
+                    // show all validation messages
+                    Object.values(errors).flat().forEach((msg) => {
+                        enqueueSnackbar(msg, { variant: "error" });
+                    });
+                }
+                // else if server error (500 or other)
+                else if (error.response?.data?.error) {
+                    enqueueSnackbar(error.response.data.error, { variant: "error" });
+                }
+                // fallback
+                else {
+                    enqueueSnackbar("Server not responding ❌", { variant: "error" });
+                }
+            } finally {
+            }
         } else {
 
             const payload = {
@@ -415,7 +439,7 @@ const OrderdetailsForm = () => {
         ? steps.findIndex(step => step.label === mappedLabel)
         : 0;
 
-    const handleOrdeStatus = () => {
+    const handleOrdeStatus = async () => {
 
         let payload = {};
 
@@ -429,14 +453,37 @@ const OrderdetailsForm = () => {
             }
         }
 
+        try {
 
 
-        axios.post(`/updateOrder/${id}`, payload).then((response) => {
-            console.log("******************");
-            console.log(response.data);
-            setOrder(response.data.order);
 
-        });
+            const response = await axios.post(`/updateOrder/${id}`, payload).then((response) => {
+                console.log("******************");
+                console.log(response.data);
+                setOrder(response.data.order);
+
+            });
+        } catch (error) {
+            console.log(error.response?.data?.error);
+
+            // if validation errors (422)
+            if (error.response?.status === 422 && error.response?.data?.error) {
+                const errors = error.response.data.error;
+                // show all validation messages
+                Object.values(errors).flat().forEach((msg) => {
+                    enqueueSnackbar(msg, { variant: "error" });
+                });
+            }
+            // else if server error (500 or other)
+            else if (error.response?.data?.error) {
+                enqueueSnackbar(error.response.data.error, { variant: "error" });
+            }
+            // fallback
+            else {
+                enqueueSnackbar("Server not responding ❌", { variant: "error" });
+            }
+        } finally {
+        }
 
     }
 
@@ -958,7 +1005,7 @@ const OrderdetailsForm = () => {
                                                         size="small"
                                                         color="success"
                                                         sx={{ borderRadius: 2 }}
-                                                        onClick={() => window.open(`https://biltozbackend.growmoon.top/storage/${order.pod}`, "_blank")}
+                                                        onClick={() => window.open(`http://127.0.0.1:8000/storage/${order.pod}`, "_blank")}
                                                     >
                                                         View POD
                                                     </Button>
@@ -1047,7 +1094,9 @@ const OrderdetailsForm = () => {
                                                     <Typography variant="subtitle1">Party Amount</Typography>
                                                     <Box display="flex" alignItems="center" gap={1}>
                                                         <Typography color="primary" fontWeight={600}>₹ {order?.freight_charge || 0}</Typography>
-                                                        <Button size="small" onClick={() => handleOpenAmountEdit("Party", values.Party)}>✏️</Button>
+                                                        {order?.status !== "completed" && (
+                                                            <Button size="small" onClick={() => handleOpenAmountEdit("Party", values.Party)}>✏️</Button>
+                                                        )}
                                                     </Box>
                                                 </Box>
 
@@ -1064,8 +1113,8 @@ const OrderdetailsForm = () => {
                                                             <Box display="flex" justifyContent="space-between" alignItems="center">
                                                                 {/* Left side: details + edit on click */}
                                                                 <Box
-                                                                    onClick={() => handleEditAdvance("party", index, oneOrder)}
-                                                                    sx={{ cursor: "pointer", flex: 1 }}
+                                                                    onClick={() => order?.status !== "completed" && handleEditAdvance("party", index, oneOrder)}
+                                                                    sx={{ cursor: order?.status !== "completed" && "pointer", flex: 1 }}
                                                                 >
                                                                     <Typography fontWeight={700}>Advance Party Balance</Typography>
                                                                     <Typography color="primary" fontWeight={700}>
@@ -1080,14 +1129,17 @@ const OrderdetailsForm = () => {
                                                                 </Box>
 
                                                                 {/* Delete button */}
-                                                                <Button
-                                                                    variant="outlined"
-                                                                    color="error"
-                                                                    size="small"
-                                                                    onClick={() => handleDeleteAdvance("party", index)}
-                                                                >
-                                                                    Delete
-                                                                </Button>
+                                                                {order?.status !== "completed" && (
+
+                                                                    <Button
+                                                                        variant="outlined"
+                                                                        color="error"
+                                                                        size="small"
+                                                                        onClick={() => handleDeleteAdvance("party", index)}
+                                                                    >
+                                                                        Delete
+                                                                    </Button>
+                                                                )}
                                                             </Box>
                                                         </Box>
                                                     ))}
@@ -1097,14 +1149,17 @@ const OrderdetailsForm = () => {
 
 
                                                     {/* Add Advance button at last */}
-                                                    <Button
-                                                        size="small"
-                                                        color="primary"
-                                                        onClick={() => handleAddAdvance("party")}
-                                                        sx={{ mt: 2 }}
-                                                    >
-                                                        Add Advance
-                                                    </Button>
+                                                    {order?.status !== "completed" && (
+
+                                                        <Button
+                                                            size="small"
+                                                            color="primary"
+                                                            onClick={() => handleAddAdvance("party")}
+                                                            sx={{ mt: 2 }}
+                                                        >
+                                                            Add Advance
+                                                        </Button>
+                                                    )}
                                                 </Box>
 
                                                 <Box pl={2} mb={2}>
@@ -1120,8 +1175,8 @@ const OrderdetailsForm = () => {
                                                             <Box display="flex" justifyContent="space-between" alignItems="center">
                                                                 {/* Left side (Edit on click) */}
                                                                 <Box
-                                                                    onClick={() => handleEditAdditionalCharge("party", index, oneOrder)}
-                                                                    sx={{ cursor: "pointer", flex: 1 }}
+                                                                    onClick={() => order?.status !== "completed" && handleEditAdditionalCharge("party", index, oneOrder)}
+                                                                    sx={{ cursor: order?.status !== "completed" && "pointer", flex: 1 }}
                                                                 >
                                                                     <Typography fontWeight={700}>Party Additional Charge</Typography>
                                                                     <Typography color="primary" fontWeight={700}>
@@ -1133,24 +1188,29 @@ const OrderdetailsForm = () => {
                                                                 </Box>
 
                                                                 {/* Delete button */}
-                                                                <Button
-                                                                    variant="outlined"
-                                                                    color="error"
-                                                                    size="small"
-                                                                    onClick={() => handleDeleteAdditionalCharge("party", index)}
-                                                                >
-                                                                    Delete
-                                                                </Button>
+                                                                {order?.status !== "completed" && (
+
+                                                                    <Button
+                                                                        variant="outlined"
+                                                                        color="error"
+                                                                        size="small"
+                                                                        onClick={() => handleDeleteAdditionalCharge("party", index)}
+                                                                    >
+                                                                        Delete
+                                                                    </Button>
+                                                                )}
                                                             </Box>
                                                         </Box>
                                                     ))}
 
 
                                                     {/* Add Advance button at last */}
+                                                    {order?.status !== "completed" && (
 
-                                                    <Button size="small" color="primary" onClick={() => {
-                                                        setChargeType("party"); setOpenChargeModal(true);
-                                                    }}>Add Party     Charge</Button>
+                                                        <Button size="small" color="primary" onClick={() => {
+                                                            setChargeType("party"); setOpenChargeModal(true);
+                                                        }}>Add Party     Charge</Button>
+                                                    )}
                                                 </Box>
 
                                                 <Box display="flex" justifyContent="space-between" mt={2}>
@@ -1190,7 +1250,10 @@ const OrderdetailsForm = () => {
                                                     <Typography variant="subtitle1">Supplier Amount</Typography>
                                                     <Box display="flex" alignItems="center" gap={1}>
                                                         <Typography color="primary" fontWeight={600}>₹ {order?.hiring_cost || 0}</Typography>
-                                                        <Button size="small" onClick={() => handleOpenAmountEdit("Supplier", values.Supplier)}>✏️</Button>
+                                                        {order?.status !== "completed" && (
+
+                                                            <Button size="small" onClick={() => handleOpenAmountEdit("Supplier", values.Supplier)}>✏️</Button>
+                                                        )}
                                                     </Box>
                                                 </Box>
 
@@ -1214,7 +1277,7 @@ const OrderdetailsForm = () => {
                                                             sx={{ cursor: "pointer" }}
                                                         >
                                                             <Box display="flex" justifyContent="space-between" alignItems="center">
-                                                                <Box onClick={() => handleEditAdvance("supplier", index, oneOrder)} style={{ flex: 1, cursor: "pointer" }}>
+                                                                <Box onClick={() => order?.status !== "completed" && handleEditAdvance("supplier", index, oneOrder)} style={{ cursor: order?.status !== "completed" && "pointer", flex: 1 }}>
 
                                                                     <Typography fontWeight={700}>Advance Supplier Balance</Typography>
                                                                     <Typography color="primary" fontWeight={700}>
@@ -1229,29 +1292,33 @@ const OrderdetailsForm = () => {
                                                                 </Box>
 
                                                                 {/* Delete Button */}
-                                                                <Button
-                                                                    variant="outlined"
-                                                                    color="error"
-                                                                    size="small"
-                                                                    onClick={() => handleDeleteAdvance("supplier", index)}
-                                                                >
-                                                                    Delete
-                                                                </Button>
+                                                                {order?.status !== "completed" && (
+
+                                                                    <Button
+                                                                        variant="outlined"
+                                                                        color="error"
+                                                                        size="small"
+                                                                        onClick={() => handleDeleteAdvance("supplier", index)}
+                                                                    >
+                                                                        Delete
+                                                                    </Button>
+                                                                )}
                                                             </Box>
                                                         </Box>
                                                     ))}
 
+                                                    {order?.status !== "completed" && (
 
-                                                    <Button
-                                                        size="small"
-                                                        color="primary"
-                                                        onClick={() => handleAddAdvance("supplier")}
-                                                        sx={{ mt: 2 }}
-                                                    >
-                                                        Add Advance
-                                                    </Button>
+                                                        <Button
+                                                            size="small"
+                                                            color="primary"
+                                                            onClick={() => handleAddAdvance("supplier")}
+                                                            sx={{ mt: 2 }}
+                                                        >
+                                                            Add Advance
+                                                        </Button>
 
-
+                                                    )}
 
 
 
@@ -1271,8 +1338,8 @@ const OrderdetailsForm = () => {
                                                         >
                                                             <Box display="flex" justifyContent="space-between" alignItems="center">
                                                                 <Box
-                                                                    onClick={() => handleEditAdditionalCharge("supplier", index, oneOrder)}
-                                                                    sx={{ cursor: "pointer", flex: 1 }}
+                                                                    onClick={() => order?.status !== "completed" && handleEditAdditionalCharge("supplier", index, oneOrder)}
+                                                                    sx={{ cursor: order?.status !== "completed" && "pointer", flex: 1 }}
                                                                 >
                                                                     <Typography fontWeight={700}>Supplier Additional Charge</Typography>
                                                                     <Typography color="primary" fontWeight={700}>
@@ -1282,30 +1349,34 @@ const OrderdetailsForm = () => {
                                                                         Note: {oneOrder.additional_charge_note}
                                                                     </Typography>
                                                                 </Box>
+                                                                {order?.status !== "completed" && (
 
-                                                                <Button
-                                                                    variant="outlined"
-                                                                    color="error"
-                                                                    size="small"
-                                                                    onClick={() => handleDeleteAdditionalCharge("supplier", index)}
-                                                                >
-                                                                    Delete
-                                                                </Button>
+                                                                    <Button
+                                                                        variant="outlined"
+                                                                        color="error"
+                                                                        size="small"
+                                                                        onClick={() => handleDeleteAdditionalCharge("supplier", index)}
+                                                                    >
+                                                                        Delete
+                                                                    </Button>
+                                                                )}
                                                             </Box>
                                                         </Box>
                                                     ))}
+                                                    {order?.status !== "completed" && (
 
-                                                    <Button
-                                                        size="small"
-                                                        color="primary"
-                                                        onClick={() => {
-                                                            setChargeType("supplier");
-                                                            setOpenChargeModal(true);
-                                                        }}
-                                                        sx={{ mt: 2 }}
-                                                    >
-                                                        Add Supplier Charge
-                                                    </Button>
+                                                        <Button
+                                                            size="small"
+                                                            color="primary"
+                                                            onClick={() => {
+                                                                setChargeType("supplier");
+                                                                setOpenChargeModal(true);
+                                                            }}
+                                                            sx={{ mt: 2 }}
+                                                        >
+                                                            Add Supplier Charge
+                                                        </Button>
+                                                    )}
                                                 </Box>
 
 

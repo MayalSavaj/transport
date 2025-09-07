@@ -39,6 +39,7 @@ const ordersRow = ({
         <Delete />
       </StyledIconButton>
     </StyledTableCell>
+
   </StyledTableRow>;
 };
 export default ordersRow;

@@ -96,6 +96,8 @@ export default function partypaymentsettle() {
   };
   const isSelected = (id) => selected.includes(id);
 
+  const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
+
   const handleSettle = () => {
 
     console.log("dsadasd");
@@ -110,11 +112,18 @@ export default function partypaymentsettle() {
     setFormRows(formatted);
     setOpenModal(true);
   };
-  const handleExtraInputChange = (index, field, value, id) => {
+  const handleExtraInputChange = (index, field, value, amount) => {
+
+
     const updated = [...formRows];
     updated[index] = { ...updated[index], [field]: value };
     setFormRows(updated);
+
+    const shouldDisable = updated.some(row => Number(row.pay) > Number(row.amount));
+    setIsSubmitDisabled(shouldDisable);
   };
+
+
   const handleSubmit = async () => {
     setLoading(true);
     try {
@@ -259,7 +268,7 @@ export default function partypaymentsettle() {
 
       {/* --- Settlement Modal (Existing code) --- */}
       <Dialog open={openModal} onClose={() => setOpenModal(false)} maxWidth="md" fullWidth>
-        <DialogTitle>Settle supplier Payments</DialogTitle>
+        <DialogTitle>Settle party Payments</DialogTitle>
 
         <DialogContent dividers sx={{ maxHeight: "70vh", overflowY: "auto" }}>
           {formRows.map((row, idx) => (
@@ -294,7 +303,7 @@ export default function partypaymentsettle() {
                     type="number"
                     value={row.pay || ""}
                     inputProps={{ min: 0 }}
-                    onChange={(e) => handleExtraInputChange(idx, "pay", e.target.value)}
+                    onChange={(e) => handleExtraInputChange(idx, "pay", e.target.value, row?.amount)}
                   />
                 </Grid>
               </Grid>
@@ -344,7 +353,7 @@ export default function partypaymentsettle() {
 
         <DialogActions>
           <Button onClick={() => setOpenModal(false)}>Cancel</Button>
-          <Button onClick={handleSubmit} variant="contained" color="error">
+          <Button disabled={isSubmitDisabled} onClick={handleSubmit} variant="contained" color="error">
             Submit
           </Button>
         </DialogActions>

@@ -35,6 +35,7 @@ import { useEffect, useState } from "react";
 import axios from "utils/axios";
 import CloseIcon from "@mui/icons-material/Close";
 import FilterListIcon from '@mui/icons-material/FilterList'; // The icon for the button
+import ProfileCheckModal from "../../ProfileCheckModal";
 
 // ... (tableHeading and getLayout remain the same)
 const tableHeading = [
@@ -230,7 +231,7 @@ export default function OrdersList() {
       {/* --- THIS IS THE ONLY PART THAT HAS CHANGED --- */}
       {/* We now pass an IconButton instead of a full Button */}
 
-
+      <ProfileCheckModal></ProfileCheckModal>
       <Card>
         {/* ... Table and Drawer JSX remains exactly the same ... */}
         <Scrollbar>

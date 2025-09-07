@@ -107,7 +107,6 @@ export default function Profile() {
           // preload profile photo + signature if available
           if (sanitizedUser.profile_photo) {
 
-            console.log("http://127.0.0.1:8000/storage/" + user?.profile_photo);
             setProfilePhotoFile([
               {
                 name: "profile_photo.jpg",
@@ -117,7 +116,6 @@ export default function Profile() {
             ]);
           }
           if (sanitizedUser.signature_stamp) {
-            console.log("http://127.0.0.1:8000/storage" + sanitizedUser?.signature_stamp);
 
             setSignatureFile([
               {

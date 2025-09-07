@@ -15,12 +15,14 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
+  MenuItem,
 } from "@mui/material";
 import DownloadIcon from "@mui/icons-material/Download";
 import { Formik } from "formik";
 import * as yup from "yup";
 import axios from "utils/axios"; // import the custom axios
 import { useRouter } from "next/router";
+import { useSnackbar } from "notistack";
 
 
 // Initial values and validation schema
@@ -34,12 +36,16 @@ const BiltyManager = () => {
   const router = useRouter();
   const { id } = router.query;
 
-  console.log("router is na", router);
-  console.log("id is na", id);
+  const { enqueueSnackbar } = useSnackbar();
 
 
   const [biltyList, setBiltyList] = useState([]);
   const [lrNumber, setLrNumber] = useState();
+
+
+  const [consignerData, setConsignerData] = useState({});
+  const [consigneeData, setConsigneeData] = useState({});
+  const [materialData, setMaterialData] = useState({});
 
   useEffect(() => {
     if (!router.isReady) return; // ✅ only run when query is ready
@@ -68,6 +74,8 @@ const BiltyManager = () => {
   const handleOpenForm = (value) => {
     setLrNumber(value)
     setModalOpen(true);
+    setActiveTab(0);                // Always start from first tab
+    setTabAccess([true, false, false]);
   };
 
   const handleCloseForm = () => {
@@ -124,15 +132,58 @@ const BiltyManager = () => {
       document.body.appendChild(link);
       link.click();
     } catch (error) {
-      console.error("Download failed:", error);
+
+      console.error("Download error:", error);
+      if (error.response?.status === 422 && error.response?.data?.error) {
+        const errors = error.response.data.error;
+        // show all validation messages
+        Object.values(errors).flat().forEach((msg) => {
+          enqueueSnackbar(msg, { variant: "error" });
+        });
+      }
+      // else if server error (500 or other)
+      else if (error.response?.data?.error) {
+        enqueueSnackbar(error.response.data.error, { variant: "error" });
+      }
+      // fallback
+
+
+
+
+      else {
+        enqueueSnackbar("Incomplete data to generate bilty. Please ensure consignee,consigner and material details are filled.", { variant: "error" });
+      }
     }
   };
+
+
+  const handleForm = (lrId) => {
+    try {
+      const biltyData = axios.get(`/getBuiltyDetails/${lrId}`).then((res) => {
+        if (res.data) {
+
+          setConsignerData(res.data.consigner);
+          setConsigneeData(res.data.consignee);
+          setMaterialData(res.data.material_details);
+          handleOpenForm(lrId);
+        } else {
+          console.error("No data found for the given LR ID");
+        }
+      });
+
+    } catch (err) {
+    }
+  }
 
 
 
   const [tabAccess, setTabAccess] = useState([true, false, false]);
 
+  const [states, setStates] = useState([]);
+
   const isTabValid = (tabIndex, values) => {
+
+    console.log("Validating Tab:", tabIndex, values);
     if (tabIndex === 0) {
       // Consigner Tab
       return (
@@ -170,6 +221,26 @@ const BiltyManager = () => {
     return false;
   };
 
+  // fetch states
+  useEffect(() => {
+    axios
+      .get("/cities")
+      .then((response) => {
+        const cityList = response?.data?.city || [];
+        const uniqueStates = [...new Set(cityList.map((item) => item.city_state))];
+        setStates(uniqueStates);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch states:", err);
+      });
+  }, []);
+
+
+  const handleStateChange = (selectedState, setFieldValue) => {
+    setFieldValue("consigner_state", selectedState);
+  };
+
+
 
   return (
     <>
@@ -193,7 +264,7 @@ const BiltyManager = () => {
                 <TableCell>{index + 1}</TableCell>
                 <TableCell
                   sx={{ cursor: "pointer", color: "blue" }}
-                  onClick={() => handleOpenForm(bilty?.id)}
+                  onClick={() => handleForm(bilty?.id)}
                 >
                   {bilty.drop_location}
                 </TableCell>
@@ -240,27 +311,29 @@ const BiltyManager = () => {
             {/* Formik Form */}
             <Formik
               initialValues={{
-                consignee_mobile: biltyList?.consignee?.contact_number,
-                consignee_name: biltyList?.consignee?.name,
-                consignee_gstNumber: biltyList?.consignee?.gst_number,
-                consignee_address1: biltyList?.consignee?.gst_number,
-                consignee_address2: biltyList?.consignee?.gst_number,
-                consignee_state: biltyList?.consignee?.gst_number,
-                consignee_pincode: biltyList?.consignee?.gst_number,
+                consignee_mobile: consigneeData?.mobile_number,
+                consignee_name: consigneeData?.name,
+                consignee_gstNumber: consigneeData?.gst_number,
+                consignee_address1: consigneeData?.address,
+                consignee_address2: consigneeData?.gst_number,
+                consignee_state: consigneeData?.state,
+                consignee_pincode: consigneeData?.pincode,
 
 
-                consigner_mobile: biltyList?.consigner?.contact_number,
-                consigner_name: biltyList?.consigner?.name,
-                consigner_gstNumber: biltyList?.consigner?.gst_number,
-                consigner_address1: biltyList?.consigner?.address,
+                consigner_mobile: consignerData?.mobile_number,
+                consigner_name: consignerData?.name,
+                consigner_gstNumber: consignerData?.gst_number,
+                consigner_address1: consignerData?.address,
                 consigner_address2: "",
-                consigner_state: biltyList?.consigner?.state,
-                consigner_pincode: biltyList?.consigner?.pincode,
-                materialDetail: "",
-                totalWeight: "",
-                ewayBillNo: "",
-                invoiceNo: biltyList?.order?.invoice_number ?? "",
-                materialAmount: "",
+                consigner_state: consignerData?.state,
+                consigner_pincode: consignerData?.pincode,
+
+
+                materialDetail: materialData?.details ?? "",
+                totalWeight: materialData?.total_weight ?? "",
+                ewayBillNo: materialData?.e_bill_no ?? "",
+                invoiceNo: materialData?.invoice_number ?? "",
+                materialAmount: materialData?.amount ?? "",
               }}
               validationSchema={validationSchema}
               onSubmit={handleFormSubmit}
@@ -272,6 +345,7 @@ const BiltyManager = () => {
                 handleChange,
                 handleBlur,
                 handleSubmit,
+                setFieldValue,
               }) => (
                 <form onSubmit={handleSubmit}>
                   <Grid container spacing={2}>
@@ -318,14 +392,21 @@ const BiltyManager = () => {
                         <Grid item xs={6}>
                           <TextField
                             fullWidth
+                            select
                             label="State"
                             name="consigner_state"
-                            value={values.consigner_state}
-                            onChange={handleChange}
+                            value={values.consigner_state || ""}
+                            onChange={(e) => handleStateChange(e.target.value, setFieldValue)}
                             onBlur={handleBlur}
-                            error={touched.state && Boolean(errors.state)}
-                            helperText={touched.state && errors.state}
-                          />
+                            error={touched.consigner_state && Boolean(errors.consigner_state)}
+                            helperText={touched.consigner_state && errors.consigner_state}
+                          >
+                            {states.map((state, index) => (
+                              <MenuItem key={index} value={state}>
+                                {state}
+                              </MenuItem>
+                            ))}
+                          </TextField>
                         </Grid>
                         <Grid item xs={6}>
                           <TextField
@@ -396,14 +477,21 @@ const BiltyManager = () => {
                         <Grid item xs={6}>
                           <TextField
                             fullWidth
+                            select
                             label="State"
                             name="consignee_state"
-                            value={values.consignee_state}
+                            value={values.consignee_state || ""}
                             onChange={handleChange}
                             onBlur={handleBlur}
-                            error={touched.state && Boolean(errors.state)}
-                            helperText={touched.state && errors.state}
-                          />
+                            error={touched.consignee_state && Boolean(errors.consignee_state)}
+                            helperText={touched.consignee_state && errors.consignee_state}
+                          >
+                            {states.map((state, index) => (
+                              <MenuItem key={index} value={state}>
+                                {state}
+                              </MenuItem>
+                            ))}
+                          </TextField>
                         </Grid>
                         <Grid item xs={6}>
                           <TextField

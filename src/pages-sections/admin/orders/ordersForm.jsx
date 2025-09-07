@@ -83,7 +83,7 @@ const OrdersForm = () => {
 
     const fetchCities = async () => {
       try {
-        const res = await axios.get("http://127.0.0.1:8000/api/cities"); // ✅ Your API
+        const res = await axios.get("/cities"); // ✅ Your API
         const options = res.data.city.map((city) => ({
           label: `${city.city_name}, ${city.city_state}`,
           value: city.city_name, // ✅ Use ID for backend

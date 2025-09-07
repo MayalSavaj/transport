@@ -37,7 +37,7 @@ const SuppliersForm = (props) => {
 
   // Fetch states and cities from API
   useEffect(() => {
-    axios.get("http://127.0.0.1:8000/api/cities").then((response) => {
+    axios.get("/cities").then((response) => {
       const cityList = response?.data?.city || [];
       setCities(cityList);
 

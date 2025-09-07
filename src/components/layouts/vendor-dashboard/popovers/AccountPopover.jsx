@@ -46,7 +46,7 @@ const AccountPopover = () => {
     axios
       .post(`/logout`)
       .then((res) => {
-        Router.push("/login")
+        router.push("/login")
       })
       .catch((err) => {
         console.error("Failed to fetch user:", err);

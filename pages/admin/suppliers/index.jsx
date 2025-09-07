@@ -91,6 +91,8 @@ export default function SupplierList() {
 
   const handleDelete = async (id) => {
 
+    const confirmDelete = window.confirm("Are you sure you want to delete this supplier?");
+    if (!confirmDelete) return;
 
     try {
       const response = await axios.delete(`/supplier/${id}`);

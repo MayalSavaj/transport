@@ -120,8 +120,10 @@ export default function PartyList() {
 
   const handleDelete = async (id) => {
 
+    const confirmDelete = window.confirm("Are you sure you want to delete this party?");
+    if (!confirmDelete) return;
 
-    console.log(id);
+
 
     try {
       const response = await axios.delete(`/parties/${id}`);

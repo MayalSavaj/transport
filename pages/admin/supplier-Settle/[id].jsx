@@ -84,6 +84,8 @@ export default function supplierpaymentsettle() {
   const [remark, setRemark] = useState("");
   const [settleDate, setSettleDate] = useState(new Date().toISOString().split("T")[0]);
   const [receipt, setReceipt] = useState(null);
+  const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
+
 
   const handleSelect = (id) => {
     setSelected((prev) =>
@@ -104,10 +106,18 @@ export default function supplierpaymentsettle() {
     setFormRows(formatted);
     setOpenModal(true);
   };
+
+
+
   const handleExtraInputChange = (index, field, value) => {
     const updated = [...formRows];
     updated[index] = { ...updated[index], [field]: value };
     setFormRows(updated);
+
+    const shouldDisable = updated.some(row => Number(row.pay) > Number(row.amount));
+    setIsSubmitDisabled(shouldDisable);
+
+
   };
   const handleSubmit = async () => {
     setLoading(true);
@@ -361,7 +371,7 @@ export default function supplierpaymentsettle() {
 
         <DialogActions>
           <Button onClick={() => setOpenModal(false)}>Cancel</Button>
-          <Button onClick={handleSettleSubmit} variant="contained" color="error">
+          <Button disabled={isSubmitDisabled} onClick={handleSettleSubmit} variant="contained" color="error">
             Submit
           </Button>
         </DialogActions>

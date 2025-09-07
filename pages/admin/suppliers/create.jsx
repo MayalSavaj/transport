@@ -61,7 +61,7 @@ export default function CreateBrand() {
         address: values.address,
         city: values.city,
         state: values.state,
-        pincode: values.pin_code,
+        pincode: values.pincode,
         route_name: values.route_name,
       });
 

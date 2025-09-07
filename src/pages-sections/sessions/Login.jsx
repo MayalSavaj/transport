@@ -103,10 +103,7 @@ const Login = () => {
           .matches(/[A-Z]{5}[0-9]{4}[A-Z]{1}$/, "Invalid PAN Number"),
     }),
 
-    name: yup.string().when("userType", {
-      is: (val) => val === "company" || val === "transportor",
-      then: (schema) => schema.required("Firm Name is required"),
-    }),
+
     firmname: yup.string().when("userType", {
       is: (val) => val === "company" || val === "transportor",
       then: (schema) => schema.required("Firm Name is required"),
@@ -138,6 +135,9 @@ const Login = () => {
             });
             setShowOtp(true);
             startResendCountdown();
+
+           
+
           } else {
             const { data } = await axios.post("/verify-otp", {
               mobile_number: values.mobile,
@@ -317,7 +317,7 @@ const Login = () => {
                     size="small"
                     variant="outlined"
                     onBlur={handleBlur}
-                    value={values.name}
+                    value={values.firmname}
                     onChange={handleChange}
                     label="Firm Name"
                     placeholder="Name as per GST"
@@ -353,7 +353,7 @@ const Login = () => {
                     size="small"
                     variant="outlined"
                     onBlur={handleBlur}
-                    value={values.name}
+                    value={values.firmname}
                     onChange={handleChange}
                     label="Firm Name"
                     placeholder="Name as Per PAN"
@@ -366,72 +366,72 @@ const Login = () => {
             {/* OTP Input */}
             {((tabIndex === 0 && showOtp) ||
               (tabIndex === 1 && showSignUpOtp)) && (
-              <>
-                <Typography mb={1}>
-                  Enter the OTP sent to {values.mobile}
-                </Typography>
-                <Box mb={2} display="flex" justifyContent="center">
-                  <OtpInput
-                    value={values.otp}
-                    onChange={(otp) => {
-                      const numericOtp = otp.replace(/\D/g, "");
-                      setFieldValue("otp", numericOtp);
-                    }}
-                    numInputs={6}
-                    shouldAutoFocus
-                    isInputNum
-                    renderInput={(props) => (
-                      <input
-                        {...props}
-                        inputMode="numeric"
-                        pattern="[0-9]*"
-                        onInput={(e) => {
-                          e.target.value = e.target.value.replace(/\D/g, "");
-                        }}
-                        style={{
-                          width: "45px",
-                          height: "50px",
-                          margin: "0 4px",
-                          fontSize: "22px",
-                          borderRadius: "8px",
-                          border: "2px solid #00796b",
-                          textAlign: "center",
-                          backgroundColor: "#ffffff",
-                          outline: "none",
-                        }}
-                      />
-                    )}
-                  />
-                </Box>
-                {touched.otp && errors.otp && (
-                  <Typography
-                    color="error"
-                    mt={1}
-                    fontSize={12}
-                    textAlign="center"
-                  >
-                    {errors.otp}
+                <>
+                  <Typography mb={1}>
+                    Enter the OTP sent to {values.mobile}
                   </Typography>
-                )}
-                {/* Resend OTP Button (only for Sign In) */}
-                {tabIndex === 0 && showOtp && (
-                  <Box textAlign="center" mt={1}>
-                    <Button
-                      size="small"
-                      onClick={() => {
-                        console.log("Resend OTP:", values.mobile);
-                        startResendCountdown();
+                  <Box mb={2} display="flex" justifyContent="center">
+                    <OtpInput
+                      value={values.otp}
+                      onChange={(otp) => {
+                        const numericOtp = otp.replace(/\D/g, "");
+                        setFieldValue("otp", numericOtp);
                       }}
-                      disabled={resendTimer > 0}
-                    >
-                      {resendTimer > 0
-                        ? `Resend OTP in ${resendTimer}s`
-                        : "Resend OTP"}
-                    </Button>
+                      numInputs={6}
+                      shouldAutoFocus
+                      isInputNum
+                      renderInput={(props) => (
+                        <input
+                          {...props}
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          onInput={(e) => {
+                            e.target.value = e.target.value.replace(/\D/g, "");
+                          }}
+                          style={{
+                            width: "45px",
+                            height: "50px",
+                            margin: "0 4px",
+                            fontSize: "22px",
+                            borderRadius: "8px",
+                            border: "2px solid #00796b",
+                            textAlign: "center",
+                            backgroundColor: "#ffffff",
+                            outline: "none",
+                          }}
+                        />
+                      )}
+                    />
                   </Box>
-                )}
-              </>
-            )}
+                  {touched.otp && errors.otp && (
+                    <Typography
+                      color="error"
+                      mt={1}
+                      fontSize={12}
+                      textAlign="center"
+                    >
+                      {errors.otp}
+                    </Typography>
+                  )}
+                  {/* Resend OTP Button (only for Sign In) */}
+                  {tabIndex === 0 && showOtp && (
+                    <Box textAlign="center" mt={1}>
+                      <Button
+                        size="small"
+                        onClick={() => {
+                          console.log("Resend OTP:", values.mobile);
+                          startResendCountdown();
+                        }}
+                        disabled={resendTimer > 0}
+                      >
+                        {resendTimer > 0
+                          ? `Resend OTP in ${resendTimer}s`
+                          : "Resend OTP"}
+                      </Button>
+                    </Box>
+                  )}
+                </>
+              )}
 
             {/* Submit */}
             <Button
@@ -446,8 +446,8 @@ const Login = () => {
                   ? "Verify OTP"
                   : "Send OTP"
                 : showSignUpOtp
-                ? "Verify OTP"
-                : "Register"}
+                  ? "Verify OTP"
+                  : "Register"}
             </Button>
           </form>
         </Wrapper>
