@@ -12,6 +12,7 @@ import {
   IconButton,
   useMediaQuery,
   CircularProgress,
+  MenuItem,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import ClearIcon from "@mui/icons-material/Clear";
@@ -87,6 +88,23 @@ export default function Profile() {
   const [profilePhotoFile, setProfilePhotoFile] = useState([]);
   const [imgLoaded, setImgLoaded] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [cities, setCities] = useState([]);
+  const [states, setStates] = useState([]);
+  const [filteredCities, setFilteredCities] = useState([]);
+
+  // Fetch city & state data from API
+  useEffect(() => {
+    axios.get("/cities").then((response) => {
+      const cityList = response?.data?.city || [];
+      setCities(cityList);
+
+      // Extract unique states from city list
+      const uniqueStates = [...new Set(cityList.map((item) => item.city_state))];
+      setStates(uniqueStates);
+    }).catch((err) => {
+      console.error("Failed to fetch cities:", err);
+    });
+  }, []);
 
   useEffect(() => {
     const fetchUser = () => {
@@ -136,6 +154,24 @@ export default function Profile() {
 
     fetchUser();
   }, []);
+
+  // Filter cities when state changes or user data loads
+  useEffect(() => {
+    if (user.state && cities.length > 0) {
+      const filtered = cities.filter((c) => c.city_state === user.state);
+      setFilteredCities(filtered);
+    }
+  }, [user.state, cities]);
+
+  // Handle State Change
+  const handleStateChange = (selectedState) => {
+    formik.setFieldValue("state", selectedState);
+    formik.setFieldValue("city", ""); // Reset city when state changes
+
+    // Filter cities based on selected state
+    const filtered = cities.filter((c) => c.city_state === selectedState);
+    setFilteredCities(filtered);
+  };
 
   const handleFileDelete = (fileToRemove, type) => () => {
     if (type === "profile") {
@@ -362,17 +398,21 @@ export default function Profile() {
                     formik={formik}
                     editMode={editMode}
                   />
-                  <ProfileItem
-                    name="city"
-                    title="City"
-                    formik={formik}
-                    editMode={editMode}
-                  />
-                  <ProfileItem
+                  <ProfileDropdownItem
                     name="state"
                     title="State"
                     formik={formik}
                     editMode={editMode}
+                    options={states}
+                    onChange={handleStateChange}
+                  />
+                  <ProfileDropdownItem
+                    name="city"
+                    title="City"
+                    formik={formik}
+                    editMode={editMode}
+                    options={filteredCities.map(city => city.city_name)}
+                    disabled={!formik.values.state}
                   />
                   <ProfileItem
                     name="pin_code"
@@ -511,6 +551,37 @@ const ProfileItem = ({ title, name, formik, editMode }) => (
         error={formik.touched[name] && Boolean(formik.errors[name])}
         helperText={formik.touched[name] && formik.errors[name]}
       />
+    ) : (
+      <Typography fontWeight={500}>{formik.values[name] || "-"}</Typography>
+    )}
+  </Grid>
+);
+
+// --- ProfileDropdownItem helper ---
+const ProfileDropdownItem = ({ title, name, formik, editMode, options, onChange, disabled = false }) => (
+  <Grid item xs={12} md={6}>
+    <Typography color="grey.600" fontSize={13}>
+      {title}
+    </Typography>
+    {editMode ? (
+      <TextField
+        select
+        fullWidth
+        size="small"
+        name={name}
+        value={formik.values[name] || ""}
+        onChange={onChange ? (e) => onChange(e.target.value) : formik.handleChange}
+        onBlur={formik.handleBlur}
+        disabled={disabled}
+        error={formik.touched[name] && Boolean(formik.errors[name])}
+        helperText={formik.touched[name] && formik.errors[name]}
+      >
+        {options.map((option, index) => (
+          <MenuItem key={index} value={option}>
+            {option}
+          </MenuItem>
+        ))}
+      </TextField>
     ) : (
       <Typography fontWeight={500}>{formik.values[name] || "-"}</Typography>
     )}

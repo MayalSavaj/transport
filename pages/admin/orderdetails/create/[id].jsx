@@ -342,21 +342,23 @@ const OrderdetailsForm = () => {
         if (value == true) {
 
 
-            const payload = {
-                'lr_number': true
-            }
-            axios.post(`/updateOrder/${id}`, payload).then((response) => {
-                console.log("******************");
-                console.log(response.data);
-                setOrder(response.data.order);
 
-
-            });
 
             try {
                 const response = await axios.post(`/order/create-lr-number/${id}`).then((response) => {
 
                     setT3lrModalOpen(false);
+
+                    const payload = {
+                        'lr_number': true
+                    }
+                    axios.post(`/updateOrder/${id}`, payload).then((response) => {
+                        console.log("******************");
+                        console.log(response.data);
+                        setOrder(response.data.order);
+
+
+                    });
                     router.push(`/admin/bilty/${id}`);
 
                 });
@@ -658,6 +660,8 @@ const OrderdetailsForm = () => {
         order?.drop_location_2,
         order?.drop_location_3,
     ];
+
+    console.log("order is na ", order);
 
 
 
@@ -1070,6 +1074,7 @@ const OrderdetailsForm = () => {
                                             Yes
                                         </Button>
                                         <Button
+
                                             variant="outlined"
                                             color="secondary"
                                             onClick={() => handleCreateLr(false)}

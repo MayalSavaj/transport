@@ -17,6 +17,7 @@ import BazaarImage from "components/BazaarImage";
 import BazaarTextField from "components/BazaarTextField";
 import OtpInput from "react-otp-input";
 import axios from "utils/axios";
+import { useSnackbar } from "notistack";
 
 // Styled card wrapper
 const Wrapper = styled(Card)(({ theme }) => ({
@@ -110,6 +111,9 @@ const Login = () => {
     }),
   });
 
+  const { enqueueSnackbar } = useSnackbar();
+
+
   const {
     values,
     errors,
@@ -136,7 +140,7 @@ const Login = () => {
             setShowOtp(true);
             startResendCountdown();
 
-           
+
 
           } else {
             const { data } = await axios.post("/verify-otp", {
@@ -149,14 +153,36 @@ const Login = () => {
         } else {
           // === Sign Up Flow ===
           if (!showSignUpOtp) {
-            await axios.post("/register", {
-              mobile_number: values.mobile,
-              user_type: values.userType == "transportor" ? 1 : 2,
-              gst_number: values.gstNumber,
-              pan_number: values.panNumber,
-              firm_name: "dadas",
-            });
-            setShowSignUpOtp(true);
+
+            try {
+              await axios.post("/register", {
+                mobile_number: values.mobile,
+                user_type: values.userType == "transportor" ? 1 : 2,
+                gst_number: values.gstNumber,
+                pan_number: values.panNumber,
+                firm_name: values.firmname,
+              });
+              setShowSignUpOtp(true);
+            } catch (error) {
+              if (error.response?.status === 422 && error.response?.data?.error) {
+                const errors = error.response.data.error;
+                // show all validation messages
+                Object.values(errors).flat().forEach((msg) => {
+                  enqueueSnackbar(msg, { variant: "error" });
+                });
+              }
+              // else if server error (500 or other)
+              else if (error.response?.data?.error) {
+                enqueueSnackbar(error.response.data.error, { variant: "error" });
+              }
+              // fallback
+              else {
+                enqueueSnackbar("Server not responding ❌", { variant: "error" });
+              }
+
+            }
+
+
           } else {
             const { data } = await axios.post("/verify-otp", {
               mobile_number: values.mobile,
@@ -169,9 +195,22 @@ const Login = () => {
             setShowSignUpOtp(false);
           }
         }
-      } catch (err) {
-        console.error(err);
-        alert("Something went wrong");
+      } catch (error) {
+        if (error.response?.status === 422 && error.response?.data?.error) {
+          const errors = error.response.data.error;
+          // show all validation messages
+          Object.values(errors).flat().forEach((msg) => {
+            enqueueSnackbar(msg, { variant: "error" });
+          });
+        }
+        // else if server error (500 or other)
+        else if (error.response?.data?.error) {
+          enqueueSnackbar(error.response.data.error, { variant: "error" });
+        }
+        // fallback
+        else {
+          enqueueSnackbar("Server not responding ❌", { variant: "error" });
+        }
       }
     },
   });
