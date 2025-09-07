@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
-import axios from "axios";
+import axios from "utils/axios";
 
 const validationSchema = yup.object().shape({
   name: yup.string().required("Name is required"),

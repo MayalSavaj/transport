@@ -1,7 +1,7 @@
 import { Button, Card, Grid, MenuItem, TextField, Typography } from "@mui/material";
 import { Formik } from "formik";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "utils/axios";
 
 const PartysForm = (props) => {
   const { initialValues, validationSchema, handleFormSubmit } = props;
