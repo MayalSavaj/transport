@@ -94,7 +94,9 @@ export default function Profile() {
 
   // Fetch city & state data from API
   useEffect(() => {
-    axios.get("/cities").then((response) => {
+    axios.get("/cities", {
+      hideLoading: true
+    }).then((response) => {
       const cityList = response?.data?.city || [];
       setCities(cityList);
 
@@ -109,7 +111,9 @@ export default function Profile() {
   useEffect(() => {
     const fetchUser = () => {
       axios
-        .get(`/myprofile`)
+        .get(`/myprofile`, {
+          loadingMessage: "Loading profile information..."
+        })
         .then((res) => {
           const fetchedUser = res.data.user || {};
           const sanitizedUser = {};
@@ -205,6 +209,7 @@ export default function Profile() {
 
       const res = await axios.post(`/update-profile`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
+        loadingMessage: "Updating profile..."
       });
 
       console.log("Profile updated:", res.data);

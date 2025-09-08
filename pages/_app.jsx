@@ -9,6 +9,7 @@ import OpenGraphTags from "utils/OpenGraphTags";
 import { AppProvider } from "contexts/AppContext";
 import SettingsProvider from "contexts/SettingContext";
 import SnackbarProvider from "components/SnackbarProvider";
+import { LoadingProvider } from "contexts/LoadingContext";
 import nextI18NextConfig from "../next-i18next.config";
 import "nprogress/nprogress.css";
 import "simplebar/dist/simplebar.min.css";
@@ -39,19 +40,21 @@ const App = ({ Component, pageProps }) => {
       <SettingsProvider>
         <AppProvider>
           <MuiTheme>
-            <SnackbarProvider
-              maxSnack={3}
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              autoHideDuration={3000}
-            >
-              {" "}
-              <ProfileCheckModal>
-                <RTL>{getLayout(<AnyComponent {...pageProps} />)}</RTL>
-              </ProfileCheckModal>
-            </SnackbarProvider>
+            <LoadingProvider>
+              <SnackbarProvider
+                maxSnack={3}
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                autoHideDuration={3000}
+              >
+                {" "}
+                <ProfileCheckModal>
+                  <RTL>{getLayout(<AnyComponent {...pageProps} />)}</RTL>
+                </ProfileCheckModal>
+              </SnackbarProvider>
+            </LoadingProvider>
           </MuiTheme>
         </AppProvider>
       </SettingsProvider>
